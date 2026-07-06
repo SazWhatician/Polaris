@@ -1,0 +1,34 @@
+[
+  {
+    "id": "1",
+    "title": "Process Management",
+    "description": "Managing processes, CPU scheduling and IPC",
+    "subtopics": [
+      {
+        "id": "1-1",
+        "title": "CPU Scheduling Algorithms",
+        "description": "Scheduling strategies",
+        "subtopics": []
+      },
+      {
+        "id": "1-2",
+        "title": "Threading models and IPC",
+        "description": "Inter-process communication",
+        "subtopics": []
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "title": "Memory Management",
+    "description": "Managing memory hierarchy",
+    "subtopics": [
+      {
+        "id": "2-1",
+        "title": "Paging and Segmentation",
+        "description": "Virtual memory systems",
+        "subtopics": []
+      }
+    ]
+  }
+]

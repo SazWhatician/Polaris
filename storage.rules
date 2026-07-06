@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isAcceptedType() {
+      return request.resource.contentType.matches('application/pdf')
+          || request.resource.contentType.matches('image/(jpeg|png|webp)');
+    }
+
+    function withinSizeLimit() {
+      // 50 MiB, matches backend max_upload_bytes.
+      return request.resource.size < 50 * 1024 * 1024;
+    }
+
+    // Files live at: users/{uid}/{docId}/{filename}
+    match /users/{uid}/{docId}/{filename=**} {
+      allow read: if isOwner(uid);
+      // Direct browser uploads via signed URL bypass rules (signed by Admin SDK),
+      // but a write attempt without the URL must still satisfy these rules.
+      allow write: if isOwner(uid) && isAcceptedType() && withinSizeLimit();
+    }
+
+    // Default deny.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

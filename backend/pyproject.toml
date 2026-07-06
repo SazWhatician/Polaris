@@ -1,0 +1,70 @@
+[project]
+name = "polaris-backend"
+version = "0.1.0"
+description = "Polaris AI Academic Navigator — FastAPI backend"
+requires-python = ">=3.11,<3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle / pyflakes
+    "I",             # isort
+    "B",             # bugbear
+    "UP",            # pyupgrade
+    "ASYNC",         # async correctness
+    "S",             # bandit (security)
+    "C4",            # comprehensions
+    "SIM",           # simplify
+    "RET",           # return value cleanliness
+    "TID",           # tidy imports
+]
+ignore = [
+    "S101",  # asserts allowed in tests
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "S106", "E402", "SIM117"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
+warn_unused_configs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+exclude = ["build/", "dist/", ".venv/"]
+
+[[tool.mypy.overrides]]
+module = ["firebase_admin.*", "google.cloud.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --cov=app --cov-report=term-missing --cov-report=xml"
+markers = [
+    "integration: requires Firestore/Qdrant emulators",
+    "slow: takes >1s",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/core/otel.py"]  # instrumentation, exercised by integration only
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]

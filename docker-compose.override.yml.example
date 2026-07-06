@@ -1,0 +1,11 @@
+# Copy to docker-compose.override.yml (gitignored) once you have a Firebase
+# service account JSON downloaded to backend/secrets/firebase-sa.json.
+# `docker-compose` automatically merges this with docker-compose.yml.
+
+services:
+  api:
+    volumes:
+      - ./backend/secrets/firebase-sa.json:/run/secrets/firebase-sa.json:ro
+  worker:
+    volumes:
+      - ./backend/secrets/firebase-sa.json:/run/secrets/firebase-sa.json:ro

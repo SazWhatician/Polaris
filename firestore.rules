@@ -1,0 +1,34 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: is this request from the user that owns `uid`?
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // Per-user subtree. Users can only read/write under their own uid.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      match /documents/{docId} {
+        allow read: if isOwner(uid);
+        // Writes are intentionally server-only (Admin SDK bypasses rules).
+        // Client direct-write would let users forge `status` and `storage_path`.
+        allow write: if false;
+
+        // Reserved for Phase 2: per-page OCR text.
+        match /pages/{pageId} {
+          allow read: if isOwner(uid);
+          allow write: if false;
+        }
+      }
+    }
+
+    // Default deny.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

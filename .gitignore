@@ -1,0 +1,71 @@
+# ---- Secrets / credentials (NEVER commit) ----
+.env
+.env.*
+!.env.example
+!.env.local.example
+*serviceAccount*.json
+*service-account*.json
+*-firebase-adminsdk-*.json
+*.pem
+*.key
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+.tox/
+
+# ---- Node / Next.js ----
+node_modules/
+.next/
+out/
+.turbo/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# ---- Docker / runtime data ----
+qdrant_storage/
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+pglite-debug.log
+docker-compose.override.yml
+backend/secrets/
+
+# ---- IDE / OS ----
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ---- Eval reports (regenerable; commit cherry-picked ones manually) ----
+evals/reports/*.html
+evals/reports/_local/
+
+# ---- Generated artifacts ----
+backend/openapi.json
+
+# ---- Logs ----
+*.log
+logs/

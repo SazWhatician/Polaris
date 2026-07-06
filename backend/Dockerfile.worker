@@ -1,0 +1,54 @@
+# syntax=docker/dockerfile:1.7
+#
+# OCR worker image. Larger than the API image (~2.5 GB) because it bakes
+# PaddleOCR's detection/recognition/angle-classification models at build time
+# so cold starts don't pull 1.5 GB on first task.
+
+# ---- Stage 1: builder ----
+FROM python:3.11-slim AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+WORKDIR /build
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends build-essential gcc \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt requirements-ocr.txt ./
+RUN python -m venv /opt/venv \
+ && /opt/venv/bin/pip install --upgrade pip \
+ && /opt/venv/bin/pip install -r requirements-ocr.txt
+
+# ---- Stage 2: runtime ----
+FROM python:3.11-slim AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
+
+# OpenCV runtime libs for PaddleOCR.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        libgomp1 libgl1 libglib2.0-0 libsm6 libxext6 libxrender1 \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd --system app && useradd --system --gid app --create-home --shell /bin/bash app
+
+WORKDIR /app
+COPY --from=builder /opt/venv /opt/venv
+
+# Bake PaddleOCR models into the image (~500 MB). One-time download at build,
+# zero download at container start. Models cache to /home/app/.paddleocr.
+USER app
+RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(use_angle_cls=True, lang='en', show_log=False)"
+
+# Bake the embedding model too — used by the ingest task.
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
+
+COPY --chown=app:app app ./app
+
+CMD ["arq", "app.workers.ocr_worker.WorkerSettings"]

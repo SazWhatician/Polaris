@@ -1,0 +1,83 @@
+from functools import lru_cache
+from typing import Literal
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
+
+    app_name: str = "polaris-backend"
+    app_env: Literal["dev", "test", "prod"] = "dev"
+    log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+
+    allowed_origins: str = "http://localhost:3000"
+
+    firebase_project_id: str = "polaris-dev"
+    firebase_credentials_path: str | None = None
+    firebase_storage_bucket: str | None = None  # defaults to <project>.firebasestorage.app
+
+    signed_url_ttl_seconds: int = 15 * 60  # 15 minutes for upload URLs
+    max_upload_bytes: int = 50 * 1024 * 1024  # 50 MiB per file
+    document_list_limit: int = 50
+
+    redis_url: str = "redis://redis:6379"
+
+    ocr_max_pages: int = 200
+    ocr_render_scale: float = 2.0  # 2x DPI for OCR quality vs memory tradeoff
+    ocr_job_timeout_seconds: int = 600
+    ocr_max_retries: int = 3
+
+    # --- Vector search / embeddings ---
+    qdrant_url: str = "http://qdrant:6333"
+    qdrant_api_key: str | None = None  # set for Qdrant Cloud
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_dim: int = 384
+    embedding_batch_size: int = 32
+
+    # --- Chunking ---
+    chunk_size: int = 800
+    chunk_overlap: int = 100
+
+    # --- LLM ---
+    groq_api_key: str | None = None
+    groq_model: str = "llama-3.3-70b-versatile"
+    groq_judge_model: str = "llama-3.3-70b-versatile"  # used by answer eval
+
+    # --- RAG ---
+    rag_top_k: int = 5
+    rag_max_context_chars: int = 8000
+
+    @property
+    def qdrant_collection_name(self) -> str:
+        """Collection per environment so dev / test / prod don't collide."""
+        return f"polaris-{self.app_env}-chunks"
+
+    otel_exporter_otlp_endpoint: str | None = None
+    otel_service_name: str = "polaris-api"
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]
+
+    @property
+    def is_dev(self) -> bool:
+        return self.app_env == "dev"
+
+    @property
+    def using_firebase_emulators(self) -> bool:
+        import os
+
+        return bool(
+            os.getenv("FIRESTORE_EMULATOR_HOST") or os.getenv("FIREBASE_AUTH_EMULATOR_HOST")
+        )
+
+
+@lru_cache(maxsize=1)
+def get_settings() -> Settings:
+    return Settings()

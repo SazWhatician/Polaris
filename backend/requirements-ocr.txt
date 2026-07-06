@@ -1,0 +1,8 @@
+# Additive deps for the OCR worker image only — NOT installed in the API image.
+# Install as: pip install -r requirements-ocr.txt
+# (pillow / pypdfium2 / numpy already live in requirements.txt.)
+-r requirements.txt
+
+# PaddleOCR pulls in opencv-python-headless transitively; CPU paddle keeps image leaner.
+paddleocr==2.7.3
+paddlepaddle==2.6.1
