@@ -46,7 +46,9 @@ async def api() -> AsyncIterator[tuple[AsyncClient, DocumentService]]:
     app = _build_app(get_settings())
     svc = _make_service()
 
-    app.dependency_overrides[verify_id_token] = lambda: AuthenticatedUser(uid="alice", email="a@x.com")
+    app.dependency_overrides[verify_id_token] = lambda: AuthenticatedUser(
+        uid="alice", email="a@x.com"
+    )
     app.dependency_overrides[get_document_service] = lambda: svc
 
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://testserver") as ac:

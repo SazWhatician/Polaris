@@ -82,7 +82,9 @@ async def test_create_syllabus_api_success(api: tuple[AsyncClient, SyllabusServi
     assert body["tree"][0]["id"] == "1"
 
 
-async def test_create_syllabus_api_invalid_request(api: tuple[AsyncClient, SyllabusService]) -> None:
+async def test_create_syllabus_api_invalid_request(
+    api: tuple[AsyncClient, SyllabusService],
+) -> None:
     client, _ = api
     # Both provided
     resp = await client.post(
