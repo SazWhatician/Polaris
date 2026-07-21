@@ -5,6 +5,7 @@ import {
   signInWithPopup,
   signOut as fbSignOut,
   type User,
+  connectAuthEmulator,
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -20,8 +21,17 @@ function getFirebaseApp(): FirebaseApp {
   return getApps().length ? getApp() : initializeApp(firebaseConfig);
 }
 
+let cachedAuth: ReturnType<typeof getAuth> | null = null;
+
 export function getFirebaseAuth() {
-  return getAuth(getFirebaseApp());
+  if (cachedAuth) return cachedAuth;
+  const app = getFirebaseApp();
+  cachedAuth = getAuth(app);
+  // Check if we are running in browser and in development mode
+  if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
+    connectAuthEmulator(cachedAuth, "http://127.0.0.1:9099", { disableWarnings: true });
+  }
+  return cachedAuth;
 }
 
 export async function signInWithGoogle(): Promise<User> {

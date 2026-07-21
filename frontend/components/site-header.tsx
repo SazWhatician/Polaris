@@ -24,9 +24,13 @@ export function SiteHeader() {
               <NavLink href="/dashboard" current={pathname}>
                 Documents
               </NavLink>
+              <NavLink href="/gaps" current={pathname}>
+                Learning Gaps
+              </NavLink>
               <NavLink href="/chat" current={pathname}>
                 Chat
               </NavLink>
+
             </nav>
           )}
         </div>

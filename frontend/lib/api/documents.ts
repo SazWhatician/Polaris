@@ -17,6 +17,7 @@ export interface DocumentResponse {
   status: DocumentStatus;
   storage_path: string;
   content_hash: string | null;
+  page_count: number | null;
   error: string | null;
   created_at: string;
   updated_at: string;
