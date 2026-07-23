@@ -73,6 +73,49 @@ flowchart LR
     worker --> nvidia
 ```
 
+## System (post — Phase 11 Ambient Study Layer)
+
+Adds two browser-resident components on top of the Phase 10 deploy: (1) an in-page copilot living inside the Next.js app, and (2) a separately-installable Chrome extension. Everything server-side is additive — one new router for signals, one for embedding snapshots. See [`proposals/phase-11-ambient-study-layer.md`](proposals/phase-11-ambient-study-layer.md) for the full spec.
+
+```mermaid
+flowchart LR
+    subgraph browser [User browser]
+        fe[Next.js · Vercel]
+        pa[PageAgent · in-page]
+        ext[Chrome extension · MV3]
+        lrt[LiteRT.js · WebGPU / WASM]
+        idb[(IndexedDB · topic snapshot)]
+    end
+
+    api[FastAPI · Render]
+    fs[(Firestore)]
+    storage[(Firebase Storage · model asset + notes)]
+    qdrant[(Qdrant Cloud)]
+    groq[Groq LLM]
+    twin[Twin service · Phase 9]
+
+    fe --> pa
+    pa -->|plan via proxy| api
+    api -->|planning chat| groq
+    pa -->|invokes REST| api
+
+    ext -->|Readability content| lrt
+    ext -->|snapshot RW| idb
+    ext -->|POST /api/twin/signals| api
+    ext -->|GET /api/graph/topic-embeddings| api
+    ext -->|fetch .tflite once| storage
+
+    api --> fs
+    api --> qdrant
+    api --> twin
+    twin --> fs
+```
+
+**Trust boundaries introduced in Phase 11:**
+- The extension is treated as an untrusted client; all `/api/twin/signals` posts are rate-limited (100/hour/user) and dedup'd by `(user, url_hash, occurred_at_bucket)`.
+- The topic-embedding snapshot is a *derived* asset — losing it costs nothing beyond a re-fetch; it is *never* the authoritative store.
+- On-device embedding is only allowed to *classify* (which topic does this page cover?), never to *mutate* twin state directly — mutation happens server-side after the signal is validated.
+
 ## Auth round-trip (Phase 0)
 
 ```mermaid
@@ -235,6 +278,12 @@ Every phase must produce:
 * **Goal:** Cross-agent composition mapping career paths to skills and material. Live production deployments with Sentry observability.
 * **Deliverables:** Pathfinder composition agent, Vercel/Render production deploys, final README update.
 * **ADRs:** ADR 0014 (Deployment topology & cold-start tradeoffs).
+
+#### Phase 11 — Ambient Study Layer (PageAgent + LiteRT.js)
+* **Goal:** Turn the browser into a sensor + actuator for Polaris. In-page copilot (PageAgent) drives the app via natural language; Chrome extension observes real-world learning across YouTube / arXiv / Wikipedia / docs sites, classifies pages on-device against the user's own knowledge-graph topic embeddings using LiteRT.js (quantized MiniLM via WebGPU), and pipes matches back to the Phase 9 digital twin as passive study signals.
+* **Deliverables:** `POST /api/twin/signals` + `GET /api/graph/topic-embeddings` backend routers; in-page copilot component + capability registry + systematic `data-agent-target` attributes; standalone MV3 Chrome extension under `extension/` with Readability extraction, LiteRT.js WebGPU embedding, engagement heuristics, allowlist popup; quantized `.tflite` model asset hosted from Firebase Storage; classification + parity evals gated in CI.
+* **ADRs:** ADR 0015 (in-page-agent LLM key boundary), ADR 0016 (on-device embedding parity envelope + fallback), ADR 0017 (passive-signal schema + privacy discipline).
+* **Full spec:** [`proposals/phase-11-ambient-study-layer.md`](proposals/phase-11-ambient-study-layer.md).
 
 ---
 

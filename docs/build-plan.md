@@ -334,6 +334,30 @@ Every phase ends with **all** of:
 
 ---
 
+## Phase 11 — Ambient Study Layer (PageAgent + LiteRT.js) (6–8 days) — **POST-DEPLOY DIFFERENTIATOR**
+
+> Detailed spec: [`docs/proposals/phase-11-ambient-study-layer.md`](proposals/phase-11-ambient-study-layer.md).
+
+**Goal:** Close the loop between "Polaris recommends" and "student actually learns" by observing real-world learning behavior across the browser, all with on-device privacy. Adds two independently-shippable pieces on top of the deployed Phase 10 system:
+
+1. An **in-page copilot** inside Polaris using [alibaba/page-agent](https://github.com/alibaba/page-agent) as a natural-language shell over every existing agent endpoint.
+2. A **cross-tab Chrome extension** that uses PageAgent's extension mode + [LiteRT.js](https://developers.googleblog.com/litertjs-googles-high-performance-web-ai-inference/) (quantized MiniLM on-device via WebGPU) to detect when the user is reading/watching content related to one of their weak/missing topics, and pipes that as a passive study signal into the Phase 9 digital twin.
+
+**Concrete deliverables:**
+- **Backend:** `app/api/twin_signals.py` (`POST /api/twin/signals`, rate-limited), `app/api/graph_embeddings.py` (`GET /api/graph/topic-embeddings` snapshot), `app/services/twin_signal_service.py`, optional `app/api/agent_llm.py` proxy.
+- **Frontend copilot:** `frontend/lib/page-agent/` wrapper + capability registry, `frontend/components/agent-copilot.tsx`, systematic `data-agent-target` attributes across all interactive routes.
+- **Chrome extension** (new sibling app under `extension/`): Manifest V3 + TypeScript, Readability content extraction, LiteRT.js WebGPU embedding of visible page text against locally-cached topic-embedding snapshot, engagement heuristics per site type, popup UI for allowlist + sync.
+- **On-device model asset:** quantized `all-MiniLM-L6-v2.int8.tflite` (~25 MB), hosted via Firebase Storage with immutable cache.
+- **Evals:** classification-precision on a 150-URL hand-labeled fixture (target precision@1 ≥ 0.75 at recall 0.60); parity check between on-device and server MiniLM (target Spearman ρ ≥ 0.90 on top-10 topic ranks). CI gates the phase.
+- **ADRs:** 0015 (in-page-agent LLM key boundary — proxy vs. client), 0016 (on-device embedding parity envelope + fallback rule), 0017 (passive-signal schema + privacy discipline).
+- Playwright end-to-end: user opens a fixture external page → extension shows badge → simulated engagement → Polaris `/twin` reflects the signal within one twin-update tick.
+
+**Learning beats:** In-page GUI agents vs. server-side LangGraph agents (who owns state), on-device inference tradeoffs (WebGPU vs. WASM, quantization impact on retrieval), cross-tab collection with actual privacy discipline, closing agent loops (recommend → observe consumption).
+
+**Interview story:** "Every AI study app knows what you clicked inside it. Polaris knows what you actually watched on YouTube — and does the classification on your device so nothing leaves your browser unless it matches one of your own weak topics."
+
+---
+
 ## Verification (applies every phase)
 
 - `just up` brings up the stack; `just test` is green; `just eval` (from P3) reports no regression.
