@@ -56,9 +56,17 @@ def _build_app(settings: Settings) -> FastAPI:
             )
             embedder.warm_up()
 
-            if not settings.groq_api_key:
-                raise RuntimeError("GROQ_API_KEY not set")
-            groq = GroqClient(api_key=settings.groq_api_key, model=settings.groq_model)
+            groq_keys = settings.parsed_groq_api_keys
+            if not groq_keys:
+                raise RuntimeError("No Groq API keys configured")
+            groq = GroqClient(api_keys=groq_keys, model=settings.groq_model)
+
+            gemini_keys = settings.parsed_gemini_api_keys
+            if gemini_keys:
+                from app.services.gemini_client import GeminiClient
+                app_.state.gemini = GeminiClient(api_keys=gemini_keys, model=settings.gemini_model)
+            else:
+                app_.state.gemini = None
 
             app_.state.rag_service = RagService(
                 embedder=embedder,

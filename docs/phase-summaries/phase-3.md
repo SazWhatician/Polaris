@@ -16,7 +16,9 @@
 | `app/services/embedding_service.py` | sentence-transformers singleton (`all-MiniLM-L6-v2`, 384-dim, normalized); batched; `warm_up()` to load at startup |
 | `app/repositories/qdrant_repo.py` | `AsyncQdrantClient` wrapper; **every search includes `user_id` filter — non-negotiable**; deterministic point IDs from `uuid5(NAMESPACE_URL, "polaris/{uid}/{doc}/{page}/{chunk}")` so re-runs replace cleanly |
 | `app/services/ingest_service.py` | Orchestrates chunk → embed → delete-then-upsert; transitions `OCR_COMPLETE → INDEXING → INDEXED \| FAILED` |
-| `app/services/groq_client.py` | `AsyncGroq` wrapper with `stream_completion()` + `complete()` (latter used by eval judge) |
+| `app/services/groq_client.py` | `AsyncGroq` wrapper with multi-key pool rotation (3 Groq keys), automatic 429 rate-limit failover, and `stream_completion()` + `complete()` |
+| `app/services/gemini_client.py` | `httpx` async Gemini client supporting multi-key pool rotation (2 Gemini keys) and automatic 429 rate-limit failover |
+| `app/services/key_pool.py` | Round-robin `KeyPool` manager with rate-limit cooldown tracking for seamless 429 failover |
 | `app/services/rag_service.py` | embed question → search Qdrant (user-scoped) → format `[#N]`-numbered context → load versioned prompt → stream Groq tokens; yields heterogeneous events (citations, token×N, done) |
 | `app/services/prompts.py` | Markdown prompt loader; caches by `(name, version)` |
 | `app/prompts/rag_answer/v1.md` | First versioned prompt — explicit grounding rules + citation conventions |
@@ -25,7 +27,7 @@
 ### Backend — wiring
 | Path | Purpose |
 |---|---|
-| `app/core/config.py` (modified) | `qdrant_url`, `qdrant_api_key`, `embedding_model`, `embedding_dim`, `embedding_batch_size`, `chunk_size`, `chunk_overlap`, `groq_api_key`, `groq_model`, `groq_judge_model`, `rag_top_k`, `rag_max_context_chars`, `qdrant_collection_name` property (per-env) |
+| `app/core/config.py` (modified) | `qdrant_url`, `qdrant_api_key`, `embedding_model`, `embedding_dim`, `embedding_batch_size`, `chunk_size`, `chunk_overlap`, `groq_api_keys` (3 keys pool), `gemini_api_keys` (2 keys pool), `groq_model`, `gemini_model`, `rag_top_k`, `rag_max_context_chars` |
 | `app/models/document.py` (modified) | New states `INDEXING`, `INDEXED` |
 | `app/services/status_transition.py` (modified) | Updated `VALID_TRANSITIONS` with the new states; existing `OCR_COMPLETE → QUEUED` (re-OCR) preserved |
 | `app/services/document_service.py` (modified) | Accepts optional `qdrant_repo`; `delete_document` also tears down Qdrant points for the doc |
@@ -48,7 +50,7 @@
 | `backend/requirements.txt` (modified) | `langchain-text-splitters`, `sentence-transformers`, `qdrant-client`, `groq`, `sse-starlette` |
 | `backend/Dockerfile` (modified) | Bakes embedding model in API image (so chat startup is fast) |
 | `backend/Dockerfile.worker` (modified) | Bakes embedding model in worker image too (for ingest) |
-| `backend/.env{.example}` (modified) | `QDRANT_URL`, `QDRANT_API_KEY`, `GROQ_API_KEY`, `GROQ_MODEL`, optional `LANGCHAIN_TRACING_V2` |
+| `backend/.env{.example}` (modified) | `QDRANT_URL`, `QDRANT_API_KEY`, `GROQ_API_KEYS` (3 keys), `GEMINI_API_KEYS` (2 keys), `GROQ_MODEL`, `GEMINI_MODEL`, optional `LANGCHAIN_TRACING_V2` |
 
 ### Frontend
 | Path | Purpose |

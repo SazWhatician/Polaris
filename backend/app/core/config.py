@@ -46,8 +46,29 @@ class Settings(BaseSettings):
 
     # --- LLM ---
     groq_api_key: str | None = None
+    groq_api_keys: str | None = None  # comma-separated list of Groq keys
     groq_model: str = "llama-3.3-70b-versatile"
     groq_judge_model: str = "llama-3.3-70b-versatile"  # used by answer eval
+
+    gemini_api_key: str | None = None
+    gemini_api_keys: str | None = None  # comma-separated list of Gemini keys
+    gemini_model: str = "gemini-1.5-flash"
+
+    @property
+    def parsed_groq_api_keys(self) -> list[str]:
+        if self.groq_api_keys:
+            keys = [k.strip() for k in self.groq_api_keys.split(",") if k.strip()]
+            if keys:
+                return keys
+        return [self.groq_api_key] if self.groq_api_key else []
+
+    @property
+    def parsed_gemini_api_keys(self) -> list[str]:
+        if self.gemini_api_keys:
+            keys = [k.strip() for k in self.gemini_api_keys.split(",") if k.strip()]
+            if keys:
+                return keys
+        return [self.gemini_api_key] if self.gemini_api_key else []
 
     # --- External APIs ---
     youtube_api_key: str | None = None

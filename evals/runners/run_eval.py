@@ -36,7 +36,8 @@ REPORTS_DIR = ROOT / "reports"
 
 API_BASE = os.getenv("POLARIS_API_BASE", "http://localhost:8000")
 BEARER = os.getenv("POLARIS_EVAL_BEARER")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEYS_RAW = os.getenv("GROQ_API_KEYS") or os.getenv("GROQ_API_KEY")
+GROQ_API_KEYS = [k.strip() for k in GROQ_API_KEYS_RAW.split(",") if k.strip()] if GROQ_API_KEYS_RAW else []
 JUDGE_MODEL = os.getenv("GROQ_JUDGE_MODEL", "llama-3.3-70b-versatile")
 TOP_K = int(os.getenv("POLARIS_EVAL_TOP_K", "5"))
 
@@ -119,17 +120,11 @@ async def _run_one(client: httpx.AsyncClient, item: GoldenItem) -> ItemResult:
         )
 
     # LLM-as-judge
-    from groq import AsyncGroq
-    groq = AsyncGroq(api_key=GROQ_API_KEY)
+    from app.services.groq_client import GroqClient
+    groq_client = GroqClient(api_keys=GROQ_API_KEYS, model=JUDGE_MODEL)
 
     async def _groq_complete(prompt: str) -> str:
-        resp = await groq.chat.completions.create(
-            model=JUDGE_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0,
-            max_tokens=600,
-        )
-        return resp.choices[0].message.content or ""
+        return await groq_client.complete(prompt, temperature=0.0, max_tokens=600)
 
     answer_metrics = await judge_mod.judge(
         item=item, answer=answer, groq_complete=_groq_complete,
@@ -144,8 +139,8 @@ async def main() -> int:
     if not BEARER:
         print("ERROR: POLARIS_EVAL_BEARER not set (need a Firebase ID token)", file=sys.stderr)
         return 2
-    if not GROQ_API_KEY:
-        print("ERROR: GROQ_API_KEY not set", file=sys.stderr)
+    if not GROQ_API_KEYS:
+        print("ERROR: Neither GROQ_API_KEYS nor GROQ_API_KEY is set", file=sys.stderr)
         return 2
 
     items = _load_golden(GOLDEN_PATH)
