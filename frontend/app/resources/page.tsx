@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { Sparkles, Youtube, ExternalLink, Clock, Eye, CheckCircle2 } from "lucide-react";
+
+import { SiteHeader } from "@/components/site-header";
 import {
   triggerResourceDiscovery,
   getResourceDiscoveryStatus,
@@ -37,7 +40,6 @@ export default function ResourcesPage() {
           setStatusMsg("");
           clearInterval(interval);
         } catch (err: any) {
-          // Status 202 means still processing
           if (err?.status !== 202) {
             setError(err?.message || "Failed to retrieve resources.");
             setLoading(false);
@@ -54,132 +56,128 @@ export default function ResourcesPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
-      <div className="mb-8 text-center sm:text-left">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100 mb-2">
-          🎯 AI Resource Discovery Agent
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          Discover, filter, and rank top educational tutorials and lectures tailored to your weak syllabus topics.
-        </p>
-      </div>
-
-      {/* Input Search Card */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm mb-8">
-        <form onSubmit={handleDiscovery} className="flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            value={topicTitle}
-            onChange={(e) => setTopicTitle(e.target.value)}
-            placeholder="Enter a syllabus topic (e.g. Binary Search Trees, Dynamic Programming, TCP/IP)..."
-            className="flex-1 px-4 py-3 border border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            disabled={loading}
-          />
-          <button
-            type="submit"
-            disabled={loading || !topicTitle.trim()}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Discovering...
-              </>
-            ) : (
-              "Discover Resources"
-            )}
-          </button>
-        </form>
-
-        {statusMsg && (
-          <div className="mt-4 text-sm text-indigo-600 dark:text-indigo-400 font-medium animate-pulse flex items-center gap-2">
-            <span>✨</span> {statusMsg}
+    <div className="min-h-screen bg-background text-foreground pb-12">
+      <SiteHeader />
+      <main className="container mx-auto px-4 sm:px-8 py-10 max-w-5xl space-y-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
+              <Sparkles className="h-7 w-7 text-cyan-400" />
+              <span>AI Resource Discovery Agent</span>
+            </h1>
+            <p className="text-slate-400 text-sm mt-1">
+              Curate top educational YouTube tutorials and lectures ranked by LLM rubrics.
+            </p>
           </div>
-        )}
+        </div>
 
-        {error && (
-          <div className="mt-4 p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-lg text-sm text-rose-600 dark:text-rose-400">
-            ⚠️ {error}
-          </div>
-        )}
-      </div>
+        {/* Search Card */}
+        <div className="glass-panel p-6 shadow-xl">
+          <form onSubmit={handleDiscovery} className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              value={topicTitle}
+              onChange={(e) => setTopicTitle(e.target.value)}
+              placeholder="Enter a syllabus topic (e.g. Binary Search Trees, Dynamic Programming)..."
+              className="flex-1 px-4 py-3 border border-white/10 rounded-lg bg-white/5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              disabled={loading}
+            />
+            <button
+              type="submit"
+              disabled={loading || !topicTitle.trim()}
+              className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 text-white font-semibold rounded-lg shadow-lg transition-all flex items-center justify-center gap-2 text-sm"
+            >
+              {loading ? (
+                <>
+                  <Clock className="animate-spin h-4 w-4 text-white" />
+                  <span>Discovering…</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  <span>Discover Resources</span>
+                </>
+              )}
+            </button>
+          </form>
 
-      {/* Results View */}
-      {discoveryResult && (
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-              Recommended for: <span className="text-indigo-600 dark:text-indigo-400">{discoveryResult.topic_title}</span>
-            </h2>
-            <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-              discoveryResult.from_cache
-                ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"
-                : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-            }`}>
-              {discoveryResult.from_cache ? "⚡ Cached Response" : "🔍 Freshly Ranked"}
-            </span>
-          </div>
+          {statusMsg && (
+            <div className="mt-4 text-sm text-indigo-400 font-medium animate-pulse flex items-center gap-2">
+              <Sparkles className="h-4 w-4" /> {statusMsg}
+            </div>
+          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {discoveryResult.resources.map((res: ResourceItem, idx: number) => (
-              <div
-                key={res.video_id || idx}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col"
-              >
-                {/* Thumbnail Header */}
-                <div className="relative aspect-video bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                  <img
-                    src={res.thumbnail_url}
-                    alt={res.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLElement).style.display = "none";
-                    }}
-                  />
-                  <span className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded font-mono">
-                    {res.duration}
+          {error && <div className="mt-4 text-sm text-rose-400 font-medium">{error}</div>}
+        </div>
+
+        {/* Discovery Results */}
+        {discoveryResult && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+                <span>Ranked Educational Videos</span>
+                {discoveryResult.from_cache && (
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
+                    Cached
                   </span>
-                  <span className="absolute top-2 left-2 bg-indigo-600/90 text-white text-xs px-2 py-0.5 rounded font-bold">
-                    Rank #{idx + 1} ({Math.round(res.rank_score * 100)}%)
-                  </span>
-                </div>
+                )}
+              </h2>
+              <span className="text-xs text-slate-400">
+                Found {discoveryResult.resources.length} videos
+              </span>
+            </div>
 
-                {/* Content Details */}
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-semibold text-slate-900 dark:text-slate-100 line-clamp-2 mb-1">
-                      {res.title}
-                    </h3>
-                    <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium mb-3">
-                      📺 {res.channel_title} {res.view_count ? `• ${res.view_count.toLocaleString()} views` : ""}
-                    </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {discoveryResult.resources.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="glass-card p-5 flex flex-col justify-between space-y-4 hover:scale-[1.01] transition-transform"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="font-bold text-slate-100 text-base leading-snug line-clamp-2">
+                        {item.title}
+                      </h3>
+                      <span className="text-xs font-bold px-2 py-1 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                        {(item.rank_score * 100).toFixed(0)}% Rank
+                      </span>
+                    </div>
 
-                    {/* Why Recommended Blurb */}
-                    {res.why_recommended && (
-                      <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-lg text-xs text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-800 mb-4">
-                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">Why Study This: </span>
-                        {res.why_recommended}
-                      </div>
+                    <div className="flex items-center gap-4 text-xs text-slate-400">
+                      <span className="flex items-center gap-1">
+                        <Youtube className="h-3.5 w-3.5 text-rose-500" />
+                        {item.channel_title}
+                      </span>
+                      {item.duration !== "N/A" && (
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3.5 w-3.5 text-slate-400" />
+                          {item.duration}
+                        </span>
+                      )}
+                    </div>
+
+                    {item.why_recommended && (
+                      <p className="text-xs text-slate-300 bg-white/5 p-3 rounded-lg border border-white/5 leading-relaxed">
+                        💡 <span className="font-semibold text-indigo-300">Why Recommended:</span> {item.why_recommended}
+                      </p>
                     )}
                   </div>
 
                   <a
-                    href={res.url}
+                    href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-sm font-medium rounded-lg text-center transition-colors block"
+                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 text-xs font-semibold transition-colors"
                   >
-                    Watch Tutorial ↗
+                    <span>Watch Tutorial on YouTube</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
                   </a>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
     </div>
   );
 }

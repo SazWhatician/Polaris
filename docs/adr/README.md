@@ -15,5 +15,7 @@ Format follows [Michael Nygard's ADR template](https://github.com/joelparkerhend
 | [0007](0007-eval-methodology.md) | Eval methodology — golden set + LLM-as-judge + regression threshold | Accepted | 2026-06-28 |
 | [0008](0008-chunking-strategy.md) | Chunking strategy: RecursiveCharacterTextSplitter at 800/100 | Provisional | 2026-06-28 |
 | [0009](0009-structured-llm-output-retry-strategy.md) | Structured LLM output & retry strategy | Accepted | 2026-07-06 |
-| [0010](0010-syllabus-coverage-scoring-rollup.md) | Syllabus coverage scoring & recursive rollup | Accepted | 2026-07-06 |
+| [0011](0011-state-persistence-and-resumability.md) | State persistence & resumability strategy | Accepted | 2026-07-15 |
+| [0012](0012-rate-limiting-and-quota-aware-caching.md) | Rate limiting and quota-aware caching for third-party API agent | Accepted | 2026-07-23 |
+| [0013](0013-revision-plan-representation-and-diffing.md) | Revision plan representation and semantic diffing strategy | Accepted | 2026-07-30 |
 
