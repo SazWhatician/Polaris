@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     groq_model: str = "llama-3.3-70b-versatile"
     groq_judge_model: str = "llama-3.3-70b-versatile"  # used by answer eval
 
+    # --- External APIs ---
+    youtube_api_key: str | None = None
+
     # --- RAG ---
     rag_top_k: int = 5
     rag_max_context_chars: int = 8000
