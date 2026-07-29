@@ -18,11 +18,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
-      <body className={`${inter.className} relative bg-transparent text-foreground`}>
+      <body className={`${inter.className} relative bg-black text-foreground`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider>
             <ShaderBackground />
-            <div className="relative z-10">{children}</div>
+            <div className="relative z-10 pointer-events-auto">{children}</div>
             <Toaster position="bottom-right" />
           </AuthProvider>
         </ThemeProvider>

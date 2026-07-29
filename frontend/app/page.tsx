@@ -20,7 +20,7 @@ export default function Home() {
   }, [user, router]);
 
   return (
-    <main className="relative min-h-screen flex flex-col items-center justify-center px-4 py-12 overflow-hidden">
+    <main className="relative min-h-screen flex flex-col items-center justify-center px-4 py-12 overflow-hidden bg-transparent">
       {/* Top Controls */}
       <div className="absolute top-6 right-6 z-30 flex items-center gap-3">
         <div className="font-mono text-[11px] px-3 py-1 border border-indigo-500/40 bg-black/60 text-indigo-300 font-bold uppercase tracking-widest hidden sm:block">
@@ -37,10 +37,10 @@ export default function Home() {
             <Image
               src="/polaris-logo.png"
               alt="Polaris Main Logo"
-              width={420}
-              height={140}
+              width={640}
+              height={220}
               priority
-              className="w-[280px] sm:w-[360px] md:w-[420px] h-auto object-contain drop-shadow-[0_0_25px_rgba(168,85,247,0.6)]"
+              className="w-[360px] sm:w-[500px] md:w-[640px] h-auto object-contain drop-shadow-[0_0_40px_rgba(168,85,247,0.6)]"
             />
           </div>
 
