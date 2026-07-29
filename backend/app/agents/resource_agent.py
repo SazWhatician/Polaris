@@ -4,12 +4,11 @@ import json
 import logging
 from typing import Any, TypedDict
 
-from langgraph.graph import END, START, StateGraph
-
 from app.repositories.resource_cache_repo import ResourceCacheRepository, compute_topic_hash
 from app.services.groq_client import GroqClient
 from app.services.prompts import load as load_prompt
 from app.services.youtube_service import YouTubeService
+from langgraph.graph import END, START, StateGraph
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +42,9 @@ class ResourceAgent:
         cached = await self.cache_repo.get_cached_resources(state["user_id"], topic_hash)
 
         if cached and cached.resources:
-            logger.info("Cache HIT for topic_title='%s' (hash=%s)", state["topic_title"], topic_hash)
+            logger.info(
+                "Cache HIT for topic_title='%s' (hash=%s)", state["topic_title"], topic_hash
+            )
             return {
                 "topic_hash": topic_hash,
                 "from_cache": True,
@@ -121,7 +122,9 @@ class ResourceAgent:
             if isinstance(rankings, dict) and "resources" in rankings:
                 rankings = rankings["resources"]
 
-            ranking_map = {r["video_id"]: r for r in rankings if isinstance(r, dict) and "video_id" in r}
+            ranking_map = {
+                r["video_id"]: r for r in rankings if isinstance(r, dict) and "video_id" in r
+            }
 
             ranked_results: list[dict[str, Any]] = []
             for c in candidates:
@@ -129,9 +132,10 @@ class ResourceAgent:
                 info = ranking_map.get(v_id, {})
                 c_copy = dict(c)
                 c_copy["rank_score"] = float(info.get("rank_score", 0.7))
-                c_copy["why_recommended"] = info.get(
-                    "why_recommended"
-                ) or f"Recommended tutorial covering key concepts in {state['topic_title']}."
+                c_copy["why_recommended"] = (
+                    info.get("why_recommended")
+                    or f"Recommended tutorial covering key concepts in {state['topic_title']}."
+                )
                 ranked_results.append(c_copy)
 
             ranked_results.sort(key=lambda x: x["rank_score"], reverse=True)

@@ -3,10 +3,9 @@ from __future__ import annotations
 import json
 from typing import Any, TypedDict
 
-from langgraph.graph import END, START, StateGraph
-
 from app.repositories.syllabus_repo import SyllabusRepository
 from app.services.groq_client import GroqClient
+from langgraph.graph import END, START, StateGraph
 
 
 class GapAgentState(TypedDict):
@@ -124,9 +123,7 @@ def rank_gaps(
 ) -> list[str]:
     gap_set = set(gap_ids)
 
-    gap_prereqs = {
-        tid: [p for p in prerequisites.get(tid, []) if p in gap_set] for tid in gap_ids
-    }
+    gap_prereqs = {tid: [p for p in prerequisites.get(tid, []) if p in gap_set] for tid in gap_ids}
 
     # Calculate descendant gaps in dependency graph
     influence = {}
@@ -318,9 +315,8 @@ class GapAgent:
                         "title": rec.get("title") or find_title(tree, tid) or f"Topic {tid}",
                         "status": gaps.get(tid, "missing"),
                         "reason": rec.get("reason") or "Recommended for study.",
-                        "actionable_steps": rec.get("actionable_steps") or [
-                            "Review this topic in study materials."
-                        ],
+                        "actionable_steps": rec.get("actionable_steps")
+                        or ["Review this topic in study materials."],
                         "estimated_hours": float(rec.get("estimated_hours") or 2.0),
                     }
                 )

@@ -7,6 +7,7 @@ once and reused across tasks via the worker context.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Protocol
@@ -15,7 +16,6 @@ from opentelemetry import trace
 
 from app.core.logging import get_logger
 from app.models.document import DocumentStatus, Page
-from app.services.hashing import sha256_hex
 from app.services.page_extractor import extract_pages
 from app.services.status_transition import assert_transition
 
@@ -74,7 +74,7 @@ class OcrService:
                 raise DocumentNotFoundError(document_id)
 
             blob_bytes = await self._storage.download_bytes(doc.storage_path)
-            new_hash = sha256_hex(blob_bytes)
+            new_hash = hashlib.sha256(blob_bytes).hexdigest()
             span.set_attribute("doc.size_bytes", len(blob_bytes))
             span.set_attribute("doc.content_hash", new_hash)
 

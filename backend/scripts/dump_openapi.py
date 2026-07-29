@@ -3,6 +3,7 @@
 Used to drive openapi-typescript client generation without needing a running
 server. Run from backend/ as:  python -m scripts.dump_openapi > openapi.json
 """
+
 from __future__ import annotations
 
 import json

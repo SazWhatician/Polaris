@@ -71,7 +71,9 @@ class GeminiClient:
                         log.warning("gemini.rate_limit_exceeded", attempt=attempts, status=429)
                         await self._key_pool.mark_cooldown(key)
                         if attempts >= max_attempts:
-                            raise GeminiRateLimitError("Gemini API rate limit exceeded on all keys.")
+                            raise GeminiRateLimitError(
+                                "Gemini API rate limit exceeded on all keys."
+                            )
                         continue
 
                     res.raise_for_status()
@@ -122,7 +124,9 @@ class GeminiClient:
                             log.warning("gemini.rate_limit_exceeded_stream", attempt=attempts)
                             await self._key_pool.mark_cooldown(key)
                             if attempts >= max_attempts:
-                                raise GeminiRateLimitError("Gemini rate limit exceeded on streaming.")
+                                raise GeminiRateLimitError(
+                                    "Gemini rate limit exceeded on streaming."
+                                )
                             continue
 
                         res.raise_for_status()

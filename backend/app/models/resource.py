@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -43,6 +44,8 @@ class CachedTopicResources(BaseModel):
     topic_hash: str = Field(description="SHA256 hash of normalized topic title")
     topic_id: str = Field(description="Topic ID")
     topic_title: str = Field(description="Topic title")
-    resources: list[dict[str, Any]] = Field(default_factory=list, description="List of resource dicts")
+    resources: list[dict[str, Any]] = Field(
+        default_factory=list, description="List of resource dicts"
+    )
     cached_at: str = Field(description="ISO timestamp when cached")
     expires_at: str = Field(description="ISO timestamp when cache entry expires")

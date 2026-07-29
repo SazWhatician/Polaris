@@ -1,11 +1,11 @@
 """Unit tests for KeyPool, GroqClient key rotation, and GeminiClient key rotation."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from app.services.key_pool import AllKeysOnCooldownError, KeyPool, KeyPoolEmptyError
+import pytest
+from app.services.gemini_client import GeminiClient
 from app.services.groq_client import GroqClient
-from app.services.gemini_client import GeminiClient, GeminiRateLimitError
+from app.services.key_pool import AllKeysOnCooldownError, KeyPool, KeyPoolEmptyError
 from groq import RateLimitError
 
 
@@ -97,6 +97,11 @@ async def test_gemini_client_multi_key_retry():
     mock_http_client = AsyncMock()
     mock_http_client.post.side_effect = [mock_response_429, mock_response_200]
 
-    with patch("httpx.AsyncClient", return_value=MagicMock(__aenter__=AsyncMock(return_value=mock_http_client), __aexit__=AsyncMock())):
+    with patch(
+        "httpx.AsyncClient",
+        return_value=MagicMock(
+            __aenter__=AsyncMock(return_value=mock_http_client), __aexit__=AsyncMock()
+        ),
+    ):
         res = await gemini.complete("Hello")
         assert res == "Gemini answer"

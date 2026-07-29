@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import Sequence
+from collections.abc import Sequence
 
 from app.core.logging import get_logger
 

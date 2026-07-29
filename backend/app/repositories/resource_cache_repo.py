@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
-import firebase_admin
+
 from firebase_admin import firestore
 
 from app.models.resource import CachedTopicResources
@@ -42,7 +42,7 @@ class ResourceCacheRepository:
             expires_at_str = data.get("expires_at")
             if expires_at_str:
                 expires_dt = datetime.fromisoformat(expires_at_str)
-                if datetime.now(timezone.utc) > expires_dt:
+                if datetime.now(UTC) > expires_dt:
                     # Expired entry
                     return None
 
@@ -51,10 +51,16 @@ class ResourceCacheRepository:
             return None
 
     async def save_cached_resources(
-        self, user_id: str, topic_hash: str, topic_id: str, topic_title: str, resources: list[dict[str, Any]], ttl_days: int = 7
+        self,
+        user_id: str,
+        topic_hash: str,
+        topic_id: str,
+        topic_title: str,
+        resources: list[dict[str, Any]],
+        ttl_days: int = 7,
     ) -> CachedTopicResources:
         """Saves discovered resources to Firestore cache with a TTL (default 7 days)."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         expires_at = now + timedelta(days=ttl_days)
 
         cached_item = CachedTopicResources(
@@ -69,7 +75,7 @@ class ResourceCacheRepository:
         try:
             doc_ref = self._cache_col(user_id).document(topic_hash)
             doc_ref.set(cached_item.model_dump())
-        except Exception as err:
+        except Exception:
             # Non-fatal if cache write fails
             pass
 

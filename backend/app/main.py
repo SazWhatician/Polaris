@@ -64,6 +64,7 @@ def _build_app(settings: Settings) -> FastAPI:
             gemini_keys = settings.parsed_gemini_api_keys
             if gemini_keys:
                 from app.services.gemini_client import GeminiClient
+
                 app_.state.gemini = GeminiClient(api_keys=gemini_keys, model=settings.gemini_model)
             else:
                 app_.state.gemini = None

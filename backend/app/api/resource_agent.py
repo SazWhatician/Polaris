@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from datetime import UTC
 from typing import Annotated, Any
+
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
 
@@ -64,7 +66,7 @@ async def run_resource_agent_task(
     config = {"configurable": {"thread_id": thread_id}}
     try:
         await graph.ainvoke(state, config)
-    except Exception as exc:
+    except Exception:
         pass
 
 
@@ -113,14 +115,14 @@ async def get_resource_discovery_status(
     ranked_data = values.get("ranked_resources") or []
     resources = [ResourceItem(**item) for item in ranked_data if isinstance(item, dict)]
 
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     return ResourceDiscoveryResponse(
         topic_id=values.get("topic_id", ""),
         topic_title=values.get("topic_title", ""),
         resources=resources,
         from_cache=values.get("from_cache", False),
-        updated_at=datetime.now(timezone.utc).isoformat(),
+        updated_at=datetime.now(UTC).isoformat(),
     )
 
 

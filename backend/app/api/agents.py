@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 from typing import Annotated, Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
@@ -22,7 +21,9 @@ class GapRunRequest(BaseModel):
 
 class GapRunResponse(BaseModel):
     thread_id: str = Field(description="The unique thread ID of the run")
-    status: str = Field(description="The current status: 'running' | 'completed' | 'failed' | 'not_started'")
+    status: str = Field(
+        description="The current status: 'running' | 'completed' | 'failed' | 'not_started'"
+    )
 
 
 def get_syllabus_repo() -> SyllabusRepository:
@@ -76,7 +77,7 @@ async def run_gap_agent_task(graph: Any, thread_id: str, user_id: str, syllabus_
     config = {"configurable": {"thread_id": thread_id}}
     try:
         await graph.ainvoke(state, config)
-    except Exception as exc:
+    except Exception:
         # Save error message to state if possible, though ainvoke raising usually indicates critical failure.
         pass
 
@@ -108,18 +109,14 @@ async def get_gap_analysis_status(
     # Access control check
     parts = thread_id.split(":", 1)
     if len(parts) != 2 or parts[0] != user.uid:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, detail="Access denied to this run thread"
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Access denied to this run thread")
 
     syllabus_id = parts[1]
     config = {"configurable": {"thread_id": thread_id}}
     state_snapshot = await graph.aget_state(config)
 
     if not state_snapshot.values:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, detail="No run found for this thread ID"
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No run found for this thread ID")
 
     values = state_snapshot.values
     error = values.get("error")
@@ -130,9 +127,7 @@ async def get_gap_analysis_status(
 
     if state_snapshot.next:
         # Not finished yet
-        raise HTTPException(
-            status.HTTP_202_ACCEPTED, detail="Gap analysis is still running"
-        )
+        raise HTTPException(status.HTTP_202_ACCEPTED, detail="Gap analysis is still running")
 
     recs = [GapRecommendation.model_validate(r) for r in values.get("recommendations", [])]
 
@@ -148,7 +143,9 @@ async def get_gap_analysis_status(
 
 
 class UpdateRecommendationsRequest(BaseModel):
-    recommendations: list[GapRecommendation] = Field(description="The reordered list of study recommendations")
+    recommendations: list[GapRecommendation] = Field(
+        description="The reordered list of study recommendations"
+    )
 
 
 @router.put("/gap/runs/{thread_id}", response_model=GapAnalysisResponse)
@@ -161,28 +158,21 @@ async def update_gap_recommendations(
     # Access control check
     parts = thread_id.split(":", 1)
     if len(parts) != 2 or parts[0] != user.uid:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN, detail="Access denied to this run thread"
-        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Access denied to this run thread")
 
     syllabus_id = parts[1]
     config = {"configurable": {"thread_id": thread_id}}
     state_snapshot = await graph.aget_state(config)
 
     if not state_snapshot.values:
-        raise HTTPException(
-            status.HTTP_404_NOT_FOUND, detail="No run found for this thread ID"
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No run found for this thread ID")
 
     values = state_snapshot.values
     error = values.get("error")
     if error:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Run failed: {error}")
 
-    new_values = {
-        **values,
-        "recommendations": [r.model_dump() for r in body.recommendations]
-    }
+    new_values = {**values, "recommendations": [r.model_dump() for r in body.recommendations]}
 
     # Save update state back in checkpointer
     await graph.aupdate_state(config, new_values, as_node="generate_recommendations")
@@ -196,4 +186,3 @@ async def update_gap_recommendations(
         recommendations=body.recommendations,
         updated_at=datetime.now(UTC).isoformat(),
     )
-

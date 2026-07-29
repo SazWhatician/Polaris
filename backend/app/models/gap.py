@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
 from pydantic import BaseModel, Field
 
 
@@ -13,9 +12,7 @@ class GapRecommendation(BaseModel):
         default_factory=list,
         description="Actionable study steps or subtopics to focus on",
     )
-    estimated_hours: float = Field(
-        description="Estimated study hours needed to cover this gap"
-    )
+    estimated_hours: float = Field(description="Estimated study hours needed to cover this gap")
 
 
 class GapAnalysisResponse(BaseModel):

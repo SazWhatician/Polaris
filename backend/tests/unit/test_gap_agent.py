@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any
-import pytest
 
-from app.agents.gap_agent import GapAgent, sanitize_prerequisites, rank_gaps
+import pytest
+from app.agents.gap_agent import GapAgent, rank_gaps, sanitize_prerequisites
 from app.models.syllabus import Syllabus, SyllabusCoverage, Topic, TopicCoverage
 
 
@@ -112,7 +112,10 @@ async def test_gap_agent_end_to_end_flow() -> None:
                 "title": "Firewalls",
                 "status": "missing",
                 "reason": "This topic is missing from your notes.",
-                "actionable_steps": ["Read Chapter 5 on Firewalls.", "Practice setting up iptables."],
+                "actionable_steps": [
+                    "Read Chapter 5 on Firewalls.",
+                    "Practice setting up iptables.",
+                ],
                 "estimated_hours": 3.0,
             }
         ]

@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-import json
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
-import pytest
 
+import pytest
+from app.agents.gap_agent import GapAgent
 from app.api.agents import get_gap_agent_graph, get_syllabus_repo
 from app.core.config import get_settings
 from app.core.deps import verify_id_token
-from app.models.syllabus import Syllabus, SyllabusCoverage, Topic, TopicCoverage
+from app.models.syllabus import Syllabus, Topic
 from app.models.user import AuthenticatedUser
-from app.agents.gap_agent import GapAgent
-from langgraph.checkpoint.memory import MemorySaver
 from httpx import ASGITransport, AsyncClient
+from langgraph.checkpoint.memory import MemorySaver
 
-from tests.unit.test_gap_agent import FakeSyllabusRepo, FakeGroqClient
+from tests.unit.test_gap_agent import FakeGroqClient, FakeSyllabusRepo
 
 
 @pytest.fixture
@@ -112,8 +111,15 @@ async def test_get_gap_analysis_completed_recommendations(
         "user_id": "alice",
         "syllabus_id": "s1",
         "document_ids": None,
-        "raw_syllabus": {"id": "s1", "name": "Security", "tree": [{"id": "t1", "title": "Firewalls"}]},
-        "coverage_map": {"overall_score": 10.0, "topics": {"t1": {"score": 10.0, "status": "none"}}},
+        "raw_syllabus": {
+            "id": "s1",
+            "name": "Security",
+            "tree": [{"id": "t1", "title": "Firewalls"}],
+        },
+        "coverage_map": {
+            "overall_score": 10.0,
+            "topics": {"t1": {"score": 10.0, "status": "none"}},
+        },
         "gaps": {"t1": "missing"},
         "prerequisites": {"t1": []},
         "recommendations": [
@@ -155,8 +161,15 @@ async def test_update_gap_recommendations(
         "user_id": "alice",
         "syllabus_id": "s1",
         "document_ids": None,
-        "raw_syllabus": {"id": "s1", "name": "Security", "tree": [{"id": "t1", "title": "Firewalls"}]},
-        "coverage_map": {"overall_score": 10.0, "topics": {"t1": {"score": 10.0, "status": "none"}}},
+        "raw_syllabus": {
+            "id": "s1",
+            "name": "Security",
+            "tree": [{"id": "t1", "title": "Firewalls"}],
+        },
+        "coverage_map": {
+            "overall_score": 10.0,
+            "topics": {"t1": {"score": 10.0, "status": "none"}},
+        },
         "gaps": {"t1": "missing"},
         "prerequisites": {"t1": []},
         "recommendations": [
@@ -185,7 +198,9 @@ async def test_update_gap_recommendations(
             "estimated_hours": 3.5,
         }
     ]
-    resp = await client.put(f"/api/agents/gap/runs/{thread_id}", json={"recommendations": updated_recs})
+    resp = await client.put(
+        f"/api/agents/gap/runs/{thread_id}", json={"recommendations": updated_recs}
+    )
     assert resp.status_code == 200
     body = resp.json()
     assert len(body["recommendations"]) == 1
@@ -198,4 +213,3 @@ async def test_update_gap_recommendations(
     assert resp_get.status_code == 200
     body_get = resp_get.json()
     assert body_get["recommendations"][0]["title"] == "Firewalls v2"
-

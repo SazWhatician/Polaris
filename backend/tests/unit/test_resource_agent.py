@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock
-import pytest
 
-from app.agents.resource_agent import ResourceAgent, ResourceAgentState
+import pytest
+from app.agents.resource_agent import ResourceAgent
 from app.repositories.resource_cache_repo import compute_topic_hash
 
 

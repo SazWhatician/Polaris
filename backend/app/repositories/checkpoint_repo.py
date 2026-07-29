@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Any, AsyncIterator, Iterator, Sequence
+from collections.abc import AsyncIterator, Iterator, Sequence
+from typing import Any
 
 from google.cloud.firestore import Client as FirestoreClient
 from langchain_core.runnables import RunnableConfig
@@ -242,7 +243,9 @@ class FirestoreCheckpointSaver(BaseCheckpointSaver):
         limit: int | None = None,
     ) -> Iterator[CheckpointTuple]:
         if not config:
-            raise ValueError("FirestoreCheckpointSaver requires a non-None config to list checkpoints.")
+            raise ValueError(
+                "FirestoreCheckpointSaver requires a non-None config to list checkpoints."
+            )
 
         thread_id = config["configurable"]["thread_id"]
         checkpoint_ns = config["configurable"].get("checkpoint_ns", "")

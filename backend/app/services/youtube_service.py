@@ -5,6 +5,7 @@ import logging
 import re
 from pathlib import Path
 from typing import Any
+
 import httpx
 
 from app.core.config import get_settings
@@ -18,7 +19,7 @@ def parse_iso8601_duration(duration_str: str) -> str:
     """Converts ISO 8601 duration string (e.g. PT14M33S or PT1H2M) into readable MM:SS or HH:MM:SS format."""
     if not duration_str or not duration_str.startswith("P"):
         return "N/A"
-    
+
     match = re.search(r"PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?", duration_str)
     if not match:
         return "N/A"
@@ -79,7 +80,9 @@ class YouTubeService:
                 if not items:
                     return self._generate_mock_results(query, max_results)
 
-                video_ids = [item["id"]["videoId"] for item in items if "videoId" in item.get("id", {})]
+                video_ids = [
+                    item["id"]["videoId"] for item in items if "videoId" in item.get("id", {})
+                ]
                 if not video_ids:
                     return self._generate_mock_results(query, max_results)
 
@@ -94,9 +97,7 @@ class YouTubeService:
                 details_res.raise_for_status()
                 details_data = details_res.json()
 
-                details_map = {
-                    v["id"]: v for v in details_data.get("items", [])
-                }
+                details_map = {v["id"]: v for v in details_data.get("items", [])}
 
                 results: list[dict[str, Any]] = []
                 for item in items:
@@ -112,18 +113,22 @@ class YouTubeService:
                     duration_raw = content_details.get("duration", "")
                     duration_formatted = parse_iso8601_duration(duration_raw)
 
-                    results.append({
-                        "video_id": v_id,
-                        "title": snippet.get("title", ""),
-                        "url": f"https://www.youtube.com/watch?v={v_id}",
-                        "channel_title": snippet.get("channelTitle", "Educator Channel"),
-                        "thumbnail_url": snippet.get("thumbnails", {}).get("high", {}).get("url")
-                        or f"https://i.ytimg.com/vi/{v_id}/hqdefault.jpg",
-                        "duration": duration_formatted,
-                        "publication_date": snippet.get("publishedAt", ""),
-                        "view_count": int(statistics.get("viewCount", 0)),
-                        "description": snippet.get("description", ""),
-                    })
+                    results.append(
+                        {
+                            "video_id": v_id,
+                            "title": snippet.get("title", ""),
+                            "url": f"https://www.youtube.com/watch?v={v_id}",
+                            "channel_title": snippet.get("channelTitle", "Educator Channel"),
+                            "thumbnail_url": snippet.get("thumbnails", {})
+                            .get("high", {})
+                            .get("url")
+                            or f"https://i.ytimg.com/vi/{v_id}/hqdefault.jpg",
+                            "duration": duration_formatted,
+                            "publication_date": snippet.get("publishedAt", ""),
+                            "view_count": int(statistics.get("viewCount", 0)),
+                            "description": snippet.get("description", ""),
+                        }
+                    )
 
                 return results
         except Exception as err:
@@ -133,7 +138,11 @@ class YouTubeService:
     def _generate_mock_results(self, query: str, max_results: int) -> list[dict[str, Any]]:
         """Generates realistic mock video results for testing & offline mode."""
         seed_names = [ch["name"] for ch in self.seed_channels] or [
-            "3Blue1Brown", "Computerphile", "freeCodeCamp.org", "Neso Academy", "MIT OpenCourseWare"
+            "3Blue1Brown",
+            "Computerphile",
+            "freeCodeCamp.org",
+            "Neso Academy",
+            "MIT OpenCourseWare",
         ]
 
         mock_results: list[dict[str, Any]] = []
@@ -141,16 +150,18 @@ class YouTubeService:
         for idx in range(min(max_results, 5)):
             channel = seed_names[idx % len(seed_names)]
             v_id = f"mock_{abs(hash(clean_query + str(idx))) % 1000000:06d}"
-            mock_results.append({
-                "video_id": v_id,
-                "title": f"Understanding {clean_query} — Complete Guide & Visual Intuition",
-                "url": f"https://www.youtube.com/watch?v={v_id}",
-                "channel_title": channel,
-                "thumbnail_url": f"https://i.ytimg.com/vi/{v_id}/hqdefault.jpg",
-                "duration": f"{(idx + 1) * 8 + 4}:15",
-                "publication_date": "2024-01-15T00:00:00Z",
-                "view_count": 125000 + idx * 45000,
-                "description": f"A comprehensive tutorial explaining {clean_query} core concepts, algorithms, and practical examples.",
-            })
+            mock_results.append(
+                {
+                    "video_id": v_id,
+                    "title": f"Understanding {clean_query} — Complete Guide & Visual Intuition",
+                    "url": f"https://www.youtube.com/watch?v={v_id}",
+                    "channel_title": channel,
+                    "thumbnail_url": f"https://i.ytimg.com/vi/{v_id}/hqdefault.jpg",
+                    "duration": f"{(idx + 1) * 8 + 4}:15",
+                    "publication_date": "2024-01-15T00:00:00Z",
+                    "view_count": 125000 + idx * 45000,
+                    "description": f"A comprehensive tutorial explaining {clean_query} core concepts, algorithms, and practical examples.",
+                }
+            )
 
         return mock_results

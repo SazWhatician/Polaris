@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 from typing import Any
+
 import pytest
 from app.repositories.checkpoint_repo import FirestoreCheckpointSaver
 
 
 class FakeDocumentSnapshot:
-    def __init__(self, exists: bool, data: dict[str, Any] | None = None, reference: Any = None) -> None:
+    def __init__(
+        self, exists: bool, data: dict[str, Any] | None = None, reference: Any = None
+    ) -> None:
         self.exists = exists
         self._data = data or {}
         self.reference = reference
