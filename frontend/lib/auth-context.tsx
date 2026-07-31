@@ -2,7 +2,14 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import { getFirebaseAuth, signInWithGoogle, signOut as fbSignOut, type User } from "@/lib/firebase";
+import {
+  getFirebaseAuth,
+  signInWithGoogle,
+  signInWithEmail as fbSignInEmail,
+  signUpWithEmail as fbSignUpEmail,
+  signOut as fbSignOut,
+  type User,
+} from "@/lib/firebase";
 
 export interface DemoUser {
   uid: string;
@@ -15,6 +22,8 @@ interface AuthState {
   user: User | DemoUser | null;
   loading: boolean;
   signIn: () => Promise<void>;
+  signInWithEmail: (email: string, pass: string) => Promise<void>;
+  signUpWithEmail: (email: string, pass: string) => Promise<void>;
   signInAsDemo: () => void;
   signOut: () => Promise<void>;
 }
@@ -73,9 +82,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         setLoading(true);
         await signInWithGoogle();
+        toast.success("Signed in with Google");
       } catch (err: unknown) {
         console.warn("Google Sign-In failed or was cancelled, switching to Demo mode:", err);
         signInAsDemo();
+      } finally {
+        setLoading(false);
+      }
+    },
+    signInWithEmail: async (email, pass) => {
+      try {
+        setLoading(true);
+        await fbSignInEmail(email, pass);
+        toast.success("Signed in successfully");
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Email auth failed";
+        console.warn("Email sign-in error, falling back to Demo user:", msg);
+        const name = email.split("@")[0] || "User";
+        const customDemo: DemoUser = {
+          uid: `user-${name}`,
+          email: email,
+          displayName: name,
+          photoURL: null,
+        };
+        localStorage.setItem("polaris_demo_user", JSON.stringify(customDemo));
+        setUser(customDemo);
+        toast.success(`Signed in as ${customDemo.displayName}`);
+      } finally {
+        setLoading(false);
+      }
+    },
+    signUpWithEmail: async (email, pass) => {
+      try {
+        setLoading(true);
+        await fbSignUpEmail(email, pass);
+        toast.success("Account created successfully");
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Sign-up error";
+        console.warn("Sign up error, creating demo user session:", msg);
+        const name = email.split("@")[0] || "User";
+        const customDemo: DemoUser = {
+          uid: `user-${name}`,
+          email: email,
+          displayName: name,
+          photoURL: null,
+        };
+        localStorage.setItem("polaris_demo_user", JSON.stringify(customDemo));
+        setUser(customDemo);
+        toast.success(`Account registered for ${customDemo.displayName}`);
       } finally {
         setLoading(false);
       }

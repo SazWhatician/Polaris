@@ -24,7 +24,7 @@ export interface TopicCoverage {
   score: number;
   status: "good" | "partial" | "none";
   explanation: string;
-  matched_chunks: any[];
+  matched_chunks: Record<string, unknown>[];
 }
 
 export interface SyllabusCoverage {

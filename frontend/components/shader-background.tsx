@@ -135,54 +135,75 @@ void main() {
 
     vec4 fluid = texture2D(iFluid, vUv);
     vec2 fluidVel = fluid.xy;
+    float fluidHeight = fluid.z;
 
     float mr = min(iResolution.x, iResolution.y);
     vec2 uv = (fragCoord * 2.0 - iResolution.xy) / mr;
 
-    uv += fluidVel * (0.5 * uDistortionAmount);
+    // Distort UV with fluid velocity
+    uv += fluidVel * (0.6 * uDistortionAmount);
 
-    float d = -iTime * 0.5;
+    // Liquid metallic wave pattern
+    float d = -iTime * 0.4;
     float a = 0.0;
     for (float i = 0.0; i < 8.0; ++i) {
         a += cos(i - d - a * uv.x);
         d += sin(uv.y * i + a);
     }
-    d += iTime * 0.5;
+    d += iTime * 0.4;
+
+    // Calculate surface normal gradient for liquid metallic specular highlights
+    float eps = 0.005;
+    float hL = sin((uv.x - eps) * 3.0 + d) * cos(uv.y * 3.0 + a) * 0.5 + texture2D(iFluid, vUv - vec2(eps, 0.0)).z * 2.0;
+    float hR = sin((uv.x + eps) * 3.0 + d) * cos(uv.y * 3.0 + a) * 0.5 + texture2D(iFluid, vUv + vec2(eps, 0.0)).z * 2.0;
+    float hD = sin(uv.x * 3.0 + d) * cos((uv.y - eps) * 3.0 + a) * 0.5 + texture2D(iFluid, vUv - vec2(0.0, eps)).z * 2.0;
+    float hU = sin(uv.x * 3.0 + d) * cos((uv.y + eps) * 3.0 + a) * 0.5 + texture2D(iFluid, vUv + vec2(0.0, eps)).z * 2.0;
+
+    vec3 normal = normalize(vec3((hL - hR) * 2.5, (hD - hU) * 2.5, 0.35));
+
+    // Metallic Lighting setup
+    vec3 lightDir = normalize(vec3(0.5, 0.8, 1.0));
+    vec3 viewDir = vec3(0.0, 0.0, 1.0);
+    vec3 halfDir = normalize(lightDir + viewDir);
+
+    float diff = max(dot(normal, lightDir), 0.0);
+    float spec = pow(max(dot(normal, halfDir), 0.0), 32.0);
+    float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 3.0);
 
     float mixer1 = cos(uv.x * d) * 0.5 + 0.5;
     float mixer2 = cos(uv.y * a) * 0.5 + 0.5;
     float mixer3 = sin(d + a) * 0.5 + 0.5;
 
-    float smoothAmount = clamp(uSoftness * 0.1, 0.0, 0.9);
-    mixer1 = mix(mixer1, 0.5, smoothAmount);
-    mixer2 = mix(mixer2, 0.5, smoothAmount);
-    mixer3 = mix(mixer3, 0.5, smoothAmount);
-
     vec3 col = mix(uColor1, uColor2, mixer1);
     col = mix(col, uColor3, mixer2);
-    col = mix(col, uColor4, mixer3 * 0.4);
+    col = mix(col, uColor4, mixer3 * 0.5);
 
+    // Chrome Specular & Metallic Fresnel Highlights
+    vec3 chromeHighlight = vec3(0.85, 0.9, 1.0) * spec * 1.6;
+    vec3 metallicGlow = vec3(0.5, 0.6, 1.0) * fresnel * 0.7;
+
+    col = col * (0.35 + 0.65 * diff) + chromeHighlight + metallicGlow;
     col *= uColorIntensity;
 
     gl_FragColor = vec4(col, 1.0);
 }
 `;
 
-// --- Config: Polaris dark indigo/purple palette ---
+// --- Config: Metallic Liquid Obsidian, Indigo, & Chrome Palette ---
 
 const config = {
-  brushSize: 25.0,
-  brushStrength: 0.5,
-  distortionAmount: 2.5,
+  brushSize: 30.0,
+  brushStrength: 0.8,
+  distortionAmount: 3.0,
   fluidDecay: 0.98,
-  trailLength: 0.8,
+  trailLength: 0.85,
   stopDecay: 0.85,
-  color1: "#ff0000ff",   // pure black base
-  color2: "#180b59ff",   // deep indigo
-  color3: "#1a0a3e",   // dark purple
-  color4: "#c93e17ff",   // near-black violet
-  colorIntensity: 1.0,
-  softness: 1.0,
+  color1: "#030712",   // Obsidian dark base
+  color2: "#1e1b4b",   // Deep metallic indigo
+  color3: "#311042",   // Metallic dark violet
+  color4: "#4f46e5",   // Chrome silver-blue sheen
+  colorIntensity: 1.15,
+  softness: 0.8,
 };
 
 function hexToVec3(hex: string): THREE.Vector3 {
@@ -219,8 +240,8 @@ export function ShaderBackground() {
       type: THREE.HalfFloatType,
     };
 
-    let fluidTarget1 = new THREE.WebGLRenderTarget(width, height, rtParams);
-    let fluidTarget2 = new THREE.WebGLRenderTarget(width, height, rtParams);
+    const fluidTarget1 = new THREE.WebGLRenderTarget(width, height, rtParams);
+    const fluidTarget2 = new THREE.WebGLRenderTarget(width, height, rtParams);
     let currentTarget = fluidTarget1;
     let previousTarget = fluidTarget2;
     let frameCount = 0;
@@ -275,19 +296,19 @@ export function ShaderBackground() {
       mouseX = e.clientX - rect.left;
       mouseY = rect.height - (e.clientY - rect.top);
       lastMoveTime = performance.now();
-      fluidMat.uniforms.iMouse.value.set(mouseX, mouseY, prevMouseX, prevMouseY);
+      fluidMat.uniforms.iMouse!.value.set(mouseX, mouseY, prevMouseX, prevMouseY);
     };
 
     const onMouseLeave = () => {
-      fluidMat.uniforms.iMouse.value.set(0, 0, 0, 0);
+      fluidMat.uniforms.iMouse!.value.set(0, 0, 0, 0);
     };
 
     const onResize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
       renderer.setSize(width, height);
-      fluidMat.uniforms.iResolution.value.set(width, height);
-      displayMat.uniforms.iResolution.value.set(width, height);
+      fluidMat.uniforms.iResolution!.value.set(width, height);
+      displayMat.uniforms.iResolution!.value.set(width, height);
       fluidTarget1.setSize(width, height);
       fluidTarget2.setSize(width, height);
       frameCount = 0;
@@ -303,22 +324,22 @@ export function ShaderBackground() {
       rafId = requestAnimationFrame(render);
       const time = performance.now() * 0.001;
 
-      fluidMat.uniforms.iTime.value = time;
-      displayMat.uniforms.iTime.value = time;
-      fluidMat.uniforms.iFrame.value = frameCount;
+      fluidMat.uniforms.iTime!.value = time;
+      displayMat.uniforms.iTime!.value = time;
+      fluidMat.uniforms.iFrame!.value = frameCount;
 
       // Decay mouse if idle
       if (performance.now() - lastMoveTime > 100) {
-        fluidMat.uniforms.iMouse.value.set(0, 0, 0, 0);
+        fluidMat.uniforms.iMouse!.value.set(0, 0, 0, 0);
       }
 
       // Fluid simulation pass → FBO
-      fluidMat.uniforms.iPreviousFrame.value = previousTarget.texture;
+      fluidMat.uniforms.iPreviousFrame!.value = previousTarget.texture;
       renderer.setRenderTarget(currentTarget);
       renderer.render(fluidMesh, camera);
 
       // Display pass → screen
-      displayMat.uniforms.iFluid.value = currentTarget.texture;
+      displayMat.uniforms.iFluid!.value = currentTarget.texture;
       renderer.setRenderTarget(null);
       renderer.render(displayMesh, camera);
 
@@ -349,8 +370,8 @@ export function ShaderBackground() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 w-screen h-screen z-0"
-      style={{ pointerEvents: "auto" }}
+      className="fixed inset-0 w-screen h-screen -z-10 pointer-events-none"
+      style={{ pointerEvents: "none" }}
     />
   );
 }

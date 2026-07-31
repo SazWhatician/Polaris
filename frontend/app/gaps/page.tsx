@@ -5,8 +5,6 @@ import {
   BookOpen,
   Check,
   CheckCircle2,
-  ChevronRight,
-  ExternalLink,
   FileText,
   GripVertical,
   Info,
@@ -16,7 +14,12 @@ import {
   Sparkles,
   Trash2,
   XCircle,
+  ArrowRight,
+  MessageSquare,
+  Calendar,
+  Target,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -175,7 +178,7 @@ export default function GapsPage() {
       try {
         const cov = await getSyllabusCoverage(selectedSyllabusId);
         if (isSubscribed) setCoverage(cov);
-      } catch (err) {
+      } catch {
         if (isSubscribed) setCoverage(null);
       }
 
@@ -185,7 +188,7 @@ export default function GapsPage() {
         const runState = await getGapAnalysisStatus(threadId);
         if (!isSubscribed) return;
 
-        if (runState && (runState as any).detail === "Gap analysis is still running") {
+        if (runState && ("detail" in runState) && (runState as Record<string, unknown>).detail === "Gap analysis is still running") {
           setAgentStatus("running");
         } else {
           setAgentStatus("completed");
@@ -217,35 +220,29 @@ export default function GapsPage() {
     if (agentStatus !== "running" || !selectedSyllabusId || !user) return;
 
     const threadId = `${user.uid}:${selectedSyllabusId}`;
-    let intervalId: NodeJS.Timeout;
 
     const poll = async () => {
       try {
         const runState = await getGapAnalysisStatus(threadId);
-        if (runState && (runState as any).detail === "Gap analysis is still running") {
-          // Keep running
+        if (runState && ("detail" in runState) && (runState as Record<string, unknown>).detail === "Gap analysis is still running") {
           return;
         }
 
-        // Completed!
-        clearInterval(intervalId);
         setAgentStatus("completed");
         setRecommendations(runState.recommendations || []);
         setGapsMap(runState.gaps || {});
-        // Refresh coverage as well since the run usually aligns/updates
         try {
           const cov = await getSyllabusCoverage(selectedSyllabusId);
           setCoverage(cov);
-        } catch {}
+        } catch {
+          // Ignore
+        }
         toast.success("Learning gaps analysis finished!");
       } catch (err) {
         if (err instanceof ApiError && err.status === 404) {
-          // Not started
           setAgentStatus("idle");
-          clearInterval(intervalId);
         } else if (err instanceof ApiError && err.status >= 500) {
           setAgentStatus("failed");
-          clearInterval(intervalId);
           toast.error("Learning gap analysis failed", {
             description: err.message,
           });
@@ -253,7 +250,7 @@ export default function GapsPage() {
       }
     };
 
-    intervalId = setInterval(poll, 3000);
+    const intervalId = setInterval(poll, 3000);
     return () => clearInterval(intervalId);
   }, [agentStatus, selectedSyllabusId, user]);
 
@@ -337,7 +334,7 @@ export default function GapsPage() {
     e.dataTransfer.effectAllowed = "move";
   };
 
-  const handleDragOver = (e: React.DragEvent, index: number) => {
+  const handleDragOver = (e: React.DragEvent, _index: number) => {
     e.preventDefault();
   };
 
@@ -443,17 +440,59 @@ export default function GapsPage() {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
+    <div className="min-h-screen bg-slate-950 text-slate-100 pb-16">
       <SiteHeader />
-      <main className="container max-w-7xl space-y-8 py-8 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
         
+        {/* Step-by-Step Workflow Banner */}
+        <div className="glass-card-glow p-5 text-xs">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-semibold text-pink-400">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Step 3: Learning Gap Agent & Resource Discovery</span>
+              </div>
+              <h2 className="text-base font-bold text-slate-100">Identify Weak Concepts & Recommended Youtube Videos</h2>
+            </div>
+            <Link
+              href="/resources"
+              className="glass-button text-xs py-2 px-4 font-medium flex items-center gap-1.5 self-start md:self-auto"
+            >
+              <span>Explore Curated YT Videos</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <Link href="/dashboard" className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/40 text-slate-400 flex items-center gap-2 text-xs">
+              <span className="w-5 h-5 rounded-full bg-slate-800 text-slate-400 font-mono font-bold text-[10px] flex items-center justify-center">1</span>
+              <FileText className="h-3.5 w-3.5 text-indigo-400" />
+              <span>Upload Docs</span>
+            </Link>
+            <Link href="/chat" className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/40 text-slate-400 flex items-center gap-2 text-xs">
+              <span className="w-5 h-5 rounded-full bg-slate-800 text-slate-400 font-mono font-bold text-[10px] flex items-center justify-center">2</span>
+              <MessageSquare className="h-3.5 w-3.5 text-purple-400" />
+              <span>RAG Chat</span>
+            </Link>
+            <Link href="/gaps" className="p-2.5 rounded-xl border border-indigo-500/40 bg-indigo-600/20 text-indigo-300 font-semibold flex items-center gap-2 text-xs">
+              <span className="w-5 h-5 rounded-full bg-indigo-500 text-white font-mono font-bold text-[10px] flex items-center justify-center">3</span>
+              <Target className="h-3.5 w-3.5 text-pink-400" />
+              <span>Learning Gaps</span>
+            </Link>
+            <Link href="/plan" className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/40 text-slate-400 flex items-center gap-2 text-xs">
+              <span className="w-5 h-5 rounded-full bg-slate-800 text-slate-400 font-mono font-bold text-[10px] flex items-center justify-center">4</span>
+              <Calendar className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Revision Plan</span>
+            </Link>
+          </div>
+        </div>
+
         {/* Header Block */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-4">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text">
-              Learning Gaps & Study Path
+            <h1 className="text-2xl font-bold tracking-tight text-white">
+              Learning Gaps & Coverage Scoring
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-slate-400 text-xs mt-1">
               Analyze your class notes against your course syllabus to target what you need to study.
             </p>
           </div>
@@ -1040,22 +1079,30 @@ export default function GapsPage() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {selectedTopicDetails.cov.matched_chunks.map((chunk, idx) => (
-                        <div key={idx} className="border rounded-lg p-3 bg-card space-y-2 shadow-sm">
-                          <div className="flex items-center justify-between text-[11px] text-muted-foreground border-b pb-1.5">
-                            <span className="font-semibold text-primary/80 flex items-center gap-1">
-                              <FileText className="h-3 w-3" />
-                              {chunk.document_name || chunk.metadata?.document_name || "Document Link"}
-                            </span>
-                            <span>
-                              Page {chunk.page_number || chunk.metadata?.page_number || "N/A"} (score: {((chunk.score || 0) * 100).toFixed(0)}%)
-                            </span>
+                      {selectedTopicDetails.cov.matched_chunks.map((chunkItem, idx) => {
+                        const chunk = chunkItem as Record<string, unknown>;
+                        const meta = (chunk.metadata || {}) as Record<string, unknown>;
+                        const docName = String(chunk.document_name || meta.document_name || "Document Link");
+                        const pageNum = String(chunk.page_number || meta.page_number || "N/A");
+                        const scoreVal = typeof chunk.score === "number" ? chunk.score : 0;
+                        const snippet = String(chunk.text || chunk.content || "Snippet unavailable.");
+                        return (
+                          <div key={idx} className="border rounded-lg p-3 bg-card space-y-2 shadow-sm">
+                            <div className="flex items-center justify-between text-[11px] text-muted-foreground border-b pb-1.5">
+                              <span className="font-semibold text-primary/80 flex items-center gap-1">
+                                <FileText className="h-3 w-3" />
+                                {docName}
+                              </span>
+                              <span>
+                                Page {pageNum} (score: {(scoreVal * 100).toFixed(0)}%)
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground italic leading-relaxed bg-muted/20 p-2 rounded border border-muted/40">
+                              &ldquo;{snippet}&rdquo;
+                            </p>
                           </div>
-                          <p className="text-xs text-muted-foreground italic leading-relaxed bg-muted/20 p-2 rounded border border-muted/40">
-                            &ldquo;{chunk.text || chunk.content || "Snippet unavailable."}&rdquo;
-                          </p>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>

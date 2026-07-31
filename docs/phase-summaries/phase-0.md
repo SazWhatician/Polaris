@@ -1,6 +1,6 @@
 # Phase 0 — Foundation + Engineering Spine
 
-> **Outcome:** `just up` boots FastAPI + Qdrant + Jaeger. Next.js dev server runs on host, signs you in with Google, and round-trips a Firebase ID token through `/api/me`. CI lints, type-checks, tests, and builds both stacks. Every non-obvious choice is captured in an ADR.
+> **Outcome:** `just up` boots FastAPI + Qdrant + Jaeger. Next.js dev server runs on host, signs you in with Google or Demo Mode, and round-trips a Firebase ID token through `/api/me`. CI lints, type-checks, tests, and builds both stacks. Every non-obvious choice is captured in an ADR (including [ADR 0014: Firebase Auth & Demo Fallback](file:///c:/Users/saswa/Desktop/Polaris/docs/adr/0014-firebase-authentication-and-demo-fallback.md)).
 
 ---
 

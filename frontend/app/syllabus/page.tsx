@@ -1,12 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { BookOpen, Sparkles, CheckCircle2, ChevronRight, Layers } from "lucide-react";
+import { useEffect } from "react";
+import { BookOpen, ChevronRight, Layers } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 export default function SyllabusPage() {
   const { user, loading } = useAuth();

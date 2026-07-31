@@ -3,6 +3,8 @@ import {
   GoogleAuthProvider,
   getAuth,
   signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut as fbSignOut,
   type User,
   connectAuthEmulator,
@@ -47,6 +49,18 @@ export async function signInWithGoogle(): Promise<User> {
   const provider = new GoogleAuthProvider();
   const result = await signInWithPopup(auth, provider);
   return result.user;
+}
+
+export async function signInWithEmail(email: string, pass: string): Promise<User> {
+  const auth = getFirebaseAuth();
+  const res = await signInWithEmailAndPassword(auth, email, pass);
+  return res.user;
+}
+
+export async function signUpWithEmail(email: string, pass: string): Promise<User> {
+  const auth = getFirebaseAuth();
+  const res = await createUserWithEmailAndPassword(auth, email, pass);
+  return res.user;
 }
 
 export async function signOut(): Promise<void> {

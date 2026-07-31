@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, Youtube, ExternalLink, Clock, Eye, CheckCircle2 } from "lucide-react";
+import { Sparkles, Youtube, ExternalLink, Clock } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import {
   triggerResourceDiscovery,
   getResourceDiscoveryStatus,
   ResourceDiscoveryResponse,
-  ResourceItem,
 } from "@/lib/api/resources";
 
 export default function ResourcesPage() {
@@ -39,33 +38,35 @@ export default function ResourcesPage() {
           setLoading(false);
           setStatusMsg("");
           clearInterval(interval);
-        } catch (err: any) {
-          if (err?.status !== 202) {
-            setError(err?.message || "Failed to retrieve resources.");
+        } catch (err: unknown) {
+          const errObj = err as { status?: number; message?: string };
+          if (errObj?.status !== 202) {
+            setError(errObj?.message || "Failed to retrieve resources.");
             setLoading(false);
             setStatusMsg("");
             clearInterval(interval);
           }
         }
       }, 2000);
-    } catch (err: any) {
-      setError(err?.message || "Failed to initiate resource discovery.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to initiate resource discovery.";
+      setError(message);
       setLoading(false);
       setStatusMsg("");
     }
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground pb-12">
+    <div className="min-h-screen bg-slate-950 text-slate-100 pb-16">
       <SiteHeader />
-      <main className="container mx-auto px-4 sm:px-8 py-10 max-w-5xl space-y-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-6">
+      <main className="max-w-5xl mx-auto px-4 sm:px-8 py-8 space-y-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-              <Sparkles className="h-7 w-7 text-cyan-400" />
-              <span>AI Resource Discovery Agent</span>
+            <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+              <Sparkles className="h-6 w-6 text-cyan-400" />
+              <span>AI Educational Video Discovery</span>
             </h1>
-            <p className="text-slate-400 text-sm mt-1">
+            <p className="text-slate-400 text-xs mt-1">
               Curate top educational YouTube tutorials and lectures ranked by LLM rubrics.
             </p>
           </div>

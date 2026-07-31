@@ -42,49 +42,68 @@
 }
 
 @layer utilities {
-  /* Brutalist Hard Shadows & Borders */
+  /* Sleek Glassmorphism Design System */
+  .glass-card {
+    @apply bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl shadow-indigo-950/20 hover:border-slate-700/90 hover:bg-slate-900/80 transition-all duration-300;
+  }
+
+  .glass-card-glow {
+    @apply bg-slate-900/70 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl shadow-indigo-500/10 hover:border-purple-500/50 hover:shadow-purple-500/20 transition-all duration-300;
+  }
+
+  .glass-button {
+    @apply bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium tracking-wide rounded-xl px-5 py-2.5 shadow-lg shadow-indigo-500/25 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2;
+  }
+
+  .glass-badge {
+    @apply font-mono text-xs uppercase px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 font-semibold tracking-wide backdrop-blur-md;
+  }
+
+  /* Compatibility Fallbacks (aliased to sleek design) */
   .brutal-card {
-    @apply bg-card border-2 border-indigo-500/40 shadow-[4px_4px_0px_0px_rgba(99,102,241,0.5)] hover:shadow-[6px_6px_0px_0px_rgba(168,85,247,0.7)] hover:border-purple-400 transition-all duration-200 rounded-none;
+    @apply glass-card;
   }
 
   .brutal-card-pink {
-    @apply bg-card border-2 border-pink-500/40 shadow-[4px_4px_0px_0px_rgba(236,72,153,0.5)] hover:shadow-[6px_6px_0px_0px_rgba(244,63,94,0.7)] hover:border-pink-400 transition-all duration-200 rounded-none;
+    @apply glass-card-glow;
   }
 
   .brutal-btn {
-    @apply border-2 border-indigo-400 bg-indigo-600 text-white font-mono font-bold tracking-wider uppercase px-5 py-2.5 shadow-[3px_3px_0px_0px_#a855f7] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[5px_5px_0px_0px_#a855f7] active:translate-x-[0px] active:translate-y-[0px] active:shadow-[1px_1px_0px_0px_#a855f7] transition-all rounded-none;
+    @apply glass-button;
   }
 
   .brutal-badge {
-    @apply font-mono text-xs uppercase px-2.5 py-1 border border-indigo-400/50 bg-indigo-500/10 text-indigo-300 font-bold tracking-widest rounded-none;
+    @apply glass-badge;
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 font-black;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 font-extrabold;
   }
 
   .grid-pattern {
-    background-image: radial-gradient(rgba(99, 102, 241, 0.25) 1px, transparent 1px);
-    background-size: 16px 16px;
+    background-image: radial-gradient(rgba(99, 102, 241, 0.15) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 }
 
-/* Custom Brutalist Scrollbar */
+/* Custom Sleek Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090d16;
-  border-left: 1px solid #1e293b;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #6366f1;
-  border: 2px solid #090d16;
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 9999px;
+  border: 2px solid rgba(15, 23, 42, 0.6);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a855f7;
+  background: rgba(168, 85, 247, 0.7);
 }
+
