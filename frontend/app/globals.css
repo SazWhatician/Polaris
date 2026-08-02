@@ -51,7 +51,7 @@
   /* Light Platinum Theme — High-Contrast Crisp Styling */
   .light {
     --background: 215 28% 95%;
-    --foreground: 222 47% 10%; /* Crisp dark navy text */
+    --foreground: 222 47% 10%;
 
     --card: 0 0% 100%;
     --card-foreground: 222 47% 10%;
@@ -66,7 +66,7 @@
     --secondary-foreground: 222 47% 10%;
 
     --muted: 215 20% 90%;
-    --muted-foreground: 215 25% 32%; /* Sharp readable slate body text */
+    --muted-foreground: 215 25% 32%;
 
     --accent: 250 95% 55%;
     --accent-foreground: 0 0% 100%;
@@ -232,9 +232,131 @@
 }
 
 @layer utilities {
-  /* --- Ultra Hyper-Realistic Skeuomorphic Utilities --- */
+  /* --- Uiverse Skeuomorphic Radio Knob System --- */
+  .radio-input {
+    position: relative;
+    font-size: 0.35rem; /* Scaled down base size for clean header integration */
+  }
 
-  /* Tactile Skeuomorphic 3D Plate Card */
+  .radio-input-path {
+    position: relative;
+    width: 20em;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .radioContainer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 1em;
+  }
+
+  .radioContainer label {
+    font-size: 0.9em;
+    font-weight: 900;
+    cursor: pointer;
+    color: var(--foreground);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  }
+
+  .radio-input-path input[type="radio"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 0.55em;
+    height: 0.55em;
+    border-radius: 50%;
+    background: var(--foreground);
+    transform-origin: bottom center;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .radioContainer1 { left: 0; top: 25%; transform: rotateZ(-45deg); }
+  .radioContainer2 { left: 15%; top: 5%; transform: rotateZ(-25deg); }
+  .radioContainer3 { left: 44%; top: -5%; transform: rotateZ(0deg); }
+  .radioContainer4 { right: 15%; top: 5%; transform: rotateZ(25deg); }
+  .radioContainer5 { right: 0; top: 25%; transform: rotateZ(45deg); }
+  .radioContainer6 { right: -5%; top: 50%; transform: rotateZ(65deg); }
+
+  .knob {
+    width: 13em;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    top: 25%;
+    left: 50%;
+    position: absolute;
+    border: 3px solid rgba(0, 0, 0, 0.8);
+    outline: 2px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(145deg, #374151, #1f2937);
+    overflow: hidden;
+    transform: translateX(-50%);
+    transform-origin: center center;
+    transition: transform 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.3);
+  }
+
+  .light .knob {
+    background: linear-gradient(145deg, #e2e8f0, #cbd5e1);
+    border: 3px solid #64748b;
+    outline: 2px solid #94a3b8;
+  }
+
+  .center {
+    height: 100%;
+    width: 2.25em;
+    position: relative;
+    left: 50%;
+    top: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 7px;
+    outline: 1px solid rgba(255, 255, 255, 0.377);
+    transform: translate(-50%, -50%);
+    box-shadow: 15px 0px 35px rgba(255, 255, 255, 0.474),
+      -15px 0px 40px 5px rgba(128, 128, 128, 0.563),
+      inset 0px 0px 4px 0px rgba(255, 255, 255, 0.226);
+    transition: box-shadow 100ms linear;
+  }
+
+  .center::after {
+    content: "";
+    position: absolute;
+    width: 4px;
+    height: 25px;
+    background-color: #6366f1;
+    left: 50%;
+    top: 1%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+    box-shadow: 0 0 8px #6366f1;
+  }
+
+  /* Rotation for 6 themes */
+  .radio-input-path:has(.radio1:checked) ~ .knob { transform: translateX(-50%) rotateZ(-60deg); }
+  .radio-input-path:has(.radio2:checked) ~ .knob { transform: translateX(-50%) rotateZ(-35deg); }
+  .radio-input-path:has(.radio3:checked) ~ .knob { transform: translateX(-50%) rotateZ(0deg); }
+  .radio-input-path:has(.radio4:checked) ~ .knob { transform: translateX(-50%) rotateZ(35deg); }
+  .radio-input-path:has(.radio5:checked) ~ .knob { transform: translateX(-50%) rotateZ(60deg); }
+
+  .radio-input-path:has(.radio1:checked) ~ .knob > .center {
+    box-shadow: 15px 0px 35px rgba(255, 255, 255, 0.74), -15px 0px 40px 5px rgb(128, 128, 128), inset 0px 0px 4px 0px rgba(255, 255, 255, 0.226);
+  }
+  .radio-input-path:has(.radio2:checked) ~ .knob > .center {
+    box-shadow: 15px 0px 35px rgba(255, 255, 255, 0.74), -15px 0px 40px 5px rgba(128, 128, 128, 0.574), inset 0px 0px 4px 0px rgba(255, 255, 255, 0.226);
+  }
+  .radio-input-path:has(.radio4:checked) ~ .knob > .center {
+    box-shadow: 15px 0px 35px rgba(128, 128, 128, 0.63), -15px 0px 40px 5px rgba(255, 255, 255, 0.574), inset 0px 0px 4px 0px rgba(255, 255, 255, 0.226);
+  }
+  .radio-input-path:has(.radio5:checked) ~ .knob > .center {
+    box-shadow: 15px 0px 35px rgb(128, 128, 128), -15px 0px 40px 5px rgba(255, 255, 255, 0.74), inset 0px 0px 4px 0px rgba(255, 255, 255, 0.226);
+  }
+
+  /* --- Ultra Hyper-Realistic Skeuomorphic Utilities --- */
   .skeuo-card {
     background: var(--skeuo-card-bg);
     border: 1px solid var(--skeuo-card-border);
@@ -247,7 +369,6 @@
     transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  /* Glossy Bevel Highlight Overlay */
   .skeuo-card::before {
     content: "";
     position: absolute;
@@ -266,7 +387,6 @@
     box-shadow: var(--skeuo-shadow-raised), 0 12px 35px -5px rgba(0, 0, 0, 0.4);
   }
 
-  /* Tactile Skeuomorphic Pressed/Depressed Frame (Inputs, Inset Panels) */
   .skeuo-inset {
     background: rgba(0, 0, 0, 0.35);
     box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.7), inset 0 -1px 1px rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -282,7 +402,6 @@
     color: #0f172a;
   }
 
-  /* Tactile Skeuomorphic 3D Push Button */
   .skeuo-button {
     background: var(--skeuo-btn-bg);
     box-shadow: var(--skeuo-shadow-btn);
@@ -327,7 +446,6 @@
     box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.2);
   }
 
-  /* Skeuomorphic Secondary Metallic Plate Button */
   .skeuo-button-secondary {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
@@ -345,17 +463,6 @@
     color: #0f172a;
   }
 
-  .skeuo-button-secondary:hover {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.08) 100%);
-    border-color: rgba(255, 255, 255, 0.35);
-  }
-
-  .skeuo-button-secondary:active {
-    background: rgba(0, 0, 0, 0.3);
-    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Skeuomorphic Embossed Badge Indicator */
   .skeuo-badge {
     background: var(--skeuo-badge-bg);
     border: 1px solid var(--skeuo-card-border);
@@ -375,7 +482,6 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 5px rgba(148, 163, 184, 0.3);
   }
 
-  /* Metallic Text Gradient with Debossed Effect */
   .skeuo-title {
     background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
     -webkit-background-clip: text;
@@ -391,7 +497,6 @@
     filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.9));
   }
 
-  /* LED Status Bulb Effect */
   .led-indicator {
     width: 8px;
     height: 8px;
@@ -411,30 +516,13 @@
     border-radius: 50%;
   }
 
-  /* Backwards Compatibility Classes Aliased to Skeuomorphism */
-  .glass-card, .brutal-card {
-    @apply skeuo-card;
-  }
-
-  .glass-card-glow, .brutal-card-pink {
-    @apply skeuo-card;
-    box-shadow: var(--skeuo-shadow-raised), var(--skeuo-text-glow);
-  }
-
-  .glass-button, .brutal-btn {
-    @apply skeuo-button;
-  }
-
-  .glass-badge, .brutal-badge {
-    @apply skeuo-badge;
-  }
-
-  .gradient-text {
-    @apply skeuo-title;
-  }
+  .glass-card, .brutal-card { @apply skeuo-card; }
+  .glass-card-glow, .brutal-card-pink { @apply skeuo-card; box-shadow: var(--skeuo-shadow-raised), var(--skeuo-text-glow); }
+  .glass-button, .brutal-btn { @apply skeuo-button; }
+  .glass-badge, .brutal-badge { @apply skeuo-badge; }
+  .gradient-text { @apply skeuo-title; }
 }
 
-/* Skeuomorphic Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;

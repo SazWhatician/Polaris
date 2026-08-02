@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from qdrant_client import AsyncQdrantClient
 
-from app.api import agents, chat, documents, health, me, pages, planner_agent, resource_agent, syllabus
+from app.api import agents, chat, documents, graph, health, me, pages, planner_agent, resource_agent, syllabus
 from app.core.config import Settings, get_settings
 from app.core.firebase import initialize_firebase
 from app.core.logging import RequestIdMiddleware, configure_logging, get_logger
@@ -127,6 +127,7 @@ def _build_app(settings: Settings) -> FastAPI:
     app.include_router(agents.router)
     app.include_router(resource_agent.router)
     app.include_router(planner_agent.router)
+    app.include_router(graph.router)
 
     instrument_app(app)
     return app

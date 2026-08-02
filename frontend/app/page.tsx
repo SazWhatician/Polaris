@@ -7,20 +7,14 @@ import {
   Zap,
   ShieldCheck,
   ArrowRight,
-  Activity,
-  BookOpen,
-  Target,
-  Calendar,
-  MessageSquare,
-  Compass,
+  UserCheck,
   Mail,
   Lock,
-  UserCheck,
-  Layers,
+  Sparkles,
 } from "lucide-react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
-import { ThemeDial, SkeuoScrews, VUMeter } from "@/components/skeuomorphic-controls";
+import { SkeuoScrews, VUMeter } from "@/components/skeuomorphic-controls";
 import { useAuth } from "@/lib/auth-context";
 import { useGsapEntrance } from "@/lib/use-gsap-animations";
 
@@ -29,7 +23,7 @@ export default function Home() {
   const router = useRouter();
   const heroRef = useGsapEntrance(".gsap-item", 0.05);
 
-  const [authTab, setAuthTab] = useState<"demo" | "email" | "google">("demo");
+  const [authTab, setAuthTab] = useState<"demo" | "google" | "email">("demo");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
@@ -49,34 +43,53 @@ export default function Home() {
   };
 
   return (
-    <main className="relative min-h-screen flex flex-col items-center justify-center px-4 py-12 overflow-hidden">
-      {/* Top Controls Bar */}
-      <div className="absolute top-6 right-6 z-30 flex items-center gap-3">
-        <div className="skeuo-badge text-xs hidden md:flex items-center gap-2 text-foreground font-mono">
-          <div className="led-indicator text-emerald-400 animate-pulse" />
-          <span>POLARIS CORE ONLINE</span>
-        </div>
-        <ThemeDial />
-        <ThemeToggle />
-      </div>
-
-      <div ref={heroRef} className="z-20 max-w-6xl w-full flex flex-col items-center space-y-8 text-center mt-6 sm:mt-0">
-        
-        {/* Main Polaris Logo Presentation — Enlarged & Prominent */}
-        <div className="gsap-item flex flex-col items-center space-y-4">
-          <div className="relative max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl w-full px-4 hover:scale-105 transition-transform duration-300">
+    <div className="min-h-screen text-foreground relative flex flex-col justify-between overflow-x-hidden selection:bg-indigo-500 selection:text-white">
+      
+      {/* Top Header Bar */}
+      <header className="relative z-30 flex items-center justify-between p-6 max-w-7xl mx-auto w-full">
+        <div className="flex items-center gap-3">
+          <div className="relative w-10 h-10 rounded-2xl skeuo-inset flex items-center justify-center overflow-hidden shadow-inner">
             <Image
               src="/polaris-logo.png"
               alt="Polaris Logo"
+              width={40}
+              height={40}
+              className="object-contain drop-shadow"
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="skeuo-title text-xl tracking-tight leading-none">POLARIS</span>
+            <span className="text-[10px] font-mono font-bold tracking-widest text-muted-foreground uppercase">
+              Autonomous AI Engine
+            </span>
+          </div>
+        </div>
+
+        {/* Rotary Theme Switch Dial */}
+        <ThemeToggle />
+      </header>
+
+      {/* Main Hero & Skeuomorphic Auth Card Deck */}
+      <main
+        ref={heroRef}
+        className="relative z-20 flex-1 flex flex-col items-center justify-center text-center px-4 sm:px-6 max-w-5xl mx-auto py-8 space-y-8"
+      >
+        {/* Main Polaris Hero Emblem */}
+        <div className="gsap-item flex flex-col items-center space-y-4">
+          <div className="relative w-48 h-48 sm:w-60 sm:h-60 rounded-full skeuo-card p-6 flex items-center justify-center shadow-2xl transition-transform hover:scale-105 duration-300">
+            <SkeuoScrews />
+            <Image
+              src="/polaris-logo.png"
+              alt="Polaris Main Logo"
               width={1000}
-              height={500}
+              height={1000}
               priority
-              className="w-full h-auto object-contain filter drop-shadow-[0_12px_30px_rgba(0,0,0,0.85)]"
+              className="object-contain w-full h-full drop-shadow-2xl animate-pulse"
             />
           </div>
 
-          <div className="skeuo-badge text-xs sm:text-sm flex items-center gap-2 text-foreground font-semibold px-4 py-1.5">
-            <Activity className="h-4 w-4 text-emerald-400 animate-pulse" />
+          <div className="skeuo-badge text-xs text-indigo-300 font-mono tracking-widest flex items-center gap-2">
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
             <span>Autonomous Academic Intelligence Engine</span>
           </div>
         </div>
@@ -88,33 +101,34 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Skeuomorphic Auth Interface with Screws & Telemetry */}
+        {/* Ultra Skeuomorphic Multi-Card Auth Deck */}
         <div className="gsap-item w-full max-w-lg">
           <div className="skeuo-card p-7 text-left space-y-5 relative overflow-hidden shadow-2xl">
             <SkeuoScrews />
 
-            {/* Header & Tabs */}
+            {/* Deck Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-3.5">
               <div className="flex items-center gap-2 text-base font-black text-foreground">
                 <UserCheck className="h-5 w-5 text-indigo-500" />
                 <span>Student Portal Sign-In</span>
               </div>
-              <span className="skeuo-badge text-[11px] text-emerald-400 border-emerald-500/30 font-mono">
+              <span className="skeuo-badge text-[11px] text-emerald-400 border-emerald-500/30 font-mono flex items-center gap-1">
+                <div className="led-indicator text-emerald-400 animate-pulse" />
                 V1_ACTIVE
               </span>
             </div>
 
-            {/* Analog VU Telemetry Meter */}
+            {/* Analog Telemetry Meter */}
             <VUMeter label="Qdrant Hybrid Engine Status" level={92} />
 
-            {/* Auth Tab Selectors */}
-            <div className="grid grid-cols-3 gap-1.5 skeuo-inset p-1.5 text-xs font-semibold">
+            {/* Skeuomorphic 3-Tab Selector Cards */}
+            <div className="grid grid-cols-3 gap-1.5 skeuo-inset p-1.5 text-xs font-semibold select-none">
               <button
                 type="button"
                 onClick={() => setAuthTab("demo")}
-                className={`py-2.5 rounded-lg transition-all select-none ${
+                className={`py-2.5 rounded-lg transition-all ${
                   authTab === "demo"
-                    ? "skeuo-button text-white font-bold"
+                    ? "skeuo-button text-white font-bold shadow-md scale-[1.02]"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -123,9 +137,9 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setAuthTab("google")}
-                className={`py-2.5 rounded-lg transition-all select-none ${
+                className={`py-2.5 rounded-lg transition-all ${
                   authTab === "google"
-                    ? "skeuo-button text-white font-bold"
+                    ? "skeuo-button text-white font-bold shadow-md scale-[1.02]"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -134,9 +148,9 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setAuthTab("email")}
-                className={`py-2.5 rounded-lg transition-all select-none ${
+                className={`py-2.5 rounded-lg transition-all ${
                   authTab === "email"
-                    ? "skeuo-button text-white font-bold"
+                    ? "skeuo-button text-white font-bold shadow-md scale-[1.02]"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -144,16 +158,16 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Tab Contents */}
+            {/* Card 1: Instant Demo Session */}
             {authTab === "demo" && (
-              <div className="space-y-4 pt-1">
+              <div className="space-y-4 pt-1 animate-in fade-in duration-200">
                 <p className="text-xs text-muted-foreground leading-relaxed font-medium">
-                  Instant zero-config access for review & evaluation. Includes pre-loaded syllabus data, sample notes, and grounded RAG session.
+                  Instant zero-config access for review & evaluation. Pre-loaded with syllabus data, sample notes, and grounded RAG session.
                 </p>
                 <button
                   onClick={signInAsDemo}
                   disabled={loading}
-                  className="skeuo-button w-full text-xs py-3.5 font-extrabold"
+                  className="skeuo-button w-full text-xs py-4 font-extrabold tracking-wide uppercase"
                 >
                   <Zap className="h-4 w-4 text-amber-300 fill-current animate-bounce" />
                   <span>START 1-CLICK DEMO SESSION</span>
@@ -162,8 +176,9 @@ export default function Home() {
               </div>
             )}
 
+            {/* Card 2: Google OAuth Card */}
             {authTab === "google" && (
-              <div className="space-y-4 pt-1">
+              <div className="space-y-4 pt-1 animate-in fade-in duration-200">
                 <p className="text-xs text-muted-foreground leading-relaxed font-medium">
                   Sign in securely with your Firebase-verified Google student or university email account.
                 </p>
@@ -183,8 +198,9 @@ export default function Home() {
               </div>
             )}
 
+            {/* Card 3: Email / Password Portal Card */}
             {authTab === "email" && (
-              <form onSubmit={handleEmailAuth} className="space-y-3.5 pt-1">
+              <form onSubmit={handleEmailAuth} className="space-y-3.5 pt-1 animate-in fade-in duration-200">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-foreground flex items-center gap-1.5">
                     <Mail className="h-3.5 w-3.5 text-indigo-500" /> Email Address
@@ -222,7 +238,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setIsRegistering(!isRegistering)}
-                    className="text-[11px] text-indigo-500 hover:underline font-bold"
+                    className="text-[11px] text-indigo-400 hover:underline font-bold"
                   >
                     {isRegistering ? "Already have an account? Sign in" : "Need an account? Register here"}
                   </button>
@@ -236,90 +252,16 @@ export default function Home() {
                 <ShieldCheck className="h-4 w-4" />
                 Firebase Auth & Tenant Isolated
               </span>
-              <span className="text-muted-foreground font-mono">JWT Security</span>
+              <span className="font-mono text-[10px]">AES-256</span>
             </div>
           </div>
         </div>
+      </main>
 
-        {/* 4-Step Academic Workflow Cards */}
-        <div className="gsap-item grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl w-full text-left pt-4">
-          <SleekWorkflowCard
-            step="1"
-            icon={<BookOpen className="h-4 w-4 text-indigo-500" />}
-            title="Upload Docs & Syllabus"
-            desc="Extract structured knowledge trees and score course coverage."
-          />
-          <SleekWorkflowCard
-            step="2"
-            icon={<MessageSquare className="h-4 w-4 text-purple-500" />}
-            title="Grounded RAG Chat"
-            desc="Streamed AI answers cited from your exact uploaded PDF snippets."
-          />
-          <SleekWorkflowCard
-            step="3"
-            icon={<Target className="h-4 w-4 text-pink-500" />}
-            title="Gaps & YT Discovery"
-            desc="Isolate weak concepts and recommend targeted YouTube video lessons."
-          />
-          <SleekWorkflowCard
-            step="4"
-            icon={<Calendar className="h-4 w-4 text-cyan-500" />}
-            title="Date Revision Plan"
-            desc="Generate constraint-aware study schedules before exam day."
-          />
-        </div>
-
-        {/* Core Technical Highlights */}
-        <div className="gsap-item grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-6xl w-full text-left">
-          <div className="skeuo-card p-5 flex items-start gap-3 relative">
-            <SkeuoScrews />
-            <Layers className="h-5 w-5 text-indigo-500 mt-0.5 flex-shrink-0" />
-            <div>
-              <h3 className="text-xs font-black uppercase tracking-wider text-foreground">Multi-Tenant Qdrant Hybrid Search</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed mt-1 font-medium">
-                Dense vector retrieval coupled with sparse BM25 reranking for precise snippet extraction.
-              </p>
-            </div>
-          </div>
-          <div className="skeuo-card p-5 flex items-start gap-3 relative">
-            <SkeuoScrews />
-            <Compass className="h-5 w-5 text-purple-500 mt-0.5 flex-shrink-0" />
-            <div>
-              <h3 className="text-xs font-black uppercase tracking-wider text-foreground">LangGraph Agent State Machine</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed mt-1 font-medium">
-                Deterministic multi-node agent tracing notes coverage vs syllabus requirements.
-              </p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </main>
-  );
-}
-
-function SleekWorkflowCard({
-  step,
-  icon,
-  title,
-  desc,
-}: {
-  step: string;
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <div className="skeuo-card p-4 space-y-2 relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
-      <SkeuoScrews />
-      <div className="flex items-center justify-between">
-        <div className="p-2 skeuo-inset">{icon}</div>
-        <span className="skeuo-badge text-[10px] font-mono font-bold text-foreground">
-          {step}
-        </span>
-      </div>
-      <h3 className="font-extrabold text-xs tracking-wide text-foreground">{title}</h3>
-      <p className="text-[11px] text-muted-foreground leading-relaxed font-medium">{desc}</p>
+      {/* Footer */}
+      <footer className="relative z-20 py-6 border-t border-white/10 text-center text-xs text-muted-foreground font-semibold">
+        Polaris Academic Engine &copy; 2026. All rights reserved.
+      </footer>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, BookOpen, Target, Sparkles, Calendar, MessageSquare, FileText, User as UserIcon } from "lucide-react";
+import { LogOut, BookOpen, Target, Sparkles, Calendar, MessageSquare, FileText, Layers, User as UserIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -15,79 +15,80 @@ export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full skeuo-card !rounded-none !border-x-0 !border-t-0 !border-b-white/10 shadow-2xl backdrop-blur-2xl">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-xl transition-colors">
       <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-8">
         
-        {/* Brand & Logo */}
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative h-10 w-10 skeuo-inset p-1.5 flex items-center justify-center transition-all group-hover:scale-105">
+        {/* Brand Logo & Name */}
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative w-8 h-8 rounded-xl skeuo-inset flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105">
               <Image
-                src="/polaris-standalone.png"
-                alt="Polaris Standalone Icon"
-                width={36}
-                height={36}
-                priority
-                className="w-full h-full object-contain filter drop-shadow-md"
+                src="/polaris-logo.png"
+                alt="Polaris Logo"
+                width={32}
+                height={32}
+                className="object-contain drop-shadow"
               />
             </div>
-
             <div className="flex flex-col">
-              <span className="font-sans font-black text-lg tracking-wider skeuo-title flex items-center gap-1.5">
-                POLARIS <span className="skeuo-badge font-mono text-[10px] text-indigo-300">v1.0</span>
-              </span>
-              <span className="text-[10px] font-mono tracking-widest text-muted-foreground uppercase -mt-1 font-semibold">
-                Skeuomorphic AI Engine
+              <span className="skeuo-title text-base tracking-tight leading-none">POLARIS</span>
+              <span className="text-[9px] font-mono font-bold tracking-widest text-muted-foreground uppercase">
+                AI Engine
               </span>
             </div>
           </Link>
 
-          {/* Workflow Step Navigation */}
+          {/* Streamlined De-congested Header Navigation */}
           {user && (
-            <nav className="hidden lg:flex items-center gap-2 skeuo-inset p-1">
+            <nav className="hidden md:flex items-center gap-1 skeuo-inset p-1 ml-2">
               <NavLink href="/dashboard" current={pathname} icon={<FileText className="h-3.5 w-3.5" />} step="1">
-                Upload & Docs
+                Docs
               </NavLink>
               <NavLink href="/syllabus" current={pathname} icon={<BookOpen className="h-3.5 w-3.5" />}>
                 Syllabus
               </NavLink>
               <NavLink href="/chat" current={pathname} icon={<MessageSquare className="h-3.5 w-3.5" />} step="2">
-                RAG Chat
+                Chat
               </NavLink>
               <NavLink href="/gaps" current={pathname} icon={<Target className="h-3.5 w-3.5" />} step="3">
-                Learning Gaps
+                Gaps
               </NavLink>
               <NavLink href="/resources" current={pathname} icon={<Sparkles className="h-3.5 w-3.5" />}>
-                YT Videos
+                Videos
               </NavLink>
               <NavLink href="/plan" current={pathname} icon={<Calendar className="h-3.5 w-3.5" />} step="4">
-                Revision Plan
+                Plan
+              </NavLink>
+              <NavLink href="/graph" current={pathname} icon={<Layers className="h-3.5 w-3.5" />} step="5">
+                Graph
               </NavLink>
             </nav>
           )}
         </div>
 
-        {/* User Status & Actions */}
+        {/* User Status & Theme Controls */}
         <div className="flex items-center gap-3">
           {user ? (
-            <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 skeuo-inset text-xs font-mono text-slate-200">
+            <div className="flex items-center gap-2">
+              <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 skeuo-inset text-xs font-mono">
                 <div className="led-indicator text-emerald-400 animate-pulse" />
                 <UserIcon className="h-3.5 w-3.5 text-indigo-400" />
-                <span className="font-medium max-w-[140px] truncate">{user.displayName || user.email || "Demo Student"}</span>
+                <span className="font-medium max-w-[110px] truncate">{user.displayName || user.email || "Student"}</span>
               </div>
 
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={signOut}
-                className="skeuo-button-secondary text-xs px-3 py-1.5 gap-1.5 text-rose-300 hover:text-rose-200 hover:bg-rose-950/30"
+                className="skeuo-button-secondary text-xs px-2.5 py-1 gap-1.5 text-rose-300 hover:text-rose-200"
               >
                 <LogOut className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Sign Out</span>
+                <span className="hidden sm:inline">Exit</span>
               </Button>
             </div>
           ) : null}
+
+          {/* Unified Radio Knob Theme Toggle */}
           <ThemeToggle />
         </div>
       </div>
@@ -113,17 +114,19 @@ function NavLink({
     <Link
       href={href}
       className={cn(
-        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 select-none",
+        "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-150 select-none",
         active
-          ? "skeuo-button bg-indigo-600 text-white font-bold shadow-md"
-          : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
+          ? "skeuo-button text-white font-bold shadow-md"
+          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
       )}
     >
       {step && (
-        <span className={cn(
-          "w-4 h-4 rounded-full text-[10px] font-mono flex items-center justify-center font-bold",
-          active ? "bg-white text-indigo-700 shadow-inner" : "bg-slate-800 text-slate-400"
-        )}>
+        <span
+          className={cn(
+            "w-3.5 h-3.5 rounded-full text-[9px] font-mono flex items-center justify-center font-bold",
+            active ? "bg-white text-indigo-700 shadow-inner" : "bg-black/40 text-muted-foreground"
+          )}
+        >
           {step}
         </span>
       )}
