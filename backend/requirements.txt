@@ -34,6 +34,8 @@ pypdfium2==4.30.0
 numpy>=2.1.0
 
 # --- RAG stack ---
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
 langchain-text-splitters==0.3.2
 sentence-transformers==3.3.0
 qdrant-client==1.12.1

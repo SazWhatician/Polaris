@@ -3,107 +3,460 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 224 71% 3%;
+  /* Default Dark Obsidian Theme */
+  :root,
+  .dark {
+    --background: 224 71% 4%;
     --foreground: 210 40% 98%;
 
-    --card: 224 71% 5%;
+    --card: 222 47% 7%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 224 71% 5%;
+    --popover: 222 47% 7%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 246 80% 65%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 222 47% 10%;
+    --secondary: 222 47% 12%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 223 47% 10%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 223 47% 12%;
+    --muted-foreground: 215 20.2% 70%;
 
     --accent: 250 95% 64%;
     --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 50%;
-    --destructive-foreground: 210 40% 98%;
 
     --border: 217 33% 20%;
     --input: 217 33% 20%;
     --ring: 250 95% 64%;
 
-    --radius: 0.25rem;
+    --radius: 0.75rem;
+
+    /* Skeuomorphic Custom Properties */
+    --skeuo-bg-gradient: linear-gradient(145deg, #0b0f19, #050811);
+    --skeuo-card-bg: linear-gradient(165deg, rgba(20, 26, 42, 0.92) 0%, rgba(10, 14, 24, 0.96) 100%);
+    --skeuo-card-border: rgba(255, 255, 255, 0.14);
+    --skeuo-bevel-top: rgba(255, 255, 255, 0.2);
+    --skeuo-bevel-bottom: rgba(0, 0, 0, 0.6);
+    --skeuo-shadow-raised: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 4px 10px -2px rgba(0, 0, 0, 0.5), inset 0 1px 1px var(--skeuo-bevel-top);
+    --skeuo-shadow-btn: 0 6px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.4);
+    --skeuo-btn-bg: linear-gradient(180deg, #4f46e5 0%, #3730a3 100%);
+    --skeuo-btn-hover: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
+    --skeuo-btn-active: linear-gradient(180deg, #312e81 0%, #3730a3 100%);
+    --skeuo-badge-bg: linear-gradient(180deg, rgba(99, 102, 241, 0.25) 0%, rgba(49, 46, 129, 0.4) 100%);
+    --skeuo-text-glow: 0 0 15px rgba(99, 102, 241, 0.5);
+  }
+
+  /* Light Platinum Theme — High-Contrast Crisp Styling */
+  .light {
+    --background: 215 28% 95%;
+    --foreground: 222 47% 10%; /* Crisp dark navy text */
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 10%;
+
+    --primary: 246 80% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 20% 90%;
+    --secondary-foreground: 222 47% 10%;
+
+    --muted: 215 20% 90%;
+    --muted-foreground: 215 25% 32%; /* Sharp readable slate body text */
+
+    --accent: 250 95% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --border: 214 32% 78%;
+    --input: 214 32% 78%;
+    --ring: 250 95% 55%;
+
+    --skeuo-bg-gradient: linear-gradient(145deg, #e2e8f0, #cbd5e1);
+    --skeuo-card-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(241, 245, 249, 0.95) 100%);
+    --skeuo-card-border: rgba(148, 163, 184, 0.5);
+    --skeuo-bevel-top: rgba(255, 255, 255, 1);
+    --skeuo-bevel-bottom: rgba(148, 163, 184, 0.6);
+    --skeuo-shadow-raised: 8px 12px 24px rgba(148, 163, 184, 0.4), -6px -6px 16px rgba(255, 255, 255, 0.9), inset 0 1px 2px rgba(255, 255, 255, 1);
+    --skeuo-shadow-btn: 0 4px 10px rgba(79, 70, 229, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+    --skeuo-btn-bg: linear-gradient(180deg, #4f46e5 0%, #3730a3 100%);
+    --skeuo-btn-hover: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
+    --skeuo-btn-active: linear-gradient(180deg, #312e81 0%, #3730a3 100%);
+    --skeuo-badge-bg: linear-gradient(180deg, rgba(224, 231, 255, 0.95) 0%, rgba(199, 210, 254, 0.9) 100%);
+    --skeuo-text-glow: 0 0 10px rgba(79, 70, 229, 0.3);
+  }
+
+  /* Cyberpunk Gold Theme */
+  .theme-gold {
+    --background: 40 40% 4%;
+    --foreground: 45 100% 96%;
+
+    --card: 38 45% 7%;
+    --card-foreground: 45 100% 96%;
+
+    --primary: 43 96% 54%;
+    --primary-foreground: 30 100% 5%;
+
+    --secondary: 35 40% 12%;
+    --secondary-foreground: 45 100% 96%;
+
+    --muted-foreground: 43 40% 75%;
+
+    --border: 43 70% 25%;
+    --input: 43 70% 25%;
+    --ring: 43 96% 54%;
+
+    --skeuo-bg-gradient: linear-gradient(145deg, #181308, #0a0803);
+    --skeuo-card-bg: linear-gradient(165deg, rgba(38, 30, 15, 0.93) 0%, rgba(20, 15, 8, 0.97) 100%);
+    --skeuo-card-border: rgba(234, 179, 8, 0.35);
+    --skeuo-bevel-top: rgba(254, 240, 138, 0.35);
+    --skeuo-bevel-bottom: rgba(0, 0, 0, 0.85);
+    --skeuo-shadow-raised: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 20px rgba(234, 179, 8, 0.2), inset 0 1px 1px var(--skeuo-bevel-top);
+    --skeuo-shadow-btn: 0 6px 16px rgba(234,179,8,0.35), inset 0 1px 0 rgba(254,240,138,0.5), inset 0 -2px 4px rgba(0,0,0,0.6);
+    --skeuo-btn-bg: linear-gradient(180deg, #eab308 0%, #ca8a04 100%);
+    --skeuo-btn-hover: linear-gradient(180deg, #facc15 0%, #eab308 100%);
+    --skeuo-btn-active: linear-gradient(180deg, #a16207 0%, #854d0e 100%);
+    --skeuo-badge-bg: linear-gradient(180deg, rgba(234, 179, 8, 0.25) 0%, rgba(161, 98, 7, 0.35) 100%);
+    --skeuo-text-glow: 0 0 15px rgba(234, 179, 8, 0.6);
+  }
+
+  /* Emerald Jade Theme */
+  .theme-emerald {
+    --background: 160 50% 4%;
+    --foreground: 150 100% 96%;
+
+    --card: 162 45% 7%;
+    --card-foreground: 150 100% 96%;
+
+    --primary: 158 75% 42%;
+    --primary-foreground: 160 100% 5%;
+
+    --secondary: 160 35% 12%;
+    --secondary-foreground: 150 100% 96%;
+
+    --muted-foreground: 155 35% 75%;
+
+    --border: 158 60% 20%;
+    --input: 158 60% 20%;
+    --ring: 158 75% 42%;
+
+    --skeuo-bg-gradient: linear-gradient(145deg, #051a13, #020d09);
+    --skeuo-card-bg: linear-gradient(165deg, rgba(12, 42, 32, 0.93) 0%, rgba(5, 24, 18, 0.97) 100%);
+    --skeuo-card-border: rgba(16, 185, 129, 0.35);
+    --skeuo-bevel-top: rgba(110, 231, 183, 0.35);
+    --skeuo-bevel-bottom: rgba(0, 0, 0, 0.85);
+    --skeuo-shadow-raised: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 20px rgba(16, 185, 129, 0.2), inset 0 1px 1px var(--skeuo-bevel-top);
+    --skeuo-shadow-btn: 0 6px 16px rgba(16,185,129,0.35), inset 0 1px 0 rgba(110,231,183,0.5), inset 0 -2px 4px rgba(0,0,0,0.6);
+    --skeuo-btn-bg: linear-gradient(180deg, #10b981 0%, #059669 100%);
+    --skeuo-btn-hover: linear-gradient(180deg, #34d399 0%, #10b981 100%);
+    --skeuo-btn-active: linear-gradient(180deg, #047857 0%, #065f46 100%);
+    --skeuo-badge-bg: linear-gradient(180deg, rgba(16, 185, 129, 0.25) 0%, rgba(4, 120, 87, 0.35) 100%);
+    --skeuo-text-glow: 0 0 15px rgba(16, 185, 129, 0.6);
+  }
+
+  /* Royal Sapphire Theme */
+  .theme-sapphire {
+    --background: 218 60% 4%;
+    --foreground: 210 100% 97%;
+
+    --card: 218 50% 7%;
+    --card-foreground: 210 100% 97%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 218 100% 97%;
+
+    --secondary: 218 40% 12%;
+    --secondary-foreground: 210 100% 97%;
+
+    --muted-foreground: 215 35% 75%;
+
+    --border: 217 60% 22%;
+    --input: 217 60% 22%;
+    --ring: 217 91% 60%;
+
+    --skeuo-bg-gradient: linear-gradient(145deg, #06132b, #020919);
+    --skeuo-card-bg: linear-gradient(165deg, rgba(15, 34, 68, 0.93) 0%, rgba(7, 18, 40, 0.97) 100%);
+    --skeuo-card-border: rgba(59, 130, 246, 0.35);
+    --skeuo-bevel-top: rgba(147, 197, 253, 0.35);
+    --skeuo-bevel-bottom: rgba(0, 0, 0, 0.85);
+    --skeuo-shadow-raised: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 20px rgba(59, 130, 246, 0.2), inset 0 1px 1px var(--skeuo-bevel-top);
+    --skeuo-shadow-btn: 0 6px 16px rgba(59,130,246,0.35), inset 0 1px 0 rgba(147,197,253,0.5), inset 0 -2px 4px rgba(0,0,0,0.6);
+    --skeuo-btn-bg: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+    --skeuo-btn-hover: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+    --skeuo-btn-active: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
+    --skeuo-badge-bg: linear-gradient(180deg, rgba(59, 130, 246, 0.25) 0%, rgba(30, 64, 175, 0.35) 100%);
+    --skeuo-text-glow: 0 0 15px rgba(59, 130, 246, 0.6);
+  }
+
+  /* Crimson Velvet Theme */
+  .theme-crimson {
+    --background: 345 60% 4%;
+    --foreground: 340 100% 97%;
+
+    --card: 345 50% 7%;
+    --card-foreground: 340 100% 97%;
+
+    --primary: 346 84% 53%;
+    --primary-foreground: 340 100% 97%;
+
+    --secondary: 345 40% 12%;
+    --secondary-foreground: 340 100% 97%;
+
+    --muted-foreground: 345 35% 75%;
+
+    --border: 346 60% 22%;
+    --input: 346 60% 22%;
+    --ring: 346 84% 53%;
+
+    --skeuo-bg-gradient: linear-gradient(145deg, #2b0612, #180208);
+    --skeuo-card-bg: linear-gradient(165deg, rgba(68, 15, 30, 0.93) 0%, rgba(40, 7, 16, 0.97) 100%);
+    --skeuo-card-border: rgba(244, 63, 94, 0.35);
+    --skeuo-bevel-top: rgba(253, 164, 175, 0.35);
+    --skeuo-bevel-bottom: rgba(0, 0, 0, 0.85);
+    --skeuo-shadow-raised: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 20px rgba(244, 63, 94, 0.2), inset 0 1px 1px var(--skeuo-bevel-top);
+    --skeuo-shadow-btn: 0 6px 16px rgba(244,63,94,0.35), inset 0 1px 0 rgba(253,164,175,0.5), inset 0 -2px 4px rgba(0,0,0,0.6);
+    --skeuo-btn-bg: linear-gradient(180deg, #f43f5e 0%, #be123c 100%);
+    --skeuo-btn-hover: linear-gradient(180deg, #fb7185 0%, #e11d48 100%);
+    --skeuo-btn-active: linear-gradient(180deg, #9f1239 0%, #881337 100%);
+    --skeuo-badge-bg: linear-gradient(180deg, rgba(244, 63, 94, 0.25) 0%, rgba(159, 18, 57, 0.35) 100%);
+    --skeuo-text-glow: 0 0 15px rgba(244, 63, 94, 0.6);
   }
 
   body {
-    @apply text-foreground selection:bg-indigo-500 selection:text-black antialiased min-h-screen font-sans overflow-x-hidden;
+    @apply text-foreground antialiased min-h-screen font-sans overflow-x-hidden transition-colors duration-300;
     background: transparent;
   }
 }
 
 @layer utilities {
-  /* Sleek Glassmorphism Design System */
-  .glass-card {
-    @apply bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl shadow-xl shadow-indigo-950/20 hover:border-slate-700/90 hover:bg-slate-900/80 transition-all duration-300;
+  /* --- Ultra Hyper-Realistic Skeuomorphic Utilities --- */
+
+  /* Tactile Skeuomorphic 3D Plate Card */
+  .skeuo-card {
+    background: var(--skeuo-card-bg);
+    border: 1px solid var(--skeuo-card-border);
+    box-shadow: var(--skeuo-shadow-raised);
+    border-radius: 1.25rem;
+    backdrop-filter: blur(16px);
+    position: relative;
+    overflow: hidden;
+    color: var(--foreground);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  .glass-card-glow {
-    @apply bg-slate-900/70 backdrop-blur-2xl border border-indigo-500/30 rounded-2xl shadow-2xl shadow-indigo-500/10 hover:border-purple-500/50 hover:shadow-purple-500/20 transition-all duration-300;
+  /* Glossy Bevel Highlight Overlay */
+  .skeuo-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 45%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
   }
 
-  .glass-button {
-    @apply bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium tracking-wide rounded-xl px-5 py-2.5 shadow-lg shadow-indigo-500/25 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2;
+  .skeuo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--skeuo-shadow-raised), 0 12px 35px -5px rgba(0, 0, 0, 0.4);
   }
 
-  .glass-badge {
-    @apply font-mono text-xs uppercase px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 font-semibold tracking-wide backdrop-blur-md;
+  /* Tactile Skeuomorphic Pressed/Depressed Frame (Inputs, Inset Panels) */
+  .skeuo-inset {
+    background: rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.7), inset 0 -1px 1px rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.6);
+    border-radius: 0.875rem;
+    color: var(--foreground);
   }
 
-  /* Compatibility Fallbacks (aliased to sleek design) */
-  .brutal-card {
-    @apply glass-card;
+  .light .skeuo-inset {
+    background: rgba(226, 232, 240, 0.75);
+    box-shadow: inset 0 3px 6px rgba(148, 163, 184, 0.6), inset 0 -1px 1px rgba(255, 255, 255, 0.9), 0 1px 0 rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(203, 213, 225, 0.9);
+    color: #0f172a;
   }
 
-  .brutal-card-pink {
-    @apply glass-card-glow;
+  /* Tactile Skeuomorphic 3D Push Button */
+  .skeuo-button {
+    background: var(--skeuo-btn-bg);
+    box-shadow: var(--skeuo-shadow-btn);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 0.875rem;
+    color: #ffffff !important;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
   }
 
-  .brutal-btn {
-    @apply glass-button;
+  .skeuo-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    border-top-left-radius: 0.875rem;
+    border-top-right-radius: 0.875rem;
   }
 
-  .brutal-badge {
-    @apply glass-badge;
+  .skeuo-button:hover {
+    background: var(--skeuo-btn-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--skeuo-shadow-btn), 0 0 15px rgba(255, 255, 255, 0.2);
+  }
+
+  .skeuo-button:active {
+    background: var(--skeuo-btn-active);
+    transform: translateY(1px);
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  /* Skeuomorphic Secondary Metallic Plate Button */
+  .skeuo-button-secondary {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--skeuo-card-border);
+    border-radius: 0.875rem;
+    color: var(--foreground);
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+
+  .light .skeuo-button-secondary {
+    background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+    box-shadow: 0 4px 10px rgba(148, 163, 184, 0.3), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 -2px 4px rgba(148, 163, 184, 0.2);
+    border: 1px solid rgba(203, 213, 225, 0.9);
+    color: #0f172a;
+  }
+
+  .skeuo-button-secondary:hover {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+
+  .skeuo-button-secondary:active {
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Skeuomorphic Embossed Badge Indicator */
+  .skeuo-badge {
+    background: var(--skeuo-badge-bg);
+    border: 1px solid var(--skeuo-card-border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 5px rgba(0,0,0,0.3);
+    border-radius: 9999px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.75rem;
+    color: var(--foreground);
+    backdrop-filter: blur(8px);
+  }
+
+  .light .skeuo-badge {
+    color: #1e1b4b;
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 5px rgba(148, 163, 184, 0.3);
+  }
+
+  /* Metallic Text Gradient with Debossed Effect */
+  .skeuo-title {
+    background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+    font-weight: 900;
+  }
+
+  .light .skeuo-title {
+    background: linear-gradient(180deg, #020617 0%, #1e293b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.9));
+  }
+
+  /* LED Status Bulb Effect */
+  .led-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor, inset 0 1px 1px rgba(255, 255, 255, 0.8);
+    position: relative;
+  }
+
+  .led-indicator::after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    width: 2px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 50%;
+  }
+
+  /* Backwards Compatibility Classes Aliased to Skeuomorphism */
+  .glass-card, .brutal-card {
+    @apply skeuo-card;
+  }
+
+  .glass-card-glow, .brutal-card-pink {
+    @apply skeuo-card;
+    box-shadow: var(--skeuo-shadow-raised), var(--skeuo-text-glow);
+  }
+
+  .glass-button, .brutal-btn {
+    @apply skeuo-button;
+  }
+
+  .glass-badge, .brutal-badge {
+    @apply skeuo-badge;
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 font-extrabold;
-  }
-
-  .grid-pattern {
-    background-image: radial-gradient(rgba(99, 102, 241, 0.15) 1px, transparent 1px);
-    background-size: 24px 24px;
+    @apply skeuo-title;
   }
 }
 
-/* Custom Sleek Scrollbar */
+/* Skeuomorphic Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+.light ::-webkit-scrollbar-track {
+  background: rgba(226, 232, 240, 0.6);
+  box-shadow: inset 0 0 4px rgba(148, 163, 184, 0.4);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.4);
-  border-radius: 9999px;
-  border: 2px solid rgba(15, 23, 42, 0.6);
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.7) 0%, rgba(49, 46, 129, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.4);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.7);
+  background: linear-gradient(180deg, rgba(129, 140, 248, 0.9) 0%, rgba(67, 56, 202, 1) 100%);
 }
-

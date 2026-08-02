@@ -4,9 +4,6 @@ import { Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { uploadDocument, type DocumentResponse } from "@/lib/api/documents";
 
 const ACCEPTED = "application/pdf,image/jpeg,image/png,image/webp";
@@ -44,13 +41,14 @@ export function UploadCard({ onUploaded }: Props) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Upload a document</CardTitle>
-        <CardDescription>PDF, JPEG, PNG, WebP — up to 50 MiB. Stored privately.</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3">
-        <Input
+    <div className="skeuo-card p-6 space-y-4">
+      <div>
+        <h3 className="text-sm font-bold text-foreground tracking-wide">Upload a Course Document</h3>
+        <p className="text-xs text-muted-foreground mt-1">PDF, JPEG, PNG, WebP — up to 50 MiB. Stored privately.</p>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <input
           ref={inputRef}
           type="file"
           accept={ACCEPTED}
@@ -60,14 +58,14 @@ export function UploadCard({ onUploaded }: Props) {
             if (f) void onFile(f);
           }}
         />
-        <Button onClick={onPick} disabled={busy} className="w-fit">
+        <button onClick={onPick} disabled={busy} className="skeuo-button w-fit text-xs px-5 py-2.5 font-bold">
           <Upload className="mr-2 h-4 w-4" />
-          {busy ? `Uploading… ${progress ?? 0}%` : "Choose file"}
-        </Button>
+          {busy ? `Uploading… ${progress ?? 0}%` : "Choose File"}
+        </button>
         {busy && progress !== null && (
-          <div className="h-1.5 w-full overflow-hidden rounded bg-muted">
+          <div className="h-2 w-full overflow-hidden skeuo-inset p-0.5">
             <div
-              className="h-full bg-primary transition-all"
+              className="h-full bg-indigo-500 rounded transition-all shadow-sm"
               style={{ width: `${progress}%` }}
               role="progressbar"
               aria-valuenow={progress}
@@ -76,7 +74,7 @@ export function UploadCard({ onUploaded }: Props) {
             />
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

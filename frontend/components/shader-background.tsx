@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTheme } from "next-themes";
 import * as THREE from "three";
 
 // --- GLSL Shaders ---
@@ -43,7 +44,7 @@ vec4 t(vec2 v) {
 
 float area(vec2 a, vec2 b, vec2 c) {
     float A = length(b-c), B = length(c-a), C = length(a-b), s = 0.5*(A+B+C);
-    return sqrt(s*(s-A)*(s-B)*(s-C));
+    return sqrt(max(0.0, s*(s-A)*(s-B)*(s-C)));
 }
 
 void main() {
@@ -99,7 +100,7 @@ void main() {
             float strengthFactor = 0.03 * uBrushStrength;
 
             float falloff = exp(-brushSizeFactor*q*q*q);
-            falloff = pow(falloff, 0.5);
+            falloff = pow(max(0.0, falloff), 0.5);
 
             me.xyw += strengthFactor * falloff * vec3(m, 10.);
             if (velMagnitude < 2.0) {
@@ -135,7 +136,6 @@ void main() {
 
     vec4 fluid = texture2D(iFluid, vUv);
     vec2 fluidVel = fluid.xy;
-    float fluidHeight = fluid.z;
 
     float mr = min(iResolution.x, iResolution.y);
     vec2 uv = (fragCoord * 2.0 - iResolution.xy) / mr;
@@ -179,8 +179,8 @@ void main() {
     col = mix(col, uColor4, mixer3 * 0.5);
 
     // Chrome Specular & Metallic Fresnel Highlights
-    vec3 chromeHighlight = vec3(0.85, 0.9, 1.0) * spec * 1.6;
-    vec3 metallicGlow = vec3(0.5, 0.6, 1.0) * fresnel * 0.7;
+    vec3 chromeHighlight = vec3(0.9, 0.95, 1.0) * spec * 1.6;
+    vec3 metallicGlow = vec3(0.6, 0.7, 1.0) * fresnel * 0.7;
 
     col = col * (0.35 + 0.65 * diff) + chromeHighlight + metallicGlow;
     col *= uColorIntensity;
@@ -189,21 +189,59 @@ void main() {
 }
 `;
 
-// --- Config: Metallic Liquid Obsidian, Indigo, & Chrome Palette ---
+// --- Skeuomorphic Multi-Theme Palette Configurations ---
 
-const config = {
-  brushSize: 30.0,
-  brushStrength: 0.8,
-  distortionAmount: 3.0,
-  fluidDecay: 0.98,
-  trailLength: 0.85,
-  stopDecay: 0.85,
-  color1: "#030712",   // Obsidian dark base
-  color2: "#1e1b4b",   // Deep metallic indigo
-  color3: "#311042",   // Metallic dark violet
-  color4: "#4f46e5",   // Chrome silver-blue sheen
-  colorIntensity: 1.15,
-  softness: 0.8,
+type ThemePalette = {
+  color1: string;
+  color2: string;
+  color3: string;
+  color4: string;
+  colorIntensity: number;
+};
+
+const PALETTES: Record<string, ThemePalette> = {
+  dark: {
+    color1: "#030712",
+    color2: "#1e1b4b",
+    color3: "#311042",
+    color4: "#4f46e5",
+    colorIntensity: 1.15,
+  },
+  light: {
+    color1: "#cbd5e1",
+    color2: "#94a3b8",
+    color3: "#818cf8",
+    color4: "#38bdf8",
+    colorIntensity: 0.95,
+  },
+  "theme-gold": {
+    color1: "#1c1917",
+    color2: "#78350f",
+    color3: "#b45309",
+    color4: "#facc15",
+    colorIntensity: 1.25,
+  },
+  "theme-emerald": {
+    color1: "#022c22",
+    color2: "#064e3b",
+    color3: "#047857",
+    color4: "#34d399",
+    colorIntensity: 1.2,
+  },
+  "theme-sapphire": {
+    color1: "#021438",
+    color2: "#1e3a8a",
+    color3: "#1d4ed8",
+    color4: "#60a5fa",
+    colorIntensity: 1.2,
+  },
+  "theme-crimson": {
+    color1: "#2a0812",
+    color2: "#881337",
+    color3: "#be123c",
+    color4: "#fb7185",
+    colorIntensity: 1.25,
+  },
 };
 
 function hexToVec3(hex: string): THREE.Vector3 {
@@ -215,6 +253,20 @@ function hexToVec3(hex: string): THREE.Vector3 {
 
 export function ShaderBackground() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
+  const displayMatRef = useRef<THREE.ShaderMaterial | null>(null);
+
+  // Dynamic Theme Uniform Update
+  useEffect(() => {
+    if (!displayMatRef.current || !displayMatRef.current.uniforms.uColor1) return;
+    const key = (theme && theme in PALETTES ? theme : "dark") as keyof typeof PALETTES;
+    const palette = (PALETTES[key] || PALETTES.dark) as ThemePalette;
+    displayMatRef.current.uniforms.uColor1.value = hexToVec3(palette.color1);
+    displayMatRef.current.uniforms.uColor2!.value = hexToVec3(palette.color2);
+    displayMatRef.current.uniforms.uColor3!.value = hexToVec3(palette.color3);
+    displayMatRef.current.uniforms.uColor4!.value = hexToVec3(palette.color4);
+    displayMatRef.current.uniforms.uColorIntensity!.value = palette.colorIntensity;
+  }, [theme]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -246,6 +298,10 @@ export function ShaderBackground() {
     let previousTarget = fluidTarget2;
     let frameCount = 0;
 
+    // Active palette
+    const initKey = (theme && theme in PALETTES ? theme : "dark") as keyof typeof PALETTES;
+    const activePalette = (PALETTES[initKey] || PALETTES.dark) as ThemePalette;
+
     // Fluid simulation material
     const fluidMat = new THREE.ShaderMaterial({
       uniforms: {
@@ -254,11 +310,11 @@ export function ShaderBackground() {
         iMouse: { value: new THREE.Vector4(0, 0, 0, 0) },
         iFrame: { value: 0 },
         iPreviousFrame: { value: null },
-        uBrushSize: { value: config.brushSize },
-        uBrushStrength: { value: config.brushStrength },
-        uFluidDecay: { value: config.fluidDecay },
-        uTrailLength: { value: config.trailLength },
-        uStopDecay: { value: config.stopDecay },
+        uBrushSize: { value: 30.0 },
+        uBrushStrength: { value: 0.8 },
+        uFluidDecay: { value: 0.98 },
+        uTrailLength: { value: 0.85 },
+        uStopDecay: { value: 0.85 },
       },
       vertexShader,
       fragmentShader: fluidShader,
@@ -270,37 +326,33 @@ export function ShaderBackground() {
         iTime: { value: 0 },
         iResolution: { value: new THREE.Vector2(width, height) },
         iFluid: { value: null },
-        uDistortionAmount: { value: config.distortionAmount },
-        uColor1: { value: hexToVec3(config.color1) },
-        uColor2: { value: hexToVec3(config.color2) },
-        uColor3: { value: hexToVec3(config.color3) },
-        uColor4: { value: hexToVec3(config.color4) },
-        uColorIntensity: { value: config.colorIntensity },
-        uSoftness: { value: config.softness },
+        uDistortionAmount: { value: 3.0 },
+        uColor1: { value: hexToVec3(activePalette.color1) },
+        uColor2: { value: hexToVec3(activePalette.color2) },
+        uColor3: { value: hexToVec3(activePalette.color3) },
+        uColor4: { value: hexToVec3(activePalette.color4) },
+        uColorIntensity: { value: activePalette.colorIntensity },
+        uSoftness: { value: 0.8 },
       },
       vertexShader,
       fragmentShader: displayShader,
     });
+    displayMatRef.current = displayMat;
 
     const fluidMesh = new THREE.Mesh(geometry, fluidMat);
     const displayMesh = new THREE.Mesh(geometry, displayMat);
 
     // Mouse state
-    let mouseX = 0, mouseY = 0, prevMouseX = 0, prevMouseY = 0;
-    let lastMoveTime = 0;
+    let mouseX = width / 2, mouseY = height / 2, prevMouseX = width / 2, prevMouseY = height / 2;
+    let lastMoveTime = performance.now();
 
     const onMouseMove = (e: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
       prevMouseX = mouseX;
       prevMouseY = mouseY;
-      mouseX = e.clientX - rect.left;
-      mouseY = rect.height - (e.clientY - rect.top);
+      mouseX = e.clientX;
+      mouseY = window.innerHeight - e.clientY;
       lastMoveTime = performance.now();
       fluidMat.uniforms.iMouse!.value.set(mouseX, mouseY, prevMouseX, prevMouseY);
-    };
-
-    const onMouseLeave = () => {
-      fluidMat.uniforms.iMouse!.value.set(0, 0, 0, 0);
     };
 
     const onResize = () => {
@@ -316,7 +368,6 @@ export function ShaderBackground() {
 
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("resize", onResize);
-    container.addEventListener("mouseleave", onMouseLeave);
 
     let rafId: number;
 
@@ -329,16 +380,16 @@ export function ShaderBackground() {
       fluidMat.uniforms.iFrame!.value = frameCount;
 
       // Decay mouse if idle
-      if (performance.now() - lastMoveTime > 100) {
+      if (performance.now() - lastMoveTime > 120) {
         fluidMat.uniforms.iMouse!.value.set(0, 0, 0, 0);
       }
 
-      // Fluid simulation pass → FBO
+      // Fluid simulation pass -> FBO
       fluidMat.uniforms.iPreviousFrame!.value = previousTarget.texture;
       renderer.setRenderTarget(currentTarget);
       renderer.render(fluidMesh, camera);
 
-      // Display pass → screen
+      // Display pass -> screen
       displayMat.uniforms.iFluid!.value = currentTarget.texture;
       renderer.setRenderTarget(null);
       renderer.render(displayMesh, camera);
@@ -356,14 +407,15 @@ export function ShaderBackground() {
       cancelAnimationFrame(rafId);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("resize", onResize);
-      container.removeEventListener("mouseleave", onMouseLeave);
       renderer.dispose();
       fluidTarget1.dispose();
       fluidTarget2.dispose();
       geometry.dispose();
       fluidMat.dispose();
       displayMat.dispose();
-      container.removeChild(renderer.domElement);
+      if (container.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement);
+      }
     };
   }, []);
 
@@ -371,7 +423,6 @@ export function ShaderBackground() {
     <div
       ref={containerRef}
       className="fixed inset-0 w-screen h-screen -z-10 pointer-events-none"
-      style={{ pointerEvents: "none" }}
     />
   );
 }

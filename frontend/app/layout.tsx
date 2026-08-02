@@ -11,18 +11,18 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Polaris — Brutalist AI Academic Navigator",
-  description: "Autonomous academic intelligence engine powered by LangGraph, LiteRT, & RAG.",
+  title: "Polaris — Skeuomorphic AI Academic Navigator",
+  description: "Autonomous academic intelligence engine powered by LangGraph, WebGL Shaders & Skeuomorphic Design.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
-      <body className={`${inter.className} relative bg-black text-foreground`}>
+      <body className={`${inter.className} relative text-foreground min-h-screen antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider>
             <ShaderBackground />
-            <div className="relative z-10 pointer-events-auto">{children}</div>
+            <div className="relative z-10 pointer-events-auto min-h-screen flex flex-col">{children}</div>
             <Toaster position="bottom-right" />
           </AuthProvider>
         </ThemeProvider>

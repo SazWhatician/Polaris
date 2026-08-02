@@ -17,7 +17,7 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN python -m venv /opt/venv \
  && /opt/venv/bin/pip install --upgrade pip \
- && /opt/venv/bin/pip install -r requirements.txt
+ && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # ---- Stage 2: runtime ----
 FROM python:3.11-slim AS runtime
