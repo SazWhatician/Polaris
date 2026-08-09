@@ -125,3 +125,21 @@ async def test_delete_204_then_list_empty(api: tuple[AsyncClient, DocumentServic
     assert r2.status_code == 204
     r3 = await client.get("/api/documents")
     assert r3.json()["items"] == []
+
+
+async def test_direct_upload_success(api: tuple[AsyncClient, DocumentService]) -> None:
+    client, _ = api
+    r1 = await client.post(
+        "/api/documents",
+        json={"filename": "doc.pdf", "mime_type": "application/pdf", "size_bytes": 10},
+    )
+    doc_id = r1.json()["document_id"]
+    r2 = await client.post(
+        f"/api/documents/{doc_id}/upload",
+        files={"file": ("doc.pdf", b"pdf content", "application/pdf")},
+    )
+    assert r2.status_code == 200
+    body = r2.json()
+    assert body["filename"] == "doc.pdf"
+    assert body["status"] == "queued"
+

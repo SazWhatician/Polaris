@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Layers, Activity, RefreshCw, Sparkles, Target, Calendar, MessageSquare, FileText } from "lucide-react";
+import { Layers, Activity, RefreshCw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import Link from "next/link";
 
 import { SiteHeader } from "@/components/site-header";
 import { KnowledgeGraphViewer } from "@/components/knowledge-graph-viewer";
 import { ThemeDial, SkeuoScrews } from "@/components/skeuomorphic-controls";
+import { BorderGlow } from "@/components/border-glow";
 import { useAuth } from "@/lib/auth-context";
 import { fetchLatestGraph, extractKnowledgeGraph, type KnowledgeGraph } from "@/lib/api/graph";
 import { useGsapEntrance } from "@/lib/use-gsap-animations";
@@ -93,13 +93,6 @@ export default function GraphPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-            <WorkflowStep number="1" label="Upload Docs" href="/dashboard" icon={<FileText className="h-3.5 w-3.5 text-indigo-400" />} />
-            <WorkflowStep number="2" label="Grounded RAG" href="/chat" icon={<MessageSquare className="h-3.5 w-3.5 text-purple-400" />} />
-            <WorkflowStep number="3" label="Gaps & YT" href="/gaps" icon={<Target className="h-3.5 w-3.5 text-pink-400" />} />
-            <WorkflowStep number="4" label="Revision Plan" href="/plan" icon={<Calendar className="h-3.5 w-3.5 text-cyan-400" />} />
-            <WorkflowStep active number="5" label="Knowledge Graph" href="/graph" icon={<Layers className="h-3.5 w-3.5 text-emerald-400" />} />
-          </div>
         </div>
 
         {/* Header Block & Telemetry Cards */}
@@ -132,7 +125,9 @@ export default function GraphPage() {
               <span>Constructing Knowledge Graph Visualization...</span>
             </div>
           ) : graph ? (
-            <KnowledgeGraphViewer graph={graph} />
+            <BorderGlow borderRadius={20} glowRadius={35} colors={['#6366f1', '#a855f7', '#34d399']}>
+              <KnowledgeGraphViewer graph={graph} />
+            </BorderGlow>
           ) : null}
         </div>
       </main>
@@ -140,38 +135,7 @@ export default function GraphPage() {
   );
 }
 
-function WorkflowStep({
-  number,
-  label,
-  href,
-  icon,
-  active = false,
-}: {
-  number: string;
-  label: string;
-  href: React.ComponentProps<typeof Link>["href"];
-  icon: React.ReactNode;
-  active?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`p-2.5 rounded-xl flex items-center gap-2.5 transition-all text-xs font-semibold select-none ${
-        active
-          ? "skeuo-button text-white font-bold"
-          : "skeuo-inset hover:text-foreground"
-      }`}
-    >
-      <span className={`w-5 h-5 rounded-full text-[11px] font-mono font-bold flex items-center justify-center ${
-        active ? "bg-white text-indigo-700" : "bg-white/10 text-muted-foreground"
-      }`}>
-        {number}
-      </span>
-      {icon}
-      <span className="truncate">{label}</span>
-    </Link>
-  );
-}
+
 
 function StatTile({
   label,

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -8,17 +8,18 @@ import { ShaderBackground } from "@/components/shader-background";
 
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
 
 export const metadata: Metadata = {
-  title: "Polaris — Skeuomorphic AI Academic Navigator",
-  description: "Autonomous academic intelligence engine powered by LangGraph, WebGL Shaders & Skeuomorphic Design.",
+  title: "Polaris — Grounded AI Academic Platform",
+  description: "Autonomous academic intelligence engine powered by Grounded RAG, WebGL Shaders & Vector Indexing.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
-      <body className={`${inter.className} relative text-foreground min-h-screen antialiased`}>
+      <body className={`${inter.variable} ${jakarta.variable} font-sans relative text-foreground min-h-screen antialiased selection:bg-primary/30 selection:text-foreground`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider>
             <ShaderBackground />

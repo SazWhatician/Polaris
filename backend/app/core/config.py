@@ -54,6 +54,10 @@ class Settings(BaseSettings):
     gemini_api_keys: str | None = None  # comma-separated list of Gemini keys
     gemini_model: str = "gemini-1.5-flash"
 
+    nvidia_nim_api_key: str | None = None
+    nvidia_nim_api_keys: str | None = None
+    nvidia_nim_model: str = "deepseek-ai/deepseek-v4-pro"
+
     @property
     def parsed_groq_api_keys(self) -> list[str]:
         if self.groq_api_keys:
@@ -69,6 +73,14 @@ class Settings(BaseSettings):
             if keys:
                 return keys
         return [self.gemini_api_key] if self.gemini_api_key else []
+
+    @property
+    def parsed_nvidia_nim_api_keys(self) -> list[str]:
+        if self.nvidia_nim_api_keys:
+            keys = [k.strip() for k in self.nvidia_nim_api_keys.split(",") if k.strip()]
+            if keys:
+                return keys
+        return [self.nvidia_nim_api_key] if self.nvidia_nim_api_key else []
 
     # --- External APIs ---
     youtube_api_key: str | None = None

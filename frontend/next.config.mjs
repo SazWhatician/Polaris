@@ -1,9 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    typedRoutes: true,
-  },
+  transpilePackages: ["three", "gsap"],
+  typedRoutes: true,
 };
 
 export default nextConfig;

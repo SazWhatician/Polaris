@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
+import { usePathname } from "next/navigation";
 import * as THREE from "three";
 
 // --- GLSL Shaders ---
@@ -252,6 +253,7 @@ function hexToVec3(hex: string): THREE.Vector3 {
 }
 
 export function ShaderBackground() {
+  const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const displayMatRef = useRef<THREE.ShaderMaterial | null>(null);
@@ -269,6 +271,7 @@ export function ShaderBackground() {
   }, [theme]);
 
   useEffect(() => {
+    if (pathname !== "/") return;
     const container = containerRef.current;
     if (!container) return;
 
@@ -417,7 +420,9 @@ export function ShaderBackground() {
         container.removeChild(renderer.domElement);
       }
     };
-  }, []);
+  }, [pathname]);
+
+  if (pathname !== "/") return null;
 
   return (
     <div

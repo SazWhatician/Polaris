@@ -76,3 +76,41 @@ async def test_llm_router_failover_structured():
     assert isinstance(result, MockSchema)
     assert result.summary == "Fallback summary"
     assert result.score == 0.95
+
+
+def test_create_default_llm_router_task_specialization():
+    from app.services.llm.router import create_default_llm_router
+
+    chat_router = create_default_llm_router(
+        groq_api_key="g1,g2",
+        nvidia_api_key="n1",
+        gemini_api_key="m1",
+        task="chat",
+    )
+    names = [p.provider_name for p in chat_router.providers]
+    assert names[0].startswith("nvidia")
+    assert names[1] == "groq"
+    assert names[2] == "gemini"
+
+    graph_router = create_default_llm_router(
+        groq_api_key="g1",
+        nvidia_api_key="n1",
+        gemini_api_key="m1",
+        task="graph",
+    )
+    graph_names = [p.provider_name for p in graph_router.providers]
+    assert graph_names[0] == "groq"
+    assert graph_names[1].startswith("nvidia")
+    assert graph_names[2] == "gemini"
+
+    syllabus_router = create_default_llm_router(
+        groq_api_key="g1",
+        nvidia_api_key="n1",
+        gemini_api_key="m1",
+        task="syllabus",
+    )
+    syl_names = [p.provider_name for p in syllabus_router.providers]
+    assert syl_names[0] == "gemini"
+    assert syl_names[1] == "groq"
+    assert syl_names[2].startswith("nvidia")
+

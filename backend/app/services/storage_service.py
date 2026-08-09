@@ -54,6 +54,9 @@ class StorageService:
     async def delete_blob(self, storage_path: str) -> None:
         await asyncio.to_thread(self._delete_sync, storage_path)
 
+    async def upload_bytes(self, storage_path: str, data: bytes, mime_type: str) -> None:
+        await asyncio.to_thread(self._upload_sync, storage_path, data, mime_type)
+
     # ------- sync internals -------
 
     def _sign_upload_url(self, storage_path: str, mime_type: str, ttl_seconds: int) -> str:
@@ -80,3 +83,7 @@ class StorageService:
         blob = self._bucket.blob(storage_path)
         if blob.exists():
             blob.delete()
+
+    def _upload_sync(self, storage_path: str, data: bytes, mime_type: str) -> None:
+        blob = self._bucket.blob(storage_path)
+        blob.upload_from_string(data, content_type=mime_type)

@@ -68,7 +68,7 @@ export async function listPages(id: string): Promise<PageItem[]> {
   return res.items;
 }
 
-/** End-to-end upload: request signed URL → PUT bytes → finalize. */
+/** End-to-end upload: request signed URL → PUT bytes → finalize (with direct upload fallback). */
 export async function uploadDocument(
   file: File,
   onProgress?: (pct: number) => void,
@@ -82,11 +82,32 @@ export async function uploadDocument(
     }),
   });
 
-  await putWithProgress(create.upload_url, file, create.required_headers, onProgress);
+  try {
+    await putWithProgress(create.upload_url, file, create.required_headers, onProgress);
+    return await api<DocumentResponse>(`/api/documents/${create.document_id}/finalize`, {
+      method: "POST",
+    });
+  } catch (err) {
+    console.warn("Signed URL upload failed, falling back to direct upload", err);
+    return await uploadDirect(create.document_id, file, onProgress);
+  }
+}
 
-  return await api<DocumentResponse>(`/api/documents/${create.document_id}/finalize`, {
+export async function uploadDirect(
+  documentId: string,
+  file: File,
+  onProgress?: (pct: number) => void,
+): Promise<DocumentResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await api<DocumentResponse>(`/api/documents/${documentId}/upload`, {
     method: "POST",
+    body: formData,
   });
+
+  if (onProgress) onProgress(100);
+  return res;
 }
 
 function putWithProgress(
@@ -110,3 +131,4 @@ function putWithProgress(
     xhr.send(file);
   });
 }
+

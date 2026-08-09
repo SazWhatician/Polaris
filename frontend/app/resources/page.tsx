@@ -57,7 +57,7 @@ export default function ResourcesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pb-16">
+    <div className="min-h-screen text-foreground pb-16">
       <SiteHeader />
       <main className="max-w-5xl mx-auto px-4 sm:px-8 py-8 space-y-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">

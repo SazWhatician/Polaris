@@ -99,7 +99,14 @@ class DocumentService:
             required_headers=auth.required_headers,
         )
 
+    async def upload_direct(
+        self, user_id: str, doc_id: str, content: bytes, mime_type: str
+    ) -> None:
+        doc = await self._require_owned(user_id, doc_id)
+        await self._storage.upload_bytes(doc.storage_path, content, mime_type)
+
     async def finalize_upload(self, user_id: str, doc_id: str) -> Document:
+
         doc = await self._require_owned(user_id, doc_id)
         if not await self._storage.blob_exists(doc.storage_path):
             raise DocumentNotUploadedError(doc_id)

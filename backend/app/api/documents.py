@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 
 from app.core.config import get_settings
 from app.core.deps import CurrentUser
@@ -68,6 +68,27 @@ async def request_upload(
         return await service.request_upload(user.uid, body)
     except DocumentValidationError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/{document_id}/upload", response_model=DocumentResponse)
+async def upload_direct(
+    document_id: str,
+    user: CurrentUser,
+    service: DocService,
+    file: UploadFile = File(...),
+) -> DocumentResponse:
+    content = await file.read()
+    try:
+        await service.upload_direct(
+            user.uid,
+            document_id,
+            content,
+            file.content_type or "application/octet-stream",
+        )
+        doc = await service.finalize_upload(user.uid, document_id)
+        return DocumentResponse.model_validate(doc, from_attributes=True)
+    except DocumentNotFoundError as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Document not found") from exc
 
 
 @router.post("/{document_id}/finalize", response_model=DocumentResponse)

@@ -58,3 +58,6 @@ class GroqProvider(BaseLLMProvider):
         clean_text = response_text.replace("```json", "").replace("```", "").strip()
         data = json.loads(clean_text)
         return schema_class.model_validate(data)
+
+
+GroqLLMProvider = GroqProvider

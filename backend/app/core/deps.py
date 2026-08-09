@@ -59,3 +59,8 @@ async def verify_id_token(request: Request) -> AuthenticatedUser:
 
 
 CurrentUser = Annotated[AuthenticatedUser, Depends(verify_id_token)]
+
+
+async def get_current_user_id(user: AuthenticatedUser = Depends(verify_id_token)) -> str:
+    return user.uid
+

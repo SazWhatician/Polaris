@@ -99,3 +99,80 @@ class LLMRouter:
                 last_exception = exc
 
         raise last_exception or RuntimeError("All LLM providers in structured fallback chain failed")
+
+
+def create_default_llm_router(
+    groq_api_key: Optional[str] = None,
+    nvidia_api_key: Optional[str] = None,
+    gemini_api_key: Optional[str] = None,
+    task: str = "chat",
+) -> LLMRouter:
+    """Builds task-specialized LLMRouter distributing load across NVIDIA DeepSeek, Groq, and Gemini with key rotation."""
+    from app.core.config import get_settings
+    from app.services.groq_client import GroqClient
+    from app.services.gemini_client import GeminiClient
+    from app.services.llm.nvidia_provider import NvidiaLLMProvider
+    from app.services.llm.groq_provider import GroqLLMProvider
+    from app.services.llm.gemini_provider import GeminiLLMProvider
+
+    settings = get_settings()
+
+    # Determine key lists: explicit args take precedence over settings
+    groq_keys = [groq_api_key] if groq_api_key else settings.parsed_groq_api_keys
+    nvidia_keys = [nvidia_api_key] if nvidia_api_key else settings.parsed_nvidia_nim_api_keys
+    gemini_keys = [gemini_api_key] if gemini_api_key else settings.parsed_gemini_api_keys
+
+    nv_provider = (
+        NvidiaLLMProvider(api_keys=nvidia_keys, model=settings.nvidia_nim_model)
+        if nvidia_keys
+        else None
+    )
+    gq_provider = (
+        GroqLLMProvider(
+            groq_client=GroqClient(api_keys=groq_keys, model=settings.groq_model)
+        )
+        if groq_keys
+        else None
+    )
+    gm_provider = (
+        GeminiLLMProvider(
+            gemini_client=GeminiClient(api_keys=gemini_keys, model=settings.gemini_model)
+        )
+        if gemini_keys
+        else None
+    )
+
+    providers = []
+
+    if task == "chat":
+        # Chat -> NVIDIA DeepSeek V4 Pro -> Groq -> Gemini
+        for p in (nv_provider, gq_provider, gm_provider):
+            if p:
+                providers.append(p)
+
+    elif task in ("graph", "gap"):
+        # Graph & Gap Extraction -> Groq (Fast JSON) -> NVIDIA DeepSeek -> Gemini
+        for p in (gq_provider, nv_provider, gm_provider):
+            if p:
+                providers.append(p)
+
+    elif task == "syllabus":
+        # Syllabus Parsing -> Gemini (1M Token Context) -> Groq -> NVIDIA DeepSeek
+        for p in (gm_provider, gq_provider, nv_provider):
+            if p:
+                providers.append(p)
+
+    else:
+        # Fallback default order
+        for p in (nv_provider, gq_provider, gm_provider):
+            if p:
+                providers.append(p)
+
+    if not providers:
+        dummy_groq = GroqClient(api_key="dummy_key", model="llama-3.3-70b-versatile")
+        providers.append(GroqLLMProvider(groq_client=dummy_groq))
+
+    return LLMRouter(providers)
+
+
+
