@@ -1,0 +1,82 @@
+[
+  {
+    "id": "ml_engineer",
+    "title": "Machine Learning Engineer",
+    "description": "Design, build, and deploy ML models and pipelines at scale.",
+    "required_skills": [
+      "Linear Algebra", "Calculus", "Probability & Statistics",
+      "Python", "NumPy & Pandas", "Scikit-Learn",
+      "Neural Networks", "Deep Learning Frameworks (PyTorch/TensorFlow)",
+      "Feature Engineering", "Model Evaluation & Validation",
+      "MLOps & Model Deployment", "Data Pipelines",
+      "Transformers & Attention Mechanisms", "Computer Vision or NLP"
+    ],
+    "recommended_projects": [
+      {"title": "End-to-end image classifier", "description": "Build, train, evaluate, and deploy a CNN on a custom dataset with an API endpoint."},
+      {"title": "Recommendation engine", "description": "Collaborative filtering + content-based hybrid system with A/B evaluation framework."},
+      {"title": "ML pipeline with MLflow", "description": "Automated training, versioning, and deployment pipeline using MLflow or similar."}
+    ],
+    "milestones": ["Math foundations", "Core ML algorithms", "Deep learning", "Production ML systems"]
+  },
+  {
+    "id": "backend_engineer",
+    "title": "Backend Engineer",
+    "description": "Build scalable server-side systems, APIs, and distributed infrastructure.",
+    "required_skills": [
+      "Data Structures & Algorithms", "Operating Systems Concepts",
+      "Networking (HTTP, TCP/IP, DNS)", "Databases (SQL & NoSQL)",
+      "API Design (REST, GraphQL)", "Authentication & Authorization",
+      "Concurrency & Parallelism", "Caching Strategies",
+      "Message Queues", "Containerization (Docker)",
+      "CI/CD Pipelines", "Cloud Services (AWS/GCP/Azure)",
+      "System Design", "Monitoring & Observability"
+    ],
+    "recommended_projects": [
+      {"title": "Rate-limited API gateway", "description": "Build a reverse proxy with token bucket rate limiting, circuit breaking, and request tracing."},
+      {"title": "Distributed task queue", "description": "Implement a Redis-backed async task queue with retry semantics and dead-letter handling."},
+      {"title": "Real-time chat system", "description": "WebSocket-based chat with presence, message persistence, and horizontal scaling."}
+    ],
+    "milestones": ["CS fundamentals", "Web & API development", "Databases & caching", "Distributed systems"]
+  },
+  {
+    "id": "data_scientist",
+    "title": "Data Scientist",
+    "description": "Extract insights from data through statistical analysis, visualization, and predictive modeling.",
+    "required_skills": [
+      "Statistics & Hypothesis Testing", "Probability Distributions",
+      "Python & R", "SQL & Data Wrangling",
+      "Data Visualization (Matplotlib, Seaborn, Plotly)",
+      "Exploratory Data Analysis", "Regression & Classification",
+      "Clustering & Dimensionality Reduction",
+      "Time Series Analysis", "A/B Testing & Experiment Design",
+      "Feature Engineering", "Communication & Storytelling with Data",
+      "Bayesian Methods", "Domain Expertise"
+    ],
+    "recommended_projects": [
+      {"title": "Customer churn prediction", "description": "End-to-end analysis: EDA, feature engineering, model comparison, and stakeholder presentation."},
+      {"title": "A/B test analysis framework", "description": "Statistical testing pipeline with power analysis, multiple comparison correction, and automated reporting."},
+      {"title": "Interactive dashboard", "description": "Build a Streamlit/Dash dashboard for real-time KPI monitoring with drill-down capabilities."}
+    ],
+    "milestones": ["Statistics foundations", "Data manipulation & viz", "Predictive modeling", "Business impact"]
+  },
+  {
+    "id": "swe",
+    "title": "Software Engineer (Full-Stack)",
+    "description": "Build end-to-end web applications with modern frontend and backend technologies.",
+    "required_skills": [
+      "Data Structures & Algorithms", "Git & Version Control",
+      "HTML, CSS, JavaScript/TypeScript", "React or Next.js",
+      "Node.js or Python Backend", "Database Design",
+      "REST API Design", "Authentication Patterns",
+      "Testing (Unit, Integration, E2E)", "CI/CD",
+      "Docker & Deployment", "Performance Optimization",
+      "Security Best Practices", "System Design Basics"
+    ],
+    "recommended_projects": [
+      {"title": "Full-stack SaaS app", "description": "Multi-tenant app with auth, billing, CRUD, and deployment — demonstrates end-to-end ownership."},
+      {"title": "Open-source contribution", "description": "Contribute a meaningful feature or fix to a popular open-source project with PR review."},
+      {"title": "CLI tool with distribution", "description": "Build a developer tool published to npm/PyPI with tests, docs, and CI."}
+    ],
+    "milestones": ["Programming fundamentals", "Frontend development", "Backend & databases", "Production systems"]
+  }
+]

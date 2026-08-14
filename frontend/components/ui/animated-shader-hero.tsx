@@ -31,15 +31,19 @@ export interface HeroProps {
 
 const geminiShaderSource = `#version 300 es
 /*********
-* Gemini / Polaris Dual-Mode Shader
-* Light Mode: Luminous Sky Clouds
-* Dark Mode: Deep Cosmic Plasma (Purple, Red, Blue)
+* Polaris Multi-Theme WebGL Shader
+* 0 = Cosmic Obsidian (Purple/Red/Blue)
+* 1 = Pink Aurora (Light Mode Pastel Clouds)
+* 2 = Cyber Gold (Gold/Amber/Orange)
+* 3 = Ocean Sapphire (Deep Blue/Cyan)
+* 4 = Deep Emerald (Jade/Mint/Violet)
+* 5 = Crimson Plasma (Ruby/Rose/Fire)
 */
 precision highp float;
 out vec4 O;
 uniform vec2 resolution;
 uniform float time;
-uniform int isLight;
+uniform int themeMode;
 #define FC gl_FragCoord.xy
 #define T time
 #define R resolution
@@ -91,23 +95,49 @@ void main(void) {
 		uv+=.1*cos(i*vec2(.1+.01*i, .8)+i*i+T*.5+.1*uv.x);
 		vec2 p=uv;
 		float d=length(p);
-		vec3 geminiColor = cos(sin(i) * vec3(1.5, 0.4, 2.8)) + vec3(1.1, 0.5, 1.4);
-		col += .0014 / d * geminiColor;
+
+		// Dynamic theme color palette
+		vec3 colorVec = cos(sin(i) * vec3(1.5, 0.4, 2.8)) + vec3(1.1, 0.5, 1.4);
+		if (themeMode == 2) {
+			// Cyber Gold (Amber & Gold)
+			colorVec = cos(sin(i) * vec3(2.5, 1.2, 0.3)) + vec3(1.4, 0.9, 0.2);
+		} else if (themeMode == 3) {
+			// Ocean Sapphire (Deep Blue & Cyan)
+			colorVec = cos(sin(i) * vec3(0.3, 1.5, 2.5)) + vec3(0.2, 0.8, 1.4);
+		} else if (themeMode == 4) {
+			// Deep Emerald (Jade & Mint)
+			colorVec = cos(sin(i) * vec3(0.4, 2.5, 1.2)) + vec3(0.2, 1.3, 0.7);
+		} else if (themeMode == 5) {
+			// Crimson Plasma (Ruby & Fire)
+			colorVec = cos(sin(i) * vec3(2.8, 0.3, 0.8)) + vec3(1.5, 0.3, 0.5);
+		}
+
+		col += .0014 / d * colorVec;
 		float b = noise(i + p + bg * 1.731);
 		col += .0025 * b / length(max(p, vec2(b * p.x * .02, p.y)));
-		col = mix(col, vec3(bg * 0.12, bg * 0.04, bg * 0.28), d);
+
+		vec3 bgGlow = vec3(bg * 0.12, bg * 0.04, bg * 0.28);
+		if (themeMode == 2) bgGlow = vec3(bg * 0.18, bg * 0.10, bg * 0.02);
+		else if (themeMode == 3) bgGlow = vec3(bg * 0.02, bg * 0.10, bg * 0.22);
+		else if (themeMode == 4) bgGlow = vec3(bg * 0.02, bg * 0.18, bg * 0.08);
+		else if (themeMode == 5) bgGlow = vec3(bg * 0.22, bg * 0.02, bg * 0.06);
+
+		col = mix(col, bgGlow, d);
 	}
 
-	if (isLight == 1) {
-		vec3 lightSky = vec3(0.96, 0.96, 0.99) - col * 0.35;
-		lightSky = mix(lightSky, vec3(0.86, 0.88, 0.98), bg * 0.35);
-		O = vec4(lightSky, 1);
+	if (themeMode == 1) {
+		// Light Mode Pink Aurora
+		vec3 skyBase = mix(vec3(0.98, 0.92, 0.95), vec3(0.95, 0.88, 0.96), st.y * 0.5 + 0.5);
+		vec3 pinkSwirl = vec3(col.r * 1.1 + 0.2, col.g * 0.3 + 0.1, col.b * 0.7 + 0.3);
+		vec3 cloudTint = mix(skyBase, vec3(0.98, 0.70, 0.85), bg * 0.6);
+		vec3 finalCol = cloudTint + pinkSwirl * 0.35;
+		O = vec4(finalCol, 1);
 	} else {
 		O = vec4(col, 1);
 	}
 }`;
 
-const useShaderBackground = (isLightMode: boolean) => {
+const useShaderBackground = (themeModeCode: number) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const rendererRef = useRef<WebGLRenderer | null>(null);
@@ -253,17 +283,17 @@ void main(){gl_Position=position;}`;
       (program as any).touch = gl.getUniformLocation(program, "touch");
       (program as any).pointerCount = gl.getUniformLocation(program, "pointerCount");
       (program as any).pointers = gl.getUniformLocation(program, "pointers");
-      (program as any).isLight = gl.getUniformLocation(program, "isLight");
+      (program as any).themeMode = gl.getUniformLocation(program, "themeMode");
     }
 
-    render(now = 0, isLightMode = false) {
+    render(now = 0, modeCode = 0) {
       const gl = this.gl;
       const program = this.program;
 
       if (!gl || !program || gl.getProgramParameter(program, gl.DELETE_STATUS)) return;
 
-      if (isLightMode) {
-        gl.clearColor(0.96, 0.96, 0.99, 1);
+      if (modeCode === 1) {
+        gl.clearColor(0.96, 0.94, 0.97, 1);
       } else {
         gl.clearColor(0, 0, 0, 1);
       }
@@ -277,7 +307,7 @@ void main(){gl_Position=position;}`;
       gl.uniform2f((program as any).touch, this.mouseCoords[0] ?? 0, this.mouseCoords[1] ?? 0);
       gl.uniform1i((program as any).pointerCount, this.nbrOfPointers);
       gl.uniform2fv((program as any).pointers, this.pointerCoords);
-      gl.uniform1i((program as any).isLight, isLightMode ? 1 : 0);
+      gl.uniform1i((program as any).themeMode, modeCode);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
   }
@@ -374,7 +404,7 @@ void main(){gl_Position=position;}`;
     rendererRef.current.updatePointerCount(pointersRef.current.count);
     rendererRef.current.updatePointerCoords(pointersRef.current.coords);
     rendererRef.current.updateMove(pointersRef.current.move);
-    rendererRef.current.render(now, isLightMode);
+    rendererRef.current.render(now, themeModeCode);
     animationFrameRef.current = requestAnimationFrame(loop);
   };
 
@@ -409,7 +439,7 @@ void main(){gl_Position=position;}`;
         rendererRef.current.reset();
       }
     };
-  }, [isLightMode]);
+  }, [themeModeCode]);
 
   return canvasRef;
 };
@@ -422,9 +452,17 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
   className = "",
   fullPage = true,
 }) => {
-  const { resolvedTheme, theme } = useTheme();
-  const isLightMode = resolvedTheme === "light" || theme === "light";
-  const canvasRef = useShaderBackground(isLightMode);
+  const { theme, resolvedTheme } = useTheme();
+  
+  let themeModeCode = 0; // default dark
+  const activeTheme = theme || resolvedTheme;
+  if (activeTheme === "light") themeModeCode = 1;
+  else if (activeTheme === "theme-gold") themeModeCode = 2;
+  else if (activeTheme === "theme-sapphire") themeModeCode = 3;
+  else if (activeTheme === "theme-emerald") themeModeCode = 4;
+  else if (activeTheme === "theme-crimson") themeModeCode = 5;
+
+  const canvasRef = useShaderBackground(themeModeCode);
 
   return (
     <div className={`relative w-full ${fullPage ? "min-h-screen" : "h-screen"} overflow-hidden ${className}`}>
@@ -435,11 +473,11 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
       />
 
       {/* Hero Content Overlay */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-slate-900 dark:text-white p-6 pt-28 pb-16 min-h-screen">
+      <div className="relative z-10 flex flex-col items-center justify-center text-foreground p-6 pt-28 pb-16 min-h-screen">
         {/* Trust Badge */}
         {trustBadge && (
           <div className="mb-8">
-            <div className="flex items-center gap-2 px-6 py-2.5 bg-white/80 dark:bg-purple-500/10 backdrop-blur-xl border border-slate-200/80 dark:border-purple-400/30 rounded-full text-sm shadow-xl transition-colors">
+            <div className="flex items-center gap-2 px-6 py-2.5 bg-primary/10 border border-primary/20 backdrop-blur-2xl rounded-full text-sm shadow-xl transition-all">
               {trustBadge.icons && (
                 <div className="flex gap-1 text-sm">
                   {trustBadge.icons.map((icon, index) => (
@@ -447,20 +485,20 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
                   ))}
                 </div>
               )}
-              <span className="text-slate-800 dark:text-purple-100 font-semibold">{trustBadge.text}</span>
+              <span className="text-primary font-bold">{trustBadge.text}</span>
             </div>
           </div>
         )}
 
         <div className="text-center space-y-6 max-w-4xl mx-auto px-4">
-          {/* Simple Name Title "POLARIS" */}
-          <h1 className="text-6xl sm:text-8xl lg:text-9xl font-black tracking-tighter bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-300 dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent drop-shadow-2xl">
+          {/* Theme-Adaptive Gradient Title "POLARIS" */}
+          <h1 className="text-6xl sm:text-8xl lg:text-9xl font-black tracking-tighter bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent drop-shadow-2xl">
             {title}
           </h1>
 
           {/* Subtitle */}
           <div className="max-w-2xl mx-auto">
-            <p className="text-base sm:text-xl lg:text-2xl text-slate-700 dark:text-gray-200 font-normal leading-relaxed drop-shadow">
+            <p className="text-base sm:text-xl lg:text-2xl text-muted-foreground font-medium leading-relaxed drop-shadow-sm">
               {subtitle}
             </p>
           </div>
@@ -471,7 +509,7 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
               {buttons.primary && (
                 <button
                   onClick={buttons.primary.onClick}
-                  className="px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white rounded-full font-bold text-base sm:text-lg transition-all duration-300 hover:scale-105 shadow-xl shadow-purple-500/25 border border-purple-300/30"
+                  className="px-8 py-4 bg-primary text-primary-foreground hover:opacity-90 rounded-full font-bold text-base sm:text-lg transition-all duration-300 hover:scale-105 shadow-xl shadow-primary/25 border border-primary/30"
                 >
                   {buttons.primary.text}
                 </button>
@@ -479,7 +517,7 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
               {buttons.secondary && (
                 <button
                   onClick={buttons.secondary.onClick}
-                  className="px-8 py-4 bg-white/80 hover:bg-white dark:bg-purple-500/15 dark:hover:bg-purple-500/25 border border-slate-300/80 dark:border-purple-300/30 text-slate-900 dark:text-purple-100 rounded-full font-bold text-base sm:text-lg transition-all duration-300 hover:scale-105 backdrop-blur-md shadow-md"
+                  className="px-8 py-4 bg-secondary/80 hover:bg-secondary border border-border/80 text-secondary-foreground rounded-full font-bold text-base sm:text-lg transition-all duration-300 hover:scale-105 backdrop-blur-xl shadow-md"
                 >
                   {buttons.secondary.text}
                 </button>

@@ -61,12 +61,13 @@ Backend: http://localhost:8000/docs · Frontend: http://localhost:3000 · Jaeger
 | 2 | OCR pipeline | ✅ |
 | 3 | RAG chat + eval harness (**MVP**) | ✅ |
 | 4 | Syllabus intelligence | ✅ |
-| 5 | Learning gap agent | ⚪ |
-| 6 | Resource discovery agent | ⚪ |
-| 7 | Revision planner agent | ⚪ |
-| 8 | Knowledge graph engine | ⚪ |
-| 9 | Academic digital twin | ⚪ |
-| 10 | Pathfinder career agent + deploy | ⚪ |
+| 5 | Learning gap agent | ✅ |
+| 6 | Resource discovery agent | ✅ |
+| 7 | Revision planner agent | ✅ |
+| 8 | Knowledge graph engine | ✅ |
+| 9 | Multi-LLM failover router | ✅ |
+| 10 | Academic digital twin + Pathfinder career agent + deploy | ✅ |
+| 11 | Ambient study layer (PolarAssist integration) | ✅ |
 
 Phase summaries live in `docs/phase-summaries/`.
 

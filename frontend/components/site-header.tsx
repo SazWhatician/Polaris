@@ -30,6 +30,8 @@ const NAV_ITEMS = [
   { href: "/gaps", label: "Gaps & YT", icon: Target },
   { href: "/plan", label: "Revision Plan", icon: Calendar },
   { href: "/graph", label: "Knowledge Graph", icon: Layers },
+  { href: "/twin", label: "Academic Twin", icon: Activity },
+  { href: "/pathfinder", label: "Pathfinder", icon: Sparkles },
   { href: "/syllabus", label: "Syllabus", icon: BookOpen },
   { href: "/resources", label: "Resources", icon: Sparkles },
 ];
