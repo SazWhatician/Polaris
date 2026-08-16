@@ -16,10 +16,12 @@ import {
 import { toast } from "sonner";
 
 import { SiteHeader } from "@/components/site-header";
-import { SkeuoScrews } from "@/components/skeuomorphic-controls";
-import { BorderGlow } from "@/components/border-glow";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatCard } from "@/components/ui/stat-card";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
-import { useGsapEntrance } from "@/lib/use-gsap-animations";
+import { useGsapEntrance } from "@/lib/use-animation-system";
 import {
   fetchTwin,
   checkReadiness,
@@ -69,6 +71,11 @@ export default function TwinPage() {
     try {
       const result = await checkReadiness(query.trim());
       setReadiness(result);
+      if (result.ready) {
+        toast.success(`You are ready to learn ${query.trim()}!`);
+      } else {
+        toast.info(`Prerequisites needed for ${query.trim()}`);
+      }
     } catch (err) {
       toast.error("Readiness check failed", {
         description: err instanceof Error ? err.message : String(err),
@@ -93,72 +100,83 @@ export default function TwinPage() {
     <div className="min-h-screen text-foreground pb-16">
       <SiteHeader />
 
-      <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-8">
-        {/* Header */}
-        <div className="gsap-twin skeuo-card p-6 text-xs relative">
-          <SkeuoScrews />
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4 mb-4">
-            <div>
-              <div className="flex items-center gap-2 font-mono text-[11px] text-cyan-400 font-bold uppercase tracking-wider mb-1">
-                <Brain className="h-3.5 w-3.5 text-cyan-400" />
-                <span>Polaris AI Step 6: Academic Digital Twin</span>
-              </div>
-              <h2 className="text-lg font-extrabold text-foreground">
-                Your Learning Profile & Readiness Check
-              </h2>
-            </div>
-            <button
-              onClick={loadTwin}
-              disabled={fetching}
-              className="skeuo-button text-xs py-2 px-4 font-bold flex items-center gap-2"
-              data-agent-target="refresh-twin"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${fetching ? "animate-spin" : ""}`} />
-              <span>{fetching ? "Syncing..." : "Refresh Twin"}</span>
-            </button>
-          </div>
+      <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
+        {/* Standardized Page Header */}
+        <div className="gsap-twin">
+          <PageHeader
+            category="ACADEMIC INTELLIGENCE // DIGITAL TWIN"
+            title="Academic Digital Twin"
+            description="Real-time prerequisite graph mastery model estimating readiness for target topics and analyzing learning velocity."
+            icon={Brain}
+            badgeText="Bayesian Concept State"
+            badgeVariant="emerald"
+            actions={
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={loadTwin}
+                disabled={fetching}
+                className="gap-2 text-xs font-bold rounded-xl border-border/80 hover:bg-muted/80"
+                data-agent-target="refresh-twin"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${fetching ? "animate-spin text-primary" : ""}`} />
+                <span>{fetching ? "Syncing..." : "Refresh Twin"}</span>
+              </Button>
+            }
+          />
         </div>
 
         {/* Stats Cards */}
-        <div className="gsap-twin grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <StatTile
-            label="Known"
+        <div className="gsap-twin grid grid-cols-1 sm:grid-cols-4 gap-4 sm:gap-6">
+          <StatCard
+            label="Known Mastered"
+            numericValue={knownCount}
             value={knownCount.toString()}
-            subText="Concepts mastered"
-            icon={<CheckCircle2 className="h-5 w-5 text-emerald-400" />}
-            color="emerald"
+            icon={CheckCircle2}
+            colorScheme="emerald"
+            trend="Concepts mastered"
+            trendPositive
+            tag="Verified"
           />
-          <StatTile
-            label="Weak"
+          <StatCard
+            label="Weak Reinforce"
+            numericValue={weakCount}
             value={weakCount.toString()}
-            subText="Needs reinforcement"
-            icon={<AlertTriangle className="h-5 w-5 text-amber-400" />}
-            color="amber"
+            icon={AlertTriangle}
+            colorScheme="amber"
+            trend="Needs review"
+            trendPositive={false}
+            tag="In progress"
           />
-          <StatTile
-            label="Missing"
+          <StatCard
+            label="Missing Topics"
+            numericValue={missingCount}
             value={missingCount.toString()}
-            subText="Not yet studied"
-            icon={<XCircle className="h-5 w-5 text-rose-400" />}
-            color="rose"
+            icon={XCircle}
+            colorScheme="rose"
+            trend="Not yet studied"
+            trendPositive={false}
+            tag="Queued"
           />
-          <StatTile
-            label="Signals"
+          <StatCard
+            label="Tracked Signals"
+            numericValue={twin?.signals_count ?? 0}
             value={(twin?.signals_count ?? 0).toString()}
-            subText="Study events tracked"
-            icon={<Zap className="h-5 w-5 text-purple-400" />}
-            color="purple"
+            icon={Zap}
+            colorScheme="purple"
+            trend="Study telemetry"
+            trendPositive
+            tag="Active"
           />
         </div>
 
         {/* Knowledge Distribution Bar */}
         {totalCount > 0 && (
-          <div className="gsap-twin skeuo-card p-5 relative">
-            <SkeuoScrews />
-            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider mb-3">
-              Knowledge Distribution
+          <Card className="gsap-twin p-6 rounded-3xl bg-card/75 border border-border/80 backdrop-blur-2xl shadow-xl space-y-3">
+            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">
+              Knowledge Distribution & Mastery Ratio
             </p>
-            <div className="w-full h-4 rounded-full overflow-hidden flex bg-white/5">
+            <div className="w-full h-3.5 rounded-full overflow-hidden flex bg-muted/60">
               <div
                 className="h-full bg-emerald-500 transition-all duration-700"
                 style={{ width: `${(knownCount / totalCount) * 100}%` }}
@@ -170,182 +188,150 @@ export default function TwinPage() {
                 title={`Weak: ${weakCount}`}
               />
               <div
-                className="h-full bg-rose-500/60 transition-all duration-700"
+                className="h-full bg-rose-500/80 transition-all duration-700"
                 style={{ width: `${(missingCount / totalCount) * 100}%` }}
                 title={`Missing: ${missingCount}`}
               />
             </div>
-            <div className="flex gap-4 mt-2 text-[10px] text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Known {Math.round((knownCount / totalCount) * 100)}%
+            <div className="flex flex-wrap gap-4 pt-1 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5 font-medium">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shadow-xs" />
+                <span className="text-foreground font-bold">Known:</span> {Math.round((knownCount / totalCount) * 100)}% ({knownCount})
               </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> Weak {Math.round((weakCount / totalCount) * 100)}%
+              <span className="flex items-center gap-1.5 font-medium">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-xs" />
+                <span className="text-foreground font-bold">Weak:</span> {Math.round((weakCount / totalCount) * 100)}% ({weakCount})
               </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" /> Missing {Math.round((missingCount / totalCount) * 100)}%
+              <span className="flex items-center gap-1.5 font-medium">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow-xs" />
+                <span className="text-foreground font-bold">Missing:</span> {Math.round((missingCount / totalCount) * 100)}% ({missingCount})
               </span>
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Learning Velocity Sparkline */}
         {velocityData.length > 1 && (
-          <div className="gsap-twin skeuo-card p-5 relative">
-            <SkeuoScrews />
-            <div className="flex items-center gap-2 mb-3">
-              <TrendingUp className="h-4 w-4 text-cyan-400" />
+          <Card className="gsap-twin p-6 rounded-3xl bg-card/75 border border-border/80 backdrop-blur-2xl shadow-xl space-y-4">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
               <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">
-                Learning Velocity (Concepts / Week)
+                Learning Velocity (Concepts Mastered / Week)
               </p>
             </div>
-            <div className="flex items-end gap-1 h-16">
-              {velocityData.map((point, i) => (
+            <div className="flex items-end gap-2 h-20 pt-2">
+              {velocityData.map((point) => (
                 <div
                   key={point.week}
-                  className="flex-1 bg-gradient-to-t from-cyan-500/80 to-indigo-500/80 rounded-t transition-all duration-500 hover:from-cyan-400 hover:to-indigo-400"
+                  className="flex-1 bg-gradient-to-t from-primary/60 to-indigo-400 rounded-t-xl transition-all duration-500 hover:from-primary hover:to-indigo-300 shadow-xs"
                   style={{
-                    height: `${Math.max(4, (point.concepts_learned / maxVelocity) * 100)}%`,
+                    height: `${Math.max(8, (point.concepts_learned / maxVelocity) * 100)}%`,
                   }}
                   title={`${point.week}: ${point.concepts_learned} concepts`}
                 />
               ))}
             </div>
-            <div className="flex justify-between text-[9px] text-muted-foreground mt-1">
+            <div className="flex justify-between text-[10px] font-mono text-muted-foreground pt-1 border-t border-border/40">
               <span>{velocityData[0]?.week}</span>
               <span>{velocityData[velocityData.length - 1]?.week}</span>
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Readiness Check */}
-        <div className="gsap-twin">
-          <BorderGlow borderRadius={20} glowRadius={30} colors={["#06b6d4", "#6366f1", "#a855f7"]}>
-            <div className="skeuo-card p-6 relative">
-              <SkeuoScrews />
-              <div className="flex items-center gap-2 mb-4">
-                <Search className="h-4 w-4 text-cyan-400" />
-                <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">
-                  Can I Learn This?
-                </p>
-              </div>
+        <Card className="gsap-twin p-6 sm:p-8 rounded-3xl bg-card/75 border border-border/80 backdrop-blur-2xl shadow-xl space-y-6">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
+              <Search className="h-4 w-4" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-foreground">
+                Prerequisite Readiness Predictor
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Check whether you have the foundational concepts mastered before diving into a complex topic.
+              </p>
+            </div>
+          </div>
 
-              <form onSubmit={handleReadinessCheck} className="flex gap-3 mb-4">
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="e.g. Transformers, Gradient Descent, RAG..."
-                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
-                  data-agent-target="readiness-input"
-                />
-                <button
-                  type="submit"
-                  disabled={checking || !query.trim()}
-                  className="skeuo-button text-xs py-2.5 px-5 font-bold flex items-center gap-2"
-                  data-agent-target="readiness-check-btn"
-                >
-                  {checking ? (
-                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Sparkles className="h-3.5 w-3.5" />
-                  )}
-                  <span>{checking ? "Checking..." : "Check Readiness"}</span>
-                </button>
-              </form>
+          <form onSubmit={handleReadinessCheck} className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Enter a topic (e.g. Dynamic Programming, AVL Rotations, Dijkstra)..."
+              className="flex-1 bg-background border border-border/80 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs"
+              data-agent-target="readiness-input"
+            />
+            <Button
+              type="submit"
+              disabled={checking || !query.trim()}
+              className="text-xs font-bold px-6 py-2.5 rounded-xl gap-2 shadow-md"
+              data-agent-target="readiness-check-btn"
+            >
+              {checking ? (
+                <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="h-3.5 w-3.5" />
+              )}
+              <span>{checking ? "Checking..." : "Check Readiness"}</span>
+            </Button>
+          </form>
 
-              {/* Readiness Result */}
-              {readiness && (
-                <div
-                  className={`rounded-xl p-5 border ${
+          {/* Readiness Result */}
+          {readiness && (
+            <div
+              className={`rounded-2xl p-6 border transition-all ${
+                readiness.ready
+                  ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-300"
+                  : "border-amber-500/30 bg-amber-500/5 text-amber-300"
+              }`}
+            >
+              <div className="flex items-center gap-2.5 mb-3">
+                {readiness.ready ? (
+                  <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 text-amber-400" />
+                )}
+                <span className="font-bold text-sm text-foreground">
+                  {readiness.ready ? "Ready to Learn!" : "Prerequisites Recommended"}
+                </span>
+                <span
+                  className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-bold border ml-auto ${
                     readiness.ready
-                      ? "border-emerald-500/30 bg-emerald-500/5"
-                      : "border-amber-500/30 bg-amber-500/5"
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                      : "bg-amber-500/10 text-amber-400 border-amber-500/20"
                   }`}
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    {readiness.ready ? (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-                    ) : (
-                      <AlertTriangle className="h-5 w-5 text-amber-400" />
-                    )}
-                    <span className="font-bold text-sm">
-                      {readiness.ready ? "Ready!" : "Not Ready Yet"}
-                    </span>
+                  {readiness.ready_prerequisites.length} / {readiness.ready_prerequisites.length + readiness.missing_prerequisites.length} Prerequisites Ready
+                </span>
+              </div>
+
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {readiness.summary}
+              </p>
+
+              {readiness.missing_prerequisites.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-border/40 space-y-2">
+                  <p className="text-[11px] font-bold text-foreground uppercase tracking-wider">
+                    Missing Foundations:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {readiness.missing_prerequisites.map((p) => (
+                      <span
+                        key={p.concept_id}
+                        className="px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold"
+                      >
+                        {p.name}
+                      </span>
+                    ))}
                   </div>
-                  <p className="text-xs text-muted-foreground mb-3">{readiness.summary}</p>
-
-                  {readiness.ready_prerequisites.length > 0 && (
-                    <div className="mb-2">
-                      <p className="text-[10px] text-emerald-400 font-bold uppercase mb-1">
-                        ✓ Prerequisites Met ({readiness.ready_prerequisites.length})
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {readiness.ready_prerequisites.map((p) => (
-                          <span
-                            key={p.concept_id}
-                            className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-medium"
-                          >
-                            {p.name}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {readiness.missing_prerequisites.length > 0 && (
-                    <div>
-                      <p className="text-[10px] text-rose-400 font-bold uppercase mb-1">
-                        ✗ Missing Prerequisites ({readiness.missing_prerequisites.length})
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {readiness.missing_prerequisites.map((p) => (
-                          <span
-                            key={p.concept_id}
-                            className="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 text-[10px] font-medium"
-                          >
-                            {p.name}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
-          </BorderGlow>
-        </div>
+          )}
+        </Card>
       </main>
-    </div>
-  );
-}
-
-function StatTile({
-  label,
-  value,
-  subText,
-  icon,
-  color,
-}: {
-  label: string;
-  value: string;
-  subText: string;
-  icon: React.ReactNode;
-  color: string;
-}) {
-  return (
-    <div className="skeuo-card p-5 flex items-center justify-between relative overflow-hidden">
-      <SkeuoScrews />
-      <div className="flex items-center gap-3.5">
-        <div className="p-3 skeuo-inset">{icon}</div>
-        <div>
-          <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">
-            {label}
-          </p>
-          <p className="text-2xl font-black text-foreground">{value}</p>
-          <p className="text-[10px] text-muted-foreground">{subText}</p>
-        </div>
-      </div>
     </div>
   );
 }

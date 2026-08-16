@@ -7,7 +7,7 @@
     font-family: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
   }
 
-  /* Default Dark Obsidian Theme */
+  /* Default Dark Obsidian Glass Theme */
   :root,
   .dark {
     --background: 224 71% 4%;
@@ -35,24 +35,17 @@
     --input: 217 33% 20%;
     --ring: 250 95% 64%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Skeuomorphic Custom Properties */
-    --skeuo-bg-gradient: linear-gradient(145deg, #0b0f19, #050811);
-    --skeuo-card-bg: linear-gradient(165deg, rgba(20, 26, 42, 0.92) 0%, rgba(10, 14, 24, 0.96) 100%);
-    --skeuo-card-border: rgba(255, 255, 255, 0.14);
-    --skeuo-bevel-top: rgba(255, 255, 255, 0.2);
-    --skeuo-bevel-bottom: rgba(0, 0, 0, 0.6);
-    --skeuo-shadow-raised: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 4px 10px -2px rgba(0, 0, 0, 0.5), inset 0 1px 1px var(--skeuo-bevel-top);
-    --skeuo-shadow-btn: 0 6px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.4);
-    --skeuo-btn-bg: linear-gradient(180deg, #4f46e5 0%, #3730a3 100%);
-    --skeuo-btn-hover: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
-    --skeuo-btn-active: linear-gradient(180deg, #312e81 0%, #3730a3 100%);
-    --skeuo-badge-bg: linear-gradient(180deg, rgba(99, 102, 241, 0.25) 0%, rgba(49, 46, 129, 0.4) 100%);
-    --skeuo-text-glow: 0 0 15px rgba(99, 102, 241, 0.5);
+    /* Glassmorphism Variables */
+    --glass-bg: rgba(13, 18, 30, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-bevel-top: rgba(255, 255, 255, 0.12);
+    --glass-bevel-bottom: rgba(0, 0, 0, 0.5);
+    --glass-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 var(--glass-bevel-top);
   }
 
-  /* Light Platinum Theme — High-Contrast Crisp Styling */
+  /* Light Platinum Theme — Refined Crisp Glass */
   .light {
     --background: 215 28% 95%;
     --foreground: 222 47% 10%;
@@ -75,158 +68,99 @@
     --accent: 250 95% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --border: 214 32% 78%;
-    --input: 214 32% 78%;
+    --border: 214 32% 82%;
+    --input: 214 32% 82%;
     --ring: 250 95% 55%;
 
-    --skeuo-bg-gradient: linear-gradient(145deg, #e2e8f0, #cbd5e1);
-    --skeuo-card-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.97) 0%, rgba(241, 245, 249, 0.95) 100%);
-    --skeuo-card-border: rgba(148, 163, 184, 0.5);
-    --skeuo-bevel-top: rgba(255, 255, 255, 1);
-    --skeuo-bevel-bottom: rgba(148, 163, 184, 0.6);
-    --skeuo-shadow-raised: 8px 12px 24px rgba(148, 163, 184, 0.4), -6px -6px 16px rgba(255, 255, 255, 0.9), inset 0 1px 2px rgba(255, 255, 255, 1);
-    --skeuo-shadow-btn: 0 4px 10px rgba(79, 70, 229, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
-    --skeuo-btn-bg: linear-gradient(180deg, #4f46e5 0%, #3730a3 100%);
-    --skeuo-btn-hover: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
-    --skeuo-btn-active: linear-gradient(180deg, #312e81 0%, #3730a3 100%);
-    --skeuo-badge-bg: linear-gradient(180deg, rgba(224, 231, 255, 0.95) 0%, rgba(199, 210, 254, 0.9) 100%);
-    --skeuo-text-glow: 0 0 10px rgba(79, 70, 229, 0.3);
+    --glass-bg: rgba(255, 255, 255, 0.82);
+    --glass-border: rgba(203, 213, 225, 0.8);
+    --glass-bevel-top: rgba(255, 255, 255, 0.95);
+    --glass-bevel-bottom: rgba(148, 163, 184, 0.3);
+    --glass-shadow: 0 10px 30px -8px rgba(100, 116, 139, 0.2), inset 0 1px 0 0 var(--glass-bevel-top);
   }
 
   /* Cyberpunk Gold Theme */
   .theme-gold {
     --background: 40 40% 4%;
     --foreground: 45 100% 96%;
-
     --card: 38 45% 7%;
     --card-foreground: 45 100% 96%;
-
     --primary: 43 96% 54%;
     --primary-foreground: 30 100% 5%;
-
     --secondary: 35 40% 12%;
     --secondary-foreground: 45 100% 96%;
-
     --muted-foreground: 43 40% 75%;
-
     --border: 43 70% 25%;
     --input: 43 70% 25%;
     --ring: 43 96% 54%;
-
-    --skeuo-bg-gradient: linear-gradient(145deg, #181308, #0a0803);
-    --skeuo-card-bg: linear-gradient(165deg, rgba(38, 30, 15, 0.93) 0%, rgba(20, 15, 8, 0.97) 100%);
-    --skeuo-card-border: rgba(234, 179, 8, 0.35);
-    --skeuo-bevel-top: rgba(254, 240, 138, 0.35);
-    --skeuo-bevel-bottom: rgba(0, 0, 0, 0.85);
-    --skeuo-shadow-raised: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 20px rgba(234, 179, 8, 0.2), inset 0 1px 1px var(--skeuo-bevel-top);
-    --skeuo-shadow-btn: 0 6px 16px rgba(234,179,8,0.35), inset 0 1px 0 rgba(254,240,138,0.5), inset 0 -2px 4px rgba(0,0,0,0.6);
-    --skeuo-btn-bg: linear-gradient(180deg, #eab308 0%, #ca8a04 100%);
-    --skeuo-btn-hover: linear-gradient(180deg, #facc15 0%, #eab308 100%);
-    --skeuo-btn-active: linear-gradient(180deg, #a16207 0%, #854d0e 100%);
-    --skeuo-badge-bg: linear-gradient(180deg, rgba(234, 179, 8, 0.25) 0%, rgba(161, 98, 7, 0.35) 100%);
-    --skeuo-text-glow: 0 0 15px rgba(234, 179, 8, 0.6);
+    --glass-bg: rgba(28, 22, 12, 0.75);
+    --glass-border: rgba(234, 179, 8, 0.2);
+    --glass-bevel-top: rgba(254, 240, 138, 0.2);
+    --glass-bevel-bottom: rgba(0, 0, 0, 0.7);
+    --glass-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 var(--glass-bevel-top);
   }
 
   /* Emerald Jade Theme */
   .theme-emerald {
     --background: 160 50% 4%;
     --foreground: 150 100% 96%;
-
     --card: 162 45% 7%;
     --card-foreground: 150 100% 96%;
-
     --primary: 158 75% 42%;
     --primary-foreground: 160 100% 5%;
-
     --secondary: 160 35% 12%;
     --secondary-foreground: 150 100% 96%;
-
     --muted-foreground: 155 35% 75%;
-
     --border: 158 60% 20%;
     --input: 158 60% 20%;
     --ring: 158 75% 42%;
-
-    --skeuo-bg-gradient: linear-gradient(145deg, #051a13, #020d09);
-    --skeuo-card-bg: linear-gradient(165deg, rgba(12, 42, 32, 0.93) 0%, rgba(5, 24, 18, 0.97) 100%);
-    --skeuo-card-border: rgba(16, 185, 129, 0.35);
-    --skeuo-bevel-top: rgba(110, 231, 183, 0.35);
-    --skeuo-bevel-bottom: rgba(0, 0, 0, 0.85);
-    --skeuo-shadow-raised: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 20px rgba(16, 185, 129, 0.2), inset 0 1px 1px var(--skeuo-bevel-top);
-    --skeuo-shadow-btn: 0 6px 16px rgba(16,185,129,0.35), inset 0 1px 0 rgba(110,231,183,0.5), inset 0 -2px 4px rgba(0,0,0,0.6);
-    --skeuo-btn-bg: linear-gradient(180deg, #10b981 0%, #059669 100%);
-    --skeuo-btn-hover: linear-gradient(180deg, #34d399 0%, #10b981 100%);
-    --skeuo-btn-active: linear-gradient(180deg, #047857 0%, #065f46 100%);
-    --skeuo-badge-bg: linear-gradient(180deg, rgba(16, 185, 129, 0.25) 0%, rgba(4, 120, 87, 0.35) 100%);
-    --skeuo-text-glow: 0 0 15px rgba(16, 185, 129, 0.6);
+    --glass-bg: rgba(10, 32, 24, 0.75);
+    --glass-border: rgba(16, 185, 129, 0.2);
+    --glass-bevel-top: rgba(110, 231, 183, 0.2);
+    --glass-bevel-bottom: rgba(0, 0, 0, 0.7);
+    --glass-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 var(--glass-bevel-top);
   }
 
-  /* Royal Sapphire Theme */
+  /* Sapphire Theme */
   .theme-sapphire {
     --background: 218 60% 4%;
     --foreground: 210 100% 97%;
-
     --card: 218 50% 7%;
     --card-foreground: 210 100% 97%;
-
     --primary: 217 91% 60%;
     --primary-foreground: 218 100% 97%;
-
     --secondary: 218 40% 12%;
     --secondary-foreground: 210 100% 97%;
-
     --muted-foreground: 215 35% 75%;
-
     --border: 217 60% 22%;
     --input: 217 60% 22%;
     --ring: 217 91% 60%;
-
-    --skeuo-bg-gradient: linear-gradient(145deg, #06132b, #020919);
-    --skeuo-card-bg: linear-gradient(165deg, rgba(15, 34, 68, 0.93) 0%, rgba(7, 18, 40, 0.97) 100%);
-    --skeuo-card-border: rgba(59, 130, 246, 0.35);
-    --skeuo-bevel-top: rgba(147, 197, 253, 0.35);
-    --skeuo-bevel-bottom: rgba(0, 0, 0, 0.85);
-    --skeuo-shadow-raised: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 20px rgba(59, 130, 246, 0.2), inset 0 1px 1px var(--skeuo-bevel-top);
-    --skeuo-shadow-btn: 0 6px 16px rgba(59,130,246,0.35), inset 0 1px 0 rgba(147,197,253,0.5), inset 0 -2px 4px rgba(0,0,0,0.6);
-    --skeuo-btn-bg: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
-    --skeuo-btn-hover: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
-    --skeuo-btn-active: linear-gradient(180deg, #1e40af 0%, #1e3a8a 100%);
-    --skeuo-badge-bg: linear-gradient(180deg, rgba(59, 130, 246, 0.25) 0%, rgba(30, 64, 175, 0.35) 100%);
-    --skeuo-text-glow: 0 0 15px rgba(59, 130, 246, 0.6);
+    --glass-bg: rgba(12, 26, 52, 0.75);
+    --glass-border: rgba(59, 130, 246, 0.2);
+    --glass-bevel-top: rgba(147, 197, 253, 0.2);
+    --glass-bevel-bottom: rgba(0, 0, 0, 0.7);
+    --glass-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 var(--glass-bevel-top);
   }
 
-  /* Crimson Velvet Theme */
+  /* Crimson Theme */
   .theme-crimson {
     --background: 345 60% 4%;
     --foreground: 340 100% 97%;
-
     --card: 345 50% 7%;
     --card-foreground: 340 100% 97%;
-
     --primary: 346 84% 53%;
     --primary-foreground: 340 100% 97%;
-
     --secondary: 345 40% 12%;
     --secondary-foreground: 340 100% 97%;
-
     --muted-foreground: 345 35% 75%;
-
     --border: 346 60% 22%;
     --input: 346 60% 22%;
     --ring: 346 84% 53%;
-
-    --skeuo-bg-gradient: linear-gradient(145deg, #2b0612, #180208);
-    --skeuo-card-bg: linear-gradient(165deg, rgba(68, 15, 30, 0.93) 0%, rgba(40, 7, 16, 0.97) 100%);
-    --skeuo-card-border: rgba(244, 63, 94, 0.35);
-    --skeuo-bevel-top: rgba(253, 164, 175, 0.35);
-    --skeuo-bevel-bottom: rgba(0, 0, 0, 0.85);
-    --skeuo-shadow-raised: 0 10px 30px -5px rgba(0, 0, 0, 0.9), 0 0 20px rgba(244, 63, 94, 0.2), inset 0 1px 1px var(--skeuo-bevel-top);
-    --skeuo-shadow-btn: 0 6px 16px rgba(244,63,94,0.35), inset 0 1px 0 rgba(253,164,175,0.5), inset 0 -2px 4px rgba(0,0,0,0.6);
-    --skeuo-btn-bg: linear-gradient(180deg, #f43f5e 0%, #be123c 100%);
-    --skeuo-btn-hover: linear-gradient(180deg, #fb7185 0%, #e11d48 100%);
-    --skeuo-btn-active: linear-gradient(180deg, #9f1239 0%, #881337 100%);
-    --skeuo-badge-bg: linear-gradient(180deg, rgba(244, 63, 94, 0.25) 0%, rgba(159, 18, 57, 0.35) 100%);
-    --skeuo-text-glow: 0 0 15px rgba(244, 63, 94, 0.6);
+    --glass-bg: rgba(48, 12, 22, 0.75);
+    --glass-border: rgba(244, 63, 94, 0.2);
+    --glass-bevel-top: rgba(253, 164, 175, 0.2);
+    --glass-bevel-bottom: rgba(0, 0, 0, 0.7);
+    --glass-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 var(--glass-bevel-top);
   }
 
   body {
@@ -236,188 +170,52 @@
 }
 
 @layer utilities {
-  /* --- Uiverse Skeuomorphic Radio Knob System --- */
-  .radio-input {
-    position: relative;
-    font-size: 0.35rem; /* Scaled down base size for clean header integration */
-  }
-
-  .radio-input-path {
-    position: relative;
-    width: 20em;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .radioContainer {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin: 1em;
-  }
-
-  .radioContainer label {
-    font-size: 0.9em;
-    font-weight: 900;
-    cursor: pointer;
-    color: var(--foreground);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-  }
-
-  .radio-input-path input[type="radio"] {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    width: 0.55em;
-    height: 0.55em;
-    border-radius: 50%;
-    background: var(--foreground);
-    transform-origin: bottom center;
-    outline: none;
-    cursor: pointer;
-  }
-
-  .radioContainer1 { left: 0; top: 25%; transform: rotateZ(-45deg); }
-  .radioContainer2 { left: 15%; top: 5%; transform: rotateZ(-25deg); }
-  .radioContainer3 { left: 44%; top: -5%; transform: rotateZ(0deg); }
-  .radioContainer4 { right: 15%; top: 5%; transform: rotateZ(25deg); }
-  .radioContainer5 { right: 0; top: 25%; transform: rotateZ(45deg); }
-  .radioContainer6 { right: -5%; top: 50%; transform: rotateZ(65deg); }
-
-  .knob {
-    width: 13em;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    top: 25%;
-    left: 50%;
-    position: absolute;
-    border: 3px solid rgba(0, 0, 0, 0.8);
-    outline: 2px solid rgba(255, 255, 255, 0.2);
-    background: linear-gradient(145deg, #374151, #1f2937);
-    overflow: hidden;
-    transform: translateX(-50%);
-    transform-origin: center center;
-    transition: transform 350ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.3);
-  }
-
-  .light .knob {
-    background: linear-gradient(145deg, #e2e8f0, #cbd5e1);
-    border: 3px solid #64748b;
-    outline: 2px solid #94a3b8;
-  }
-
-  .center {
-    height: 100%;
-    width: 2.25em;
-    position: relative;
-    left: 50%;
-    top: 50%;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 7px;
-    outline: 1px solid rgba(255, 255, 255, 0.377);
-    transform: translate(-50%, -50%);
-    box-shadow: 15px 0px 35px rgba(255, 255, 255, 0.474),
-      -15px 0px 40px 5px rgba(128, 128, 128, 0.563),
-      inset 0px 0px 4px 0px rgba(255, 255, 255, 0.226);
-    transition: box-shadow 100ms linear;
-  }
-
-  .center::after {
-    content: "";
-    position: absolute;
-    width: 4px;
-    height: 25px;
-    background-color: #6366f1;
-    left: 50%;
-    top: 1%;
-    transform: translateX(-50%);
-    border-radius: 2px;
-    box-shadow: 0 0 8px #6366f1;
-  }
-
-  /* Rotation for 6 themes */
-  .radio-input-path:has(.radio1:checked) ~ .knob { transform: translateX(-50%) rotateZ(-60deg); }
-  .radio-input-path:has(.radio2:checked) ~ .knob { transform: translateX(-50%) rotateZ(-35deg); }
-  .radio-input-path:has(.radio3:checked) ~ .knob { transform: translateX(-50%) rotateZ(0deg); }
-  .radio-input-path:has(.radio4:checked) ~ .knob { transform: translateX(-50%) rotateZ(35deg); }
-  .radio-input-path:has(.radio5:checked) ~ .knob { transform: translateX(-50%) rotateZ(60deg); }
-
-  .radio-input-path:has(.radio1:checked) ~ .knob > .center {
-    box-shadow: 15px 0px 35px rgba(255, 255, 255, 0.74), -15px 0px 40px 5px rgb(128, 128, 128), inset 0px 0px 4px 0px rgba(255, 255, 255, 0.226);
-  }
-  .radio-input-path:has(.radio2:checked) ~ .knob > .center {
-    box-shadow: 15px 0px 35px rgba(255, 255, 255, 0.74), -15px 0px 40px 5px rgba(128, 128, 128, 0.574), inset 0px 0px 4px 0px rgba(255, 255, 255, 0.226);
-  }
-  .radio-input-path:has(.radio4:checked) ~ .knob > .center {
-    box-shadow: 15px 0px 35px rgba(128, 128, 128, 0.63), -15px 0px 40px 5px rgba(255, 255, 255, 0.574), inset 0px 0px 4px 0px rgba(255, 255, 255, 0.226);
-  }
-  .radio-input-path:has(.radio5:checked) ~ .knob > .center {
-    box-shadow: 15px 0px 35px rgb(128, 128, 128), -15px 0px 40px 5px rgba(255, 255, 255, 0.74), inset 0px 0px 4px 0px rgba(255, 255, 255, 0.226);
-  }
-
-  /* --- Ultra Hyper-Realistic Skeuomorphic Utilities --- */
-  .skeuo-card {
-    background: var(--skeuo-card-bg);
-    border: 1px solid var(--skeuo-card-border);
-    box-shadow: var(--skeuo-shadow-raised);
+  /* --- High-Grade Glassmorphism & Sleek Bezels --- */
+  .glass-card,
+  .glass-panel,
+  .skeuo-card,
+  .uiverse-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
     border-radius: 1.25rem;
-    backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     position: relative;
     overflow: hidden;
     color: var(--foreground);
-    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .skeuo-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 45%;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
-    border-top-left-radius: 1.25rem;
-    border-top-right-radius: 1.25rem;
-  }
-
+  .glass-card:hover,
   .skeuo-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--skeuo-shadow-raised), 0 12px 35px -5px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
   }
 
-  .skeuo-inset {
-    background: rgba(0, 0, 0, 0.35);
-    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.7), inset 0 -1px 1px rgba(255, 255, 255, 0.1), 0 1px 0 rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.6);
-    border-radius: 0.875rem;
-    color: var(--foreground);
+  .light .glass-card:hover,
+  .light .skeuo-card:hover {
+    border-color: rgba(148, 163, 184, 0.9);
+    box-shadow: 0 14px 36px -8px rgba(100, 116, 139, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 1);
   }
 
-  .light .skeuo-inset {
-    background: rgba(226, 232, 240, 0.75);
-    box-shadow: inset 0 3px 6px rgba(148, 163, 184, 0.6), inset 0 -1px 1px rgba(255, 255, 255, 0.9), 0 1px 0 rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(203, 213, 225, 0.9);
-    color: #0f172a;
+  .sleek-bezel {
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 0 rgba(0, 0, 0, 0.3), 0 8px 32px 0 rgba(0, 0, 0, 0.36);
   }
 
-  .skeuo-button {
-    background: var(--skeuo-btn-bg);
-    box-shadow: var(--skeuo-shadow-btn);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+  /* Sleek Glass Button */
+  .glass-button,
+  .skeuo-button,
+  .uiverse-button {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 100%), var(--primary);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
     border-radius: 0.875rem;
     color: #ffffff !important;
     font-weight: 700;
-    letter-spacing: 0.025em;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(12px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -425,434 +223,66 @@
     cursor: pointer;
   }
 
-  .skeuo-button::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
-    border-top-left-radius: 0.875rem;
-    border-top-right-radius: 0.875rem;
-  }
-
-  .skeuo-button:hover {
-    background: var(--skeuo-btn-hover);
+  .glass-button:hover,
+  .skeuo-button:hover,
+  .uiverse-button:hover {
     transform: translateY(-1px);
-    box-shadow: var(--skeuo-shadow-btn), 0 0 15px rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.45);
+    filter: brightness(1.08);
   }
 
-  .skeuo-button:active {
-    background: var(--skeuo-btn-active);
-    transform: translateY(1px);
-    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+  .glass-button:active,
+  .skeuo-button:active,
+  .uiverse-button:active {
+    transform: translateY(0.5px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2);
   }
 
-  .skeuo-button-secondary {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--skeuo-card-border);
+  /* Sleek Glass Inset Container */
+  .glass-inset,
+  .skeuo-inset {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.04);
     border-radius: 0.875rem;
     color: var(--foreground);
-    font-weight: 600;
-    transition: all 0.15s ease;
+    backdrop-filter: blur(12px);
   }
 
-  .light .skeuo-button-secondary {
-    background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
-    box-shadow: 0 4px 10px rgba(148, 163, 184, 0.3), inset 0 1px 0 rgba(255, 255, 255, 1), inset 0 -2px 4px rgba(148, 163, 184, 0.2);
-    border: 1px solid rgba(203, 213, 225, 0.9);
+  .light .glass-inset,
+  .light .skeuo-inset {
+    background: rgba(241, 245, 249, 0.75);
+    border: 1px solid rgba(203, 213, 225, 0.7);
+    box-shadow: inset 0 2px 4px rgba(148, 163, 184, 0.3), 0 1px 0 rgba(255, 255, 255, 0.9);
     color: #0f172a;
   }
 
+  /* Sleek Glass Badge */
+  .glass-badge,
   .skeuo-badge {
-    background: var(--skeuo-badge-bg);
-    border: 1px solid var(--skeuo-card-border);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 2px 5px rgba(0,0,0,0.3);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 9999px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 0.25rem 0.75rem;
-    color: var(--foreground);
+    padding: 0.25rem 0.625rem;
+    font-weight: 600;
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(8px);
   }
 
-  .light .skeuo-badge {
-    color: #1e1b4b;
-    border-color: rgba(99, 102, 241, 0.3);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 2px 5px rgba(148, 163, 184, 0.3);
+  /* Custom Clean Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
-
-  .skeuo-title {
-    background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
-    font-weight: 900;
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
-
-  .light .skeuo-title {
-    background: linear-gradient(180deg, #020617 0%, #1e293b 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.9));
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
   }
-
-  .led-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    box-shadow: 0 0 8px currentColor, inset 0 1px 1px rgba(255, 255, 255, 0.8);
-    position: relative;
-  }
-
-  .led-indicator::after {
-    content: "";
-    position: absolute;
-    top: 1px;
-    left: 2px;
-    width: 2px;
-    height: 2px;
-    background: #ffffff;
-    border-radius: 50%;
-  }
-
-  .glass-card, .brutal-card { @apply skeuo-card; }
-  .glass-card-glow, .brutal-card-pink { @apply skeuo-card; box-shadow: var(--skeuo-shadow-raised), var(--skeuo-text-glow); }
-  .glass-button, .brutal-btn { @apply skeuo-button; }
-  .glass-badge, .brutal-badge { @apply skeuo-badge; }
-  .gradient-text { @apply skeuo-title; }
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.6);
-}
-
-.light ::-webkit-scrollbar-track {
-  background: rgba(226, 232, 240, 0.6);
-  box-shadow: inset 0 0 4px rgba(148, 163, 184, 0.4);
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(99, 102, 241, 0.7) 0%, rgba(49, 46, 129, 0.9) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.4);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(129, 140, 248, 0.9) 0%, rgba(67, 56, 202, 1) 100%);
-}
-
-/* Theme Adapting Neumorphism Variables */
-:root, .dark {
-  --neu-bg: #212121;
-  --neu-shadow-1: #151515;
-  --neu-shadow-2: #2d2d2d;
-  --neu-text: #e0e0e0;
-}
-.light {
-  --neu-bg: #e0e0e0;
-  --neu-shadow-1: #bebebe;
-  --neu-shadow-2: #ffffff;
-  --neu-text: #333333;
-}
-
-/* From Uiverse.io by Codewithvinay */ 
-.uiverse-card {
-  border-radius: 24px;
-  background: var(--neu-bg);
-  box-shadow: 12px 12px 24px var(--neu-shadow-1), -12px -12px 24px var(--neu-shadow-2);
-  color: var(--neu-text);
-}
-
-.uiverse-button {
-  background: var(--neu-bg);
-  box-shadow: 6px 6px 12px var(--neu-shadow-1), -6px -6px 12px var(--neu-shadow-2);
-  color: var(--neu-text);
-  transition: all 0.2s ease;
-  border-radius: 12px;
-}
-.uiverse-button:active {
-  box-shadow: inset 4px 4px 8px var(--neu-shadow-1), inset -4px -4px 8px var(--neu-shadow-2);
-}
-
-/* From Uiverse.io by Cobp */ 
-.container_chat_bot {
-  display: flex;
-  flex-direction: column;
-  max-width: 100%;
-  width: 100%;
-}
-
-.container_chat_bot .container-chat-options {
-  position: relative;
-  display: flex;
-  background: linear-gradient(
-    to bottom right,
-    #7e7e7e,
-    #363636,
-    #363636,
-    #363636,
-    #363636
-  );
-  border-radius: 16px;
-  padding: 1.5px;
-  overflow: hidden;
-}
-
-.container_chat_bot .container-chat-options::after {
-  position: absolute;
-  content: "";
-  top: -10px;
-  left: -10px;
-  background: radial-gradient(
-    ellipse at center,
-    #ffffff,
-    rgba(255, 255, 255, 0.3),
-    rgba(255, 255, 255, 0.1),
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0)
-  );
-  width: 30px;
-  height: 30px;
-  filter: blur(1px);
-}
-
-.container_chat_bot .container-chat-options .chat {
-  display: flex;
-  flex-direction: column;
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 15px;
-  width: 100%;
-  overflow: hidden;
-}
-
-.container_chat_bot .container-chat-options .chat .chat-bot {
-  position: relative;
-  display: flex;
-}
-
-.container_chat_bot .chat .chat-bot textarea {
-  background-color: transparent;
-  border-radius: 16px;
-  border: none;
-  width: 100%;
-  height: 60px;
-  color: #ffffff;
-  font-family: sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  padding: 14px;
-  resize: none;
-  outline: none;
-}
-
-.container_chat_bot .chat .chat-bot textarea::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.container_chat_bot .chat .chat-bot textarea::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.container_chat_bot .chat .chat-bot textarea::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 5px;
-}
-
-.container_chat_bot .chat .chat-bot textarea::-webkit-scrollbar-thumb:hover {
-  background: #555;
-  cursor: pointer;
-}
-
-.container_chat_bot .chat .chat-bot textarea::placeholder {
-  color: #f3f6fd;
-  transition: all 0.3s ease;
-}
-
-.container_chat_bot .chat .chat-bot textarea:focus::placeholder {
-  color: #363636;
-}
-
-.container_chat_bot .chat .options {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  padding: 10px;
-}
-
-.container_chat_bot .chat .options .btns-add {
-  display: flex;
-  gap: 8px;
-}
-
-.container_chat_bot .chat .options .btns-add button {
-  display: flex;
-  color: rgba(255, 255, 255, 0.1);
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.container_chat_bot .chat .options .btns-add button:hover {
-  transform: translateY(-5px);
-  color: #ffffff;
-}
-
-.container_chat_bot .chat .options .btn-submit {
-  display: flex;
-  padding: 2px;
-  background-image: linear-gradient(to top, #292929, #555555, #292929);
-  border-radius: 10px;
-  box-shadow: inset 0 6px 2px -4px rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  border: none;
-  outline: none;
-  transition: all 0.15s ease;
-}
-
-.container_chat_bot .chat .options .btn-submit i {
-  width: 30px;
-  height: 30px;
-  padding: 6px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  backdrop-filter: blur(3px);
-  color: #8b8b8b;
-}
-
-.container_chat_bot .chat .options .btn-submit svg {
-  transition: all 0.3s ease;
-}
-
-.container_chat_bot .chat .options .btn-submit:hover svg {
-  color: #f3f6fd;
-  filter: drop-shadow(0 0 5px #ffffff);
-}
-
-.container_chat_bot .chat .options .btn-submit:focus svg {
-  color: #f3f6fd;
-  filter: drop-shadow(0 0 5px #ffffff);
-  transform: scale(1.2) rotate(45deg) translateX(-2px) translateY(1px);
-}
-
-.container_chat_bot .chat .options .btn-submit:active {
-  transform: scale(0.92);
-}
-
-.container_chat_bot .tags {
-  padding: 14px 0;
-  display: flex;
-  color: #ffffff;
-  font-size: 10px;
-  gap: 4px;
-}
-
-.container_chat_bot .tags span {
-  padding: 4px 8px;
-  background-color: #1b1b1b;
-  border: 1.5px solid #363636;
-  border-radius: 10px;
-  cursor: pointer;
-  user-select: none;
-}
-
-/* From Uiverse.io by JkHuger */ 
-.frame {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  min-height: 120px;
-}
-
-.center {
-  position: relative;
-  width: 120px;
-  height: 120px;
-  transform: scale(0.4);
-}
-
-.dot-1 {
-  position: absolute;
-  z-index: 3;
-  width: 30px;
-  height: 30px;
-  top: 45px;
-  left: 45px;
-  background: #8b5cf6; /* Changed to match theme */
-  border-radius: 50%;
-  animation: jump-jump-1 2s cubic-bezier(0.21, 0.98, 0.6, 0.99) infinite alternate;
-}
-
-.dot-2 {
-  position: absolute;
-  z-index: 2;
-  width: 60px;
-  height: 60px;
-  top: 30px;
-  left: 30px;
-  background: #6366f1; /* Changed to match theme */
-  border-radius: 50%;
-  animation: jump-jump-2 2s cubic-bezier(0.21, 0.98, 0.6, 0.99) infinite alternate;
-}
-
-.dot-3 {
-  position: absolute;
-  z-index: 1;
-  width: 90px;
-  height: 90px;
-  top: 15px;
-  left: 15px;
-  background: #3b82f6; /* Changed to match theme */
-  border-radius: 50%;
-  animation: jump-jump-3 2s cubic-bezier(0.21, 0.98, 0.6, 0.99) infinite alternate;
-}
-
-@keyframes jump-jump-1 {
-  0%, 70% {
-    box-shadow: 2px 2px 3px 2px rgba(0, 0, 0, 0.2);
-    transform: scale(0);
-  }
-  100% {
-    box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.3);
-    transform: scale(1);
-  }
-}
-
-@keyframes jump-jump-2 {
-  0%, 40% {
-    box-shadow: 2px 2px 3px 2px rgba(0, 0, 0, 0.2);
-    transform: scale(0);
-  }
-  100% {
-    box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.3);
-    transform: scale(1);
-  }
-}
-
-@keyframes jump-jump-3 {
-  0%, 10% {
-    box-shadow: 2px 2px 3px 2px rgba(0, 0, 0, 0.2);
-    transform: scale(0);
-  }
-  100% {
-    box-shadow: 10px 10px 15px 0 rgba(0, 0, 0, 0.3);
-    transform: scale(1);
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
   }
 }

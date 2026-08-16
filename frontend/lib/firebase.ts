@@ -3,12 +3,22 @@ import {
   GoogleAuthProvider,
   getAuth,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut as fbSignOut,
   type User,
   connectAuthEmulator,
 } from "firebase/auth";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  connectFirestoreEmulator,
+  type Firestore,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "demo-api-key",
@@ -19,11 +29,22 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:123456789:web:123456",
 };
 
+export interface UserProfileData {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  lastLoginAt?: string;
+  createdAt?: string;
+  role?: string;
+}
+
 function getFirebaseApp(): FirebaseApp {
   return getApps().length ? getApp() : initializeApp(firebaseConfig);
 }
 
 let cachedAuth: ReturnType<typeof getAuth> | null = null;
+let cachedFirestore: Firestore | null = null;
 let emulatorAttempted = false;
 
 export function getFirebaseAuth() {
@@ -44,22 +65,121 @@ export function getFirebaseAuth() {
   return cachedAuth;
 }
 
+export function getFirebaseFirestore(): Firestore {
+  if (cachedFirestore) return cachedFirestore;
+  const app = getFirebaseApp();
+  cachedFirestore = getFirestore(app);
+
+  if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
+    try {
+      if (process.env.NEXT_PUBLIC_USE_FIRESTORE_EMULATOR === "true") {
+        connectFirestoreEmulator(cachedFirestore, "127.0.0.1", 8080);
+      }
+    } catch {
+      // Ignore emulator connection errors in dev
+    }
+  }
+  return cachedFirestore;
+}
+
+export async function syncUserProfileToFirestore(user: {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+}): Promise<void> {
+  if (!user || !user.uid) return;
+  try {
+    const db = getFirebaseFirestore();
+    const userRef = doc(db, "users", user.uid);
+    const nowIso = new Date().toISOString();
+    
+    await setDoc(
+      userRef,
+      {
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName || (user.email ? user.email.split("@")[0] : "Student"),
+        photoURL: user.photoURL || null,
+        lastLoginAt: nowIso,
+        role: "student",
+      },
+      { merge: true }
+    );
+  } catch (err) {
+    // Non-blocking fallback for offline/demo/uninitialized firebase credentials
+    console.warn("Firestore user sync non-fatal error:", err);
+  }
+}
+
+export async function getUserProfileFromFirestore(uid: string): Promise<UserProfileData | null> {
+  if (!uid) return null;
+  try {
+    const db = getFirebaseFirestore();
+    const userRef = doc(db, "users", uid);
+    const snap = await getDoc(userRef);
+    if (snap.exists()) {
+      return snap.data() as UserProfileData;
+    }
+  } catch (err) {
+    console.warn("Failed to fetch user document from Firestore:", err);
+  }
+  return null;
+}
+
 export async function signInWithGoogle(): Promise<User> {
   const auth = getFirebaseAuth();
   const provider = new GoogleAuthProvider();
-  const result = await signInWithPopup(auth, provider);
-  return result.user;
+  provider.setCustomParameters({
+    prompt: "select_account",
+  });
+  
+  try {
+    const result = await signInWithPopup(auth, provider);
+    if (result.user) {
+      await syncUserProfileToFirestore(result.user);
+    }
+    return result.user;
+  } catch (error: unknown) {
+    const err = error as { code?: string; message?: string };
+    // If popup was blocked by browser or restricted, attempt redirect
+    if (err.code === "auth/popup-blocked") {
+      await signInWithRedirect(auth, provider);
+      throw new Error("Redirecting to Google Sign-In...");
+    }
+    throw error;
+  }
+}
+
+export async function checkRedirectResult(): Promise<User | null> {
+  try {
+    const auth = getFirebaseAuth();
+    const result = await getRedirectResult(auth);
+    if (result?.user) {
+      await syncUserProfileToFirestore(result.user);
+      return result.user;
+    }
+  } catch (err) {
+    console.warn("Redirect result check error:", err);
+  }
+  return null;
 }
 
 export async function signInWithEmail(email: string, pass: string): Promise<User> {
   const auth = getFirebaseAuth();
   const res = await signInWithEmailAndPassword(auth, email, pass);
+  if (res.user) {
+    await syncUserProfileToFirestore(res.user);
+  }
   return res.user;
 }
 
 export async function signUpWithEmail(email: string, pass: string): Promise<User> {
   const auth = getFirebaseAuth();
   const res = await createUserWithEmailAndPassword(auth, email, pass);
+  if (res.user) {
+    await syncUserProfileToFirestore(res.user);
+  }
   return res.user;
 }
 
@@ -90,3 +210,4 @@ export async function getIdToken(): Promise<string | null> {
 }
 
 export type { User };
+

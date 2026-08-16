@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Sparkles, Youtube, ExternalLink, Clock } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
+import { PageHeader } from "@/components/ui/page-header";
+import { Card } from "@/components/ui/card";
+import { useGsapEntrance } from "@/lib/use-animation-system";
 import {
   triggerResourceDiscovery,
   getResourceDiscoveryStatus,
@@ -11,6 +14,7 @@ import {
 } from "@/lib/api/resources";
 
 export default function ResourcesPage() {
+  const containerRef = useGsapEntrance(".gsap-resources", 0.05);
   const [topicTitle, setTopicTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
@@ -59,21 +63,20 @@ export default function ResourcesPage() {
   return (
     <div className="min-h-screen text-foreground pb-16">
       <SiteHeader />
-      <main className="max-w-5xl mx-auto px-4 sm:px-8 py-8 space-y-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
-              <Sparkles className="h-6 w-6 text-cyan-400" />
-              <span>AI Educational Video Discovery</span>
-            </h1>
-            <p className="text-slate-400 text-xs mt-1">
-              Curate top educational YouTube tutorials and lectures ranked by LLM rubrics.
-            </p>
-          </div>
+      <main ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <div className="gsap-resources">
+          <PageHeader
+            category="STUDY PLANNING // VIDEO RESOURCES"
+            title="AI Educational Video Discovery"
+            description="Curate top educational YouTube tutorials, prerequisite explainers, and academic lectures ranked by LLM quality rubrics."
+            icon={Sparkles}
+            badgeText="YouTube AI Ranker"
+            badgeVariant="purple"
+          />
         </div>
 
         {/* Search Card */}
-        <div className="glass-panel p-6 shadow-xl">
+        <Card className="gsap-resources p-6 rounded-3xl bg-card/75 border border-border/80 shadow-xl backdrop-blur-2xl">
           <form onSubmit={handleDiscovery} className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
@@ -109,7 +112,7 @@ export default function ResourcesPage() {
           )}
 
           {error && <div className="mt-4 text-sm text-rose-400 font-medium">{error}</div>}
-        </div>
+        </Card>
 
         {/* Discovery Results */}
         {discoveryResult && (

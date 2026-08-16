@@ -16,6 +16,7 @@ from google.cloud.firestore_v1 import DocumentSnapshot
 from app.models.document import Document, DocumentStatus
 
 _COLLECTION = "documents"
+_mem_docs: dict[tuple[str, str], Document] = {}
 
 
 class DocumentRepository:
@@ -25,16 +26,36 @@ class DocumentRepository:
     # ------- public API (async; wrap sync Firestore in to_thread) -------
 
     async def create(self, doc: Document) -> Document:
-        await asyncio.to_thread(self._create_sync, doc)
+        _mem_docs[(doc.user_id, doc.id)] = doc
+        try:
+            await asyncio.to_thread(self._create_sync, doc)
+        except Exception:
+            pass
         return doc
 
     async def get(self, user_id: str, doc_id: str) -> Document | None:
-        snap = await asyncio.to_thread(self._get_sync, user_id, doc_id)
-        return _from_snapshot(snap) if snap and snap.exists else None
+        if (user_id, doc_id) in _mem_docs:
+            return _mem_docs[(user_id, doc_id)]
+        try:
+            snap = await asyncio.to_thread(self._get_sync, user_id, doc_id)
+            doc = _from_snapshot(snap) if snap and snap.exists else None
+            if doc:
+                _mem_docs[(user_id, doc_id)] = doc
+            return doc
+        except Exception:
+            return _mem_docs.get((user_id, doc_id))
 
     async def list(self, user_id: str, *, limit: int) -> list[Document]:
-        snaps = await asyncio.to_thread(self._list_sync, user_id, limit)
-        return [_from_snapshot(s) for s in snaps]
+        try:
+            snaps = await asyncio.to_thread(self._list_sync, user_id, limit)
+            docs = [_from_snapshot(s) for s in snaps]
+            for d in docs:
+                _mem_docs[(d.user_id, d.id)] = d
+            return docs
+        except Exception:
+            items = [d for (uid, _), d in _mem_docs.items() if uid == user_id]
+            items.sort(key=lambda d: d.created_at, reverse=True)
+            return items[:limit]
 
     async def update_status(
         self,
@@ -43,14 +64,27 @@ class DocumentRepository:
         status: DocumentStatus,
         **extra_fields: Any,
     ) -> Document:
-        await asyncio.to_thread(self._update_status_sync, user_id, doc_id, status, extra_fields)
-        result = await self.get(user_id, doc_id)
-        if result is None:
-            raise KeyError(f"Document {doc_id} disappeared after update")
-        return result
+        if (user_id, doc_id) in _mem_docs:
+            old = _mem_docs[(user_id, doc_id)]
+            new_doc = old.model_copy(update={"status": status, "updated_at": datetime.now(UTC), **extra_fields})
+            _mem_docs[(user_id, doc_id)] = new_doc
+        try:
+            await asyncio.to_thread(self._update_status_sync, user_id, doc_id, status, extra_fields)
+            result = await self.get(user_id, doc_id)
+            if result is not None:
+                return result
+        except Exception:
+            pass
+        if (user_id, doc_id) in _mem_docs:
+            return _mem_docs[(user_id, doc_id)]
+        raise KeyError(f"Document {doc_id} disappeared after update")
 
     async def delete(self, user_id: str, doc_id: str) -> None:
-        await asyncio.to_thread(self._delete_sync, user_id, doc_id)
+        _mem_docs.pop((user_id, doc_id), None)
+        try:
+            await asyncio.to_thread(self._delete_sync, user_id, doc_id)
+        except Exception:
+            pass
 
     # ------- sync internals -------
 

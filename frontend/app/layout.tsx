@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth-context";
 import { ShaderBackground } from "@/components/shader-background";
 import { AgentCopilot } from "@/components/agent-copilot";
+import { NavDrawer } from "@/components/nav-drawer";
+import { TodoDrawer } from "@/components/todo-drawer";
 
 import "./globals.css";
 
@@ -25,6 +27,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AuthProvider>
             <ShaderBackground />
             <div className="relative z-10 pointer-events-auto min-h-screen flex flex-col">{children}</div>
+            <NavDrawer />
+            <TodoDrawer />
             <AgentCopilot />
             <Toaster position="bottom-right" />
           </AuthProvider>

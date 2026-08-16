@@ -205,10 +205,10 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
   return (
     <div className="relative w-full flex flex-col md:flex-row gap-4 select-none">
       {/* Interactive Graph Canvas Area */}
-      <div className="flex-1 skeuo-card p-2 relative overflow-hidden flex flex-col items-center justify-center min-h-[520px]">
+      <div className="flex-1 glass-card p-2 relative overflow-hidden flex flex-col items-center justify-center min-h-[520px] rounded-3xl">
         {/* Top Control Bar */}
         <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between pointer-events-none">
-          <div className="flex items-center gap-2 skeuo-inset p-1.5 pointer-events-auto">
+          <div className="flex items-center gap-2 glass-inset p-1.5 pointer-events-auto rounded-xl">
             <Search className="h-4 w-4 text-muted-foreground ml-1" />
             <input
               type="text"
@@ -222,21 +222,21 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
           <div className="flex items-center gap-2 pointer-events-auto">
             <button
               onClick={() => setZoom((z) => Math.min(z + 0.15, 1.8))}
-              className="skeuo-button p-2 text-xs"
+              className="p-2 rounded-xl bg-card/80 border border-border/80 text-foreground hover:bg-muted/80 text-xs shadow-sm transition-all"
               title="Zoom In"
             >
               <ZoomIn className="h-4 w-4" />
             </button>
             <button
               onClick={() => setZoom((z) => Math.max(z - 0.15, 0.6))}
-              className="skeuo-button p-2 text-xs"
+              className="p-2 rounded-xl bg-card/80 border border-border/80 text-foreground hover:bg-muted/80 text-xs shadow-sm transition-all"
               title="Zoom Out"
             >
               <ZoomOut className="h-4 w-4" />
             </button>
             <button
               onClick={() => setZoom(1)}
-              className="skeuo-button p-2 text-xs"
+              className="p-2 rounded-xl bg-card/80 border border-border/80 text-foreground hover:bg-muted/80 text-xs shadow-sm transition-all"
               title="Reset Zoom"
             >
               <RefreshCw className="h-4 w-4" />
@@ -250,7 +250,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
           width={820}
           height={520}
           onClick={handleCanvasClick}
-          className="w-full h-full cursor-grab active:cursor-grabbing rounded-xl bg-black/20"
+          className="w-full h-full cursor-grab active:cursor-grabbing rounded-2xl bg-black/20"
         />
 
         {/* Bottom Legend Pills */}
@@ -259,11 +259,11 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
             <button
               key={c.cluster_id}
               onClick={() => setActiveCluster(activeCluster === c.cluster_id ? null : c.cluster_id)}
-              className={`skeuo-badge text-[10px] flex items-center gap-1.5 cursor-pointer transition-all ${
-                activeCluster === c.cluster_id ? "ring-2 ring-white scale-105" : ""
+              className={`px-2.5 py-1 rounded-full text-[10px] font-medium border flex items-center gap-1.5 cursor-pointer transition-all bg-card/80 backdrop-blur-md ${
+                activeCluster === c.cluster_id ? "border-primary text-primary ring-2 ring-primary/30 scale-105" : "border-border/60 text-muted-foreground hover:text-foreground"
               }`}
             >
-              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: c.color_hex }} />
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: c.color_hex }} />
               <span>{c.name} ({c.node_ids.length})</span>
             </button>
           ))}
@@ -272,13 +272,13 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
 
       {/* Selected Node Details Drawer */}
       {selectedNodeObj && (
-        <div className="w-full md:w-80 skeuo-card p-5 space-y-4 animate-in fade-in slide-in-from-right-4 duration-200">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="w-full md:w-80 rounded-3xl bg-card/90 border border-border/80 p-5 space-y-4 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-right-4 duration-200 text-foreground sleek-bezel">
+          <div className="flex items-center justify-between border-b border-border/50 pb-3">
             <div className="flex items-center gap-2 font-bold text-sm text-foreground">
-              <Sparkles className="h-4 w-4 text-indigo-400" />
+              <Sparkles className="h-4 w-4 text-primary" />
               <span>Concept Inspector</span>
             </div>
-            <span className="skeuo-badge text-[10px] uppercase text-indigo-300 font-mono">
+            <span className="text-[10px] uppercase text-primary font-mono px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
               {selectedNodeObj.category}
             </span>
           </div>
@@ -290,11 +290,11 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
             </p>
           </div>
 
-          <div className="skeuo-inset p-3 space-y-1 text-xs">
+          <div className="p-3.5 rounded-2xl bg-muted/40 border border-border/60 space-y-1.5 text-xs">
             <span className="text-[10px] font-mono text-muted-foreground uppercase font-bold">Importance Rating</span>
-            <div className="h-2 w-full skeuo-inset bg-black/30 rounded overflow-hidden">
+            <div className="h-2 w-full bg-background rounded-full overflow-hidden">
               <div
-                className="h-full bg-indigo-500 rounded"
+                className="h-full bg-primary rounded-full"
                 style={{ width: `${(selectedNodeObj.importance_score || 0.5) * 100}%` }}
               />
             </div>
@@ -303,7 +303,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
           <div className="space-y-2 pt-2">
             <Link
               href={`/chat?q=${encodeURIComponent(selectedNodeObj.name)}`}
-              className="skeuo-button w-full text-xs py-2.5 font-bold"
+              className="w-full py-2.5 px-4 rounded-xl bg-primary text-primary-foreground font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:opacity-90 transition-all"
             >
               <span>Ask AI About {selectedNodeObj.name}</span>
               <ArrowRight className="h-3.5 w-3.5" />

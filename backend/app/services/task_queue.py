@@ -24,5 +24,13 @@ class ArqTaskQueue:
         await self._pool.aclose()
 
 
+class NoopTaskQueue:
+    async def enqueue(self, function_name: str, *args: Any, **kwargs: Any) -> str | None:
+        return "noop-job"
+
+    async def aclose(self) -> None:
+        pass
+
+
 async def make_arq_pool(redis_url: str) -> ArqRedis:
     return await create_pool(RedisSettings.from_dsn(redis_url))

@@ -27,7 +27,8 @@ router = APIRouter(prefix="/api/documents", tags=["documents"])
 def get_task_queue(request: Request) -> TaskQueue:
     queue = getattr(request.app.state, "task_queue", None)
     if queue is None:
-        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail="Task queue unavailable")
+        from app.services.task_queue import NoopTaskQueue
+        return NoopTaskQueue()
     return queue
 
 

@@ -30,6 +30,14 @@ def initialize_firebase(settings: Settings) -> bool:
     if _initialized:
         return True
 
+    try:
+        firebase_admin.get_app()
+        _initialized = True
+        _settings = settings
+        return True
+    except ValueError:
+        pass
+
     bucket_name = settings.firebase_storage_bucket or _default_bucket_name(
         settings.firebase_project_id
     )

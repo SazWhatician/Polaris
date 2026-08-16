@@ -12,6 +12,10 @@ service cloud.firestore {
     match /users/{uid} {
       allow read, write: if isOwner(uid);
 
+      match /todos/{todoId} {
+        allow read, write: if isOwner(uid);
+      }
+
       match /documents/{docId} {
         allow read: if isOwner(uid);
         // Writes are intentionally server-only (Admin SDK bypasses rules).

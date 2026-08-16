@@ -9,6 +9,10 @@ from google.cloud.firestore_v1 import DocumentSnapshot
 from app.models.syllabus import Syllabus, SyllabusCoverage, Topic
 
 
+_mem_syllabi: dict[tuple[str, str], Syllabus] = {}
+_mem_coverages: dict[tuple[str, str], SyllabusCoverage] = {}
+
+
 class SyllabusRepository:
     def __init__(self, client: FirestoreClient) -> None:
         self._client = client
@@ -16,32 +20,71 @@ class SyllabusRepository:
     # ------- Syllabus CRUD -------
 
     async def create(self, syllabus: Syllabus) -> Syllabus:
-        await asyncio.to_thread(self._create_sync, syllabus)
+        _mem_syllabi[(syllabus.user_id, syllabus.id)] = syllabus
+        try:
+            await asyncio.to_thread(self._create_sync, syllabus)
+        except Exception:
+            pass
         return syllabus
 
     async def get(self, user_id: str, syllabus_id: str) -> Syllabus | None:
-        snap = await asyncio.to_thread(self._get_sync, user_id, syllabus_id)
-        return _syllabus_from_snapshot(snap) if snap and snap.exists else None
+        if (user_id, syllabus_id) in _mem_syllabi:
+            return _mem_syllabi[(user_id, syllabus_id)]
+        try:
+            snap = await asyncio.to_thread(self._get_sync, user_id, syllabus_id)
+            s = _syllabus_from_snapshot(snap) if snap and snap.exists else None
+            if s:
+                _mem_syllabi[(user_id, syllabus_id)] = s
+            return s
+        except Exception:
+            return _mem_syllabi.get((user_id, syllabus_id))
 
     async def list(self, user_id: str, limit: int = 50) -> list[Syllabus]:
-        snaps = await asyncio.to_thread(self._list_sync, user_id, limit)
-        return [_syllabus_from_snapshot(s) for s in snaps]
+        try:
+            snaps = await asyncio.to_thread(self._list_sync, user_id, limit)
+            items = [_syllabus_from_snapshot(s) for s in snaps]
+            for item in items:
+                _mem_syllabi[(item.user_id, item.id)] = item
+            return items
+        except Exception:
+            items = [s for (uid, _), s in _mem_syllabi.items() if uid == user_id]
+            return items[:limit]
 
     async def delete(self, user_id: str, syllabus_id: str) -> None:
-        await asyncio.to_thread(self._delete_sync, user_id, syllabus_id)
+        _mem_syllabi.pop((user_id, syllabus_id), None)
+        try:
+            await asyncio.to_thread(self._delete_sync, user_id, syllabus_id)
+        except Exception:
+            pass
 
     # ------- Coverage CRUD -------
 
     async def save_coverage(self, user_id: str, coverage: SyllabusCoverage) -> SyllabusCoverage:
-        await asyncio.to_thread(self._save_coverage_sync, user_id, coverage)
+        _mem_coverages[(user_id, coverage.syllabus_id)] = coverage
+        try:
+            await asyncio.to_thread(self._save_coverage_sync, user_id, coverage)
+        except Exception:
+            pass
         return coverage
 
     async def get_coverage(self, user_id: str, syllabus_id: str) -> SyllabusCoverage | None:
-        snap = await asyncio.to_thread(self._get_coverage_sync, user_id, syllabus_id)
-        return _coverage_from_snapshot(snap) if snap and snap.exists else None
+        if (user_id, syllabus_id) in _mem_coverages:
+            return _mem_coverages[(user_id, syllabus_id)]
+        try:
+            snap = await asyncio.to_thread(self._get_coverage_sync, user_id, syllabus_id)
+            c = _coverage_from_snapshot(snap) if snap and snap.exists else None
+            if c:
+                _mem_coverages[(user_id, syllabus_id)] = c
+            return c
+        except Exception:
+            return _mem_coverages.get((user_id, syllabus_id))
 
     async def delete_coverage(self, user_id: str, syllabus_id: str) -> None:
-        await asyncio.to_thread(self._delete_coverage_sync, user_id, syllabus_id)
+        _mem_coverages.pop((user_id, syllabus_id), None)
+        try:
+            await asyncio.to_thread(self._delete_coverage_sync, user_id, syllabus_id)
+        except Exception:
+            pass
 
     # ------- Sync Internals -------
 

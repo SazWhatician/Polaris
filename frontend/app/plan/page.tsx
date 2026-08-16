@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Calendar, Clock, Sparkles, AlertCircle, CheckCircle2, ArrowRight, FileText, MessageSquare, Target } from "lucide-react";
+import { Calendar, Clock, Sparkles, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import Link from "next/link";
 
 import { SiteHeader } from "@/components/site-header";
+import { PageHeader } from "@/components/ui/page-header";
 import { useAuth } from "@/lib/auth-context";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -114,63 +114,17 @@ export default function RevisionPlanPage() {
   return (
     <div className="min-h-screen text-foreground pb-16">
       <SiteHeader />
-      <main ref={containerRef} className="max-w-5xl mx-auto space-y-8 py-8 px-4 sm:px-8">
-        
-        {/* Step-by-Step Workflow Banner */}
-        <Card className="gsap-plan p-5 text-xs">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 mb-4">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-primary">
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>Step 4: Date-Bounded Revision Planner</span>
-              </div>
-              <h2 className="text-base font-bold text-foreground">Constraint-Aware Revision Schedule & Diff Engine</h2>
-            </div>
-            <Button asChild size="sm" className="self-start md:self-auto gap-1.5">
-              <Link href="/dashboard">
-                <span>Back to Course Documents</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <Link href="/dashboard" className="p-2.5 rounded-xl border bg-muted/40 text-muted-foreground flex items-center gap-2 text-xs">
-              <span className="w-5 h-5 rounded-full bg-background font-mono font-bold text-[10px] flex items-center justify-center">1</span>
-              <FileText className="h-3.5 w-3.5 text-indigo-400" />
-              <span>Upload Docs</span>
-            </Link>
-            <Link href="/chat" className="p-2.5 rounded-xl border bg-muted/40 text-muted-foreground flex items-center gap-2 text-xs">
-              <span className="w-5 h-5 rounded-full bg-background font-mono font-bold text-[10px] flex items-center justify-center">2</span>
-              <MessageSquare className="h-3.5 w-3.5 text-purple-400" />
-              <span>RAG Chat</span>
-            </Link>
-            <Link href="/gaps" className="p-2.5 rounded-xl border bg-muted/40 text-muted-foreground flex items-center gap-2 text-xs">
-              <span className="w-5 h-5 rounded-full bg-background font-mono font-bold text-[10px] flex items-center justify-center">3</span>
-              <Target className="h-3.5 w-3.5 text-pink-400" />
-              <span>Learning Gaps</span>
-            </Link>
-            <Link href="/plan" className="p-2.5 rounded-xl border border-primary/40 bg-primary/10 text-primary font-semibold flex items-center gap-2 text-xs">
-              <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground font-mono font-bold text-[10px] flex items-center justify-center">4</span>
-              <Calendar className="h-3.5 w-3.5" />
-              <span>Revision Plan</span>
-            </Link>
-          </div>
-        </Card>
-
-        {/* Header Block */}
-        <div className="gsap-plan flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-4">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Autonomous Revision Planner
-            </h1>
-            <p className="text-muted-foreground text-xs mt-1">
-              Constraint-aware LangGraph state machine producing day-by-day revision schedules with semantic re-plan diffing.
-            </p>
-          </div>
-
-          <div className="px-3 py-1 text-xs font-semibold rounded-full border border-primary/30 text-primary bg-primary/10">
-            Phase 7 Revision Agent
-          </div>
+      <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
+        {/* Standardized Page Header */}
+        <div className="gsap-plan">
+          <PageHeader
+            category="STUDY PLANNING // TIMETABLE"
+            title="Autonomous Revision Planner"
+            description="Constraint-aware study planner producing day-by-day revision schedules with semantic re-plan diffing and exam countdowns."
+            icon={Calendar}
+            badgeText="LangGraph State Engine"
+            badgeVariant="indigo"
+          />
         </div>
 
         {/* Input Configuration Card */}

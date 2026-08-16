@@ -6,12 +6,14 @@ import { Layers, Activity, RefreshCw, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { SiteHeader } from "@/components/site-header";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatCard } from "@/components/ui/stat-card";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { KnowledgeGraphViewer } from "@/components/knowledge-graph-viewer";
-import { ThemeDial, SkeuoScrews } from "@/components/skeuomorphic-controls";
-import { BorderGlow } from "@/components/border-glow";
 import { useAuth } from "@/lib/auth-context";
 import { fetchLatestGraph, extractKnowledgeGraph, type KnowledgeGraph } from "@/lib/api/graph";
-import { useGsapEntrance } from "@/lib/use-gsap-animations";
+import { useGsapEntrance } from "@/lib/use-animation-system";
 
 export default function GraphPage() {
   const { user, loading } = useAuth();
@@ -66,99 +68,79 @@ export default function GraphPage() {
     <div className="min-h-screen text-foreground pb-16">
       <SiteHeader />
 
-      <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-8">
-        
-        {/* Step-by-Step Academic Workflow Header */}
-        <div className="gsap-graph skeuo-card p-6 text-xs relative">
-          <SkeuoScrews />
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4 mb-4">
-            <div>
-              <div className="flex items-center gap-2 font-mono text-[11px] text-indigo-400 font-bold uppercase tracking-wider mb-1">
-                <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
-                <span>Polaris AI Step 5: Knowledge Graph Engine</span>
-              </div>
-              <h2 className="text-lg font-extrabold text-foreground">Interactive Concept Map & Prerequisite Graph</h2>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <ThemeDial />
-              <button
+      <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
+        {/* Standardized Page Header */}
+        <div className="gsap-graph">
+          <PageHeader
+            category="ACADEMIC INTELLIGENCE // KNOWLEDGE GRAPH"
+            title="Interactive Concept Map & Graph"
+            description="Extract concept nodes, prerequisite hierarchies, and community clusters directly from indexed course documents."
+            icon={Layers}
+            badgeText="Network Graph Engine"
+            badgeVariant="indigo"
+            actions={
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleReExtract}
                 disabled={extracting}
-                className="skeuo-button text-xs py-2 px-4 font-bold flex items-center gap-2"
+                className="gap-2 text-xs font-bold rounded-xl border-border/80 hover:bg-muted/80"
               >
-                <RefreshCw className={`h-3.5 w-3.5 ${extracting ? "animate-spin" : ""}`} />
+                <RefreshCw className={`h-3.5 w-3.5 ${extracting ? "animate-spin text-primary" : ""}`} />
                 <span>{extracting ? "Extracting Graph..." : "Re-Extract Graph"}</span>
-              </button>
-            </div>
-          </div>
-
+              </Button>
+            }
+          />
         </div>
 
         {/* Header Block & Telemetry Cards */}
-        <div className="gsap-graph grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <StatTile
+        <div className="gsap-graph grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+          <StatCard
             label="Total Concepts"
+            numericValue={graph ? graph.nodes.length : 0}
             value={graph ? graph.nodes.length.toString() : "0"}
-            subText="Extracted Concept Nodes"
-            icon={<Layers className="h-5 w-5 text-indigo-400" />}
+            icon={Layers}
+            colorScheme="primary"
+            trend="Active Nodes"
+            trendPositive
+            tag="Vectorized"
           />
-          <StatTile
+          <StatCard
             label="Prerequisite Edges"
+            numericValue={graph ? graph.edges.length : 0}
             value={graph ? graph.edges.length.toString() : "0"}
-            subText="Inter-concept Relationships"
-            icon={<Activity className="h-5 w-5 text-emerald-400" />}
+            icon={Activity}
+            colorScheme="emerald"
+            trend="Directed Links"
+            trendPositive
+            tag="DAG Tree"
           />
-          <StatTile
+          <StatCard
             label="Community Clusters"
+            numericValue={graph ? graph.clusters.length : 0}
             value={graph ? graph.clusters.length.toString() : "0"}
-            subText="Graph Clusters Formed"
-            icon={<Sparkles className="h-5 w-5 text-purple-400" />}
+            icon={Sparkles}
+            colorScheme="purple"
+            trend="Louvain Partition"
+            trendPositive
+            tag="Clustered"
           />
         </div>
 
         {/* Knowledge Graph Viewer Canvas */}
         <div className="gsap-graph space-y-4">
           {fetching ? (
-            <div className="skeuo-card p-12 text-center text-muted-foreground text-xs flex items-center justify-center gap-3">
-              <RefreshCw className="h-5 w-5 animate-spin text-indigo-400" />
+            <Card className="p-12 text-center text-muted-foreground text-xs flex items-center justify-center gap-3 bg-card/75 backdrop-blur-2xl rounded-3xl border-border/80 shadow-xl">
+              <RefreshCw className="h-5 w-5 animate-spin text-primary" />
               <span>Constructing Knowledge Graph Visualization...</span>
-            </div>
+            </Card>
           ) : graph ? (
-            <BorderGlow borderRadius={20} glowRadius={35} colors={['#6366f1', '#a855f7', '#34d399']}>
+            <div className="rounded-3xl overflow-hidden border border-border/80 shadow-2xl bg-card/75 backdrop-blur-2xl sleek-bezel">
               <KnowledgeGraphViewer graph={graph} />
-            </BorderGlow>
+            </div>
           ) : null}
         </div>
       </main>
-    </div>
-  );
-}
-
-
-
-function StatTile({
-  label,
-  value,
-  subText,
-  icon,
-}: {
-  label: string;
-  value: string;
-  subText: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <div className="skeuo-card p-5 flex items-center justify-between relative overflow-hidden">
-      <SkeuoScrews />
-      <div className="flex items-center gap-3.5">
-        <div className="p-3 skeuo-inset">{icon}</div>
-        <div>
-          <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">{label}</p>
-          <p className="text-2xl font-black text-foreground">{value}</p>
-          <p className="text-[10px] text-muted-foreground">{subText}</p>
-        </div>
-      </div>
     </div>
   );
 }

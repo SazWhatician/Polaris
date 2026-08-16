@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, Request, status
 from firebase_admin import auth as fb_auth
 
-from app.core.firebase import is_initialized
+from app.core import firebase
 from app.core.logging import get_logger
 from app.models.user import AuthenticatedUser
 
@@ -19,7 +19,7 @@ async def verify_id_token(request: Request) -> AuthenticatedUser:
       503 — Firebase not initialized (server misconfiguration)
       401 — missing/malformed/expired/invalid token
     """
-    if not is_initialized():
+    if not firebase.is_initialized():
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Auth backend unavailable",

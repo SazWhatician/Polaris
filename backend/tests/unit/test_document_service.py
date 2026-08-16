@@ -87,6 +87,12 @@ class FakeStorage:
     async def delete_blob(self, storage_path: str) -> None:
         self.deleted.append(storage_path)
 
+    async def upload_bytes(
+        self, storage_path: str, data: bytes, mime_type: str = "application/octet-stream"
+    ) -> None:
+        self.existing_blobs.add(storage_path)
+        self.sizes[storage_path] = len(data)
+
 
 class FakeTaskQueue:
     def __init__(self) -> None:

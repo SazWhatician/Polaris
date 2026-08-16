@@ -3,15 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { FileText, Clock, Activity, CheckCircle2, Layers } from "lucide-react";
+import { FileText, Clock, CheckCircle2, Layers, RefreshCw } from "lucide-react";
 
 import { DocumentList } from "@/components/document-list";
 import { SiteHeader } from "@/components/site-header";
 import { UploadCard } from "@/components/upload-card";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatCard } from "@/components/ui/stat-card";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
 import { listDocuments, type DocumentResponse } from "@/lib/api/documents";
-import { useGsapEntrance } from "@/lib/use-gsap-animations";
-import { Card } from "@/components/ui/card";
+import { useGsapEntrance } from "@/lib/use-animation-system";
 
 const POLL_INTERVAL_MS = 3000;
 const IN_FLIGHT_STATES = new Set(["queued", "processing"]);
@@ -29,28 +32,26 @@ export default function DashboardPage() {
     if (!loading && !user) router.replace("/");
   }, [loading, user, router]);
 
-  // Initial load.
+  const loadDocs = async () => {
+    try {
+      const items = await listDocuments();
+      setDocs(items);
+    } catch (e) {
+      toast.error("Failed to load documents", {
+        description: e instanceof Error ? e.message : String(e),
+      });
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  // Initial load
   useEffect(() => {
     if (!user) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const items = await listDocuments();
-        if (!cancelled) setDocs(items);
-      } catch (e) {
-        toast.error("Failed to load documents", {
-          description: e instanceof Error ? e.message : String(e),
-        });
-      } finally {
-        if (!cancelled) setFetching(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+    loadDocs();
   }, [user]);
 
-  // Background poll
+  // Background poll for in-flight tasks
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
@@ -62,7 +63,7 @@ export default function DashboardPage() {
         const items = await listDocuments();
         if (!cancelled) setDocs(items);
       } catch {
-        // Polling best-effort
+        // Best-effort polling
       }
     };
 
@@ -82,43 +83,61 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen text-foreground pb-16">
       <SiteHeader />
-      <main ref={containerRef} className="max-w-6xl mx-auto space-y-8 py-8 px-4 sm:px-8">
-        
-
-
-        {/* Header Block */}
-        <div className="gsap-dash flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-4">
-          <div>
-            <h1 className="text-2xl font-black tracking-tight text-foreground">
-              Course Ingestion Library
-            </h1>
-            <p className="text-muted-foreground text-xs mt-1 font-medium">
-              Upload PDF course notes & textbooks for OCR extraction, vector chunking, and grounded RAG indexing.
-            </p>
-          </div>
-
-          <div className="px-3 py-1 text-xs font-semibold rounded-full border border-primary/30 text-primary bg-primary/10 flex items-center gap-2">
-            <Activity className="h-3.5 w-3.5 text-emerald-500 animate-pulse" />
-            <span>Qdrant Multi-Tenant Active</span>
-          </div>
+      <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
+        {/* Standardized Page Header */}
+        <div className="gsap-dash">
+          <PageHeader
+            category="CORE WORKSPACE // INGESTION"
+            title="Course Ingestion Library"
+            description="Upload PDF course notes, lecture slides, and textbooks for OCR extraction, vector chunking, and grounded RAG indexing."
+            icon={FileText}
+            badgeText="Multi-Tenant Vector Store"
+            badgeVariant="emerald"
+            actions={
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={loadDocs}
+                className="gap-2 text-xs font-bold rounded-xl border-border/80 hover:bg-muted/80"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${fetching ? "animate-spin text-primary" : ""}`} />
+                <span>Refresh Index</span>
+              </Button>
+            }
+          />
         </div>
 
-        {/* Telemetry Stats Grid */}
-        <div className="gsap-dash grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <SleekStatCard
-            icon={<FileText className="h-5 w-5 text-primary" />}
+        {/* Animated Telemetry Stat Grid */}
+        <div className="gsap-dash grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+          <StatCard
             label="Total Documents"
+            numericValue={totalDocs}
             value={totalDocs.toString()}
+            icon={FileText}
+            colorScheme="primary"
+            trend="Active Files"
+            trendPositive
+            tag="Vectorized"
           />
-          <SleekStatCard
-            icon={<CheckCircle2 className="h-5 w-5 text-emerald-500" />}
+          <StatCard
             label="OCR Complete & Indexed"
+            numericValue={processedDocs}
             value={processedDocs.toString()}
+            icon={CheckCircle2}
+            colorScheme="emerald"
+            trend="Ready for RAG"
+            trendPositive
+            tag="Qdrant Multi-Tenant"
           />
-          <SleekStatCard
-            icon={<Layers className="h-5 w-5 text-purple-500" />}
+          <StatCard
             label="Extracted Pages"
+            numericValue={totalPages}
             value={totalPages.toString()}
+            icon={Layers}
+            colorScheme="purple"
+            trend="High Resolution"
+            trendPositive
+            tag="Chunk Indexed"
           />
         </div>
 
@@ -130,9 +149,10 @@ export default function DashboardPage() {
         {/* Document List */}
         <div className="gsap-dash">
           {fetching ? (
-            <Card className="p-8 text-center text-muted-foreground text-xs flex items-center justify-center gap-3">
-              <Clock className="h-4 w-4 animate-spin text-primary" />
-              <span>Fetching Document Index...</span>
+            <Card className="p-12 text-center text-muted-foreground text-xs flex flex-col items-center justify-center gap-3 bg-card/75 backdrop-blur-2xl border-border/80 rounded-3xl">
+              <Clock className="h-6 w-6 animate-spin text-primary" />
+              <span className="font-semibold text-sm text-foreground">Fetching Document Index...</span>
+              <p className="text-xs text-muted-foreground">Synchronizing vector status with Qdrant collection</p>
             </Card>
           ) : (
             <DocumentList docs={docs} onChange={setDocs} />
@@ -140,29 +160,5 @@ export default function DashboardPage() {
         </div>
       </main>
     </div>
-  );
-}
-
-
-
-function SleekStatCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <Card className="p-5 flex items-center justify-between">
-      <div className="flex items-center gap-3.5">
-        <div className="p-3 bg-muted/50 rounded-xl">{icon}</div>
-        <div>
-          <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">{label}</p>
-          <p className="text-2xl font-black text-foreground">{value}</p>
-        </div>
-      </div>
-    </Card>
   );
 }
