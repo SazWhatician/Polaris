@@ -53,30 +53,41 @@ def initialize_firebase(settings: Settings) -> bool:
         log.info("firebase.initialized", mode="emulator", project=settings.firebase_project_id)
         return True
 
-    if not settings.firebase_credentials_path:
-        log.warning("firebase.not_initialized", reason="FIREBASE_CREDENTIALS_PATH unset")
-        return False
-
-    cred_path = Path(settings.firebase_credentials_path)
-    if not cred_path.is_file():
+    # If credentials file path is given and exists, initialize with service account certificate
+    if settings.firebase_credentials_path:
+        cred_path = Path(settings.firebase_credentials_path)
+        if cred_path.is_file():
+            cred = credentials.Certificate(str(cred_path))
+            firebase_admin.initialize_app(cred, options)
+            _initialized = True
+            _settings = settings
+            log.info(
+                "firebase.initialized",
+                mode="service-account",
+                project=settings.firebase_project_id,
+                bucket=bucket_name,
+            )
+            return True
         log.warning(
-            "firebase.not_initialized",
-            reason="credentials_file_missing",
+            "firebase.credentials_path_not_found",
             path=str(cred_path),
+            fallback="project-id-verification",
         )
-        return False
 
-    cred = credentials.Certificate(str(cred_path))
-    firebase_admin.initialize_app(cred, options)
-    _initialized = True
-    _settings = settings
-    log.info(
-        "firebase.initialized",
-        mode="service-account",
-        project=settings.firebase_project_id,
-        bucket=bucket_name,
-    )
-    return True
+    # Fallback: Initialize with projectId for public ID token verification (Google OAuth certs)
+    try:
+        firebase_admin.initialize_app(options=options)
+        _initialized = True
+        _settings = settings
+        log.info(
+            "firebase.initialized",
+            mode="project-id-verification",
+            project=settings.firebase_project_id,
+        )
+        return True
+    except Exception as exc:
+        log.error("firebase.initialize_failed", error=str(exc))
+        return False
 
 
 def is_initialized() -> bool:

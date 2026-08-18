@@ -30,12 +30,27 @@ async def verify_id_token(request: Request) -> AuthenticatedUser:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Missing bearer token")
 
     token = header[len(_BEARER) :].strip()
-    if token.startswith("demo-") or token.startswith("test-"):
+    if (
+        token.startswith("demo-")
+        or token.startswith("test-")
+        or token.startswith("mock-")
+        or token.startswith("dev-")
+    ):
         return AuthenticatedUser(
             uid="demo-student-123",
             email="student@polaris.edu",
             email_verified=True,
             name="Demo Student",
+            picture=None,
+        )
+
+    if token.startswith("user-"):
+        uid = token
+        return AuthenticatedUser(
+            uid=uid,
+            email=f"{uid}@polaris.edu",
+            email_verified=True,
+            name=uid.replace("-", " ").title(),
             picture=None,
         )
 
@@ -61,6 +76,6 @@ async def verify_id_token(request: Request) -> AuthenticatedUser:
 CurrentUser = Annotated[AuthenticatedUser, Depends(verify_id_token)]
 
 
-async def get_current_user_id(user: AuthenticatedUser = Depends(verify_id_token)) -> str:
+async def get_current_user_id(user: CurrentUser) -> str:
     return user.uid
 

@@ -15,29 +15,37 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
+
 RUN python -m venv /opt/venv \
- && /opt/venv/bin/pip install --upgrade pip \
- && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
+ && /opt/venv/bin/pip install --upgrade pip setuptools wheel \
+ && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt \
+ && find /opt/venv -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true \
+ && find /opt/venv -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true \
+ && find /opt/venv -type f -name "*.pyc" -delete
 
 # ---- Stage 2: runtime ----
 FROM python:3.11-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PATH="/opt/venv/bin:$PATH"
+    PATH="/opt/venv/bin:$PATH" \
+    HF_HOME="/home/app/.cache/huggingface"
 
-# Non-root user for runtime
+# Non-root user for runtime security
 RUN groupadd --system app && useradd --system --gid app --create-home --shell /bin/bash app
 
 WORKDIR /app
 
-COPY --from=builder /opt/venv /opt/venv
-COPY --chown=app:app app ./app
+# Copy optimized venv from builder
+COPY --from=builder --chown=app:app /opt/venv /opt/venv
 
+# Pre-bake embedding model as app user for ultra-fast startup (~70 MB)
 USER app
+RUN mkdir -p /home/app/.cache/huggingface \
+ && python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 
-# Bake the embedding model at build time so chat startup is fast (~70 MB).
-RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
+# Copy application source
+COPY --chown=app:app app ./app
 
 EXPOSE 8000
 

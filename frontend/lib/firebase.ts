@@ -27,6 +27,7 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "demo-project.appspot.com",
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "123456789",
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:123456789:web:123456",
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-G4G7G7NREL",
 };
 
 export interface UserProfileData {
@@ -198,6 +199,16 @@ export async function getIdToken(): Promise<string | null> {
   if (typeof window !== "undefined") {
     const demoUser = localStorage.getItem("polaris_demo_user");
     if (demoUser) {
+      try {
+        const parsed = JSON.parse(demoUser);
+        if (parsed?.uid) {
+          return parsed.uid.startsWith("user-") || parsed.uid.startsWith("demo-")
+            ? parsed.uid
+            : `user-${parsed.uid}`;
+        }
+      } catch {
+        return "demo-token-polaris-123";
+      }
       return "demo-token-polaris-123";
     }
   }

@@ -110,16 +110,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (err: unknown) {
         const error = err as { code?: string; message?: string };
         if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
-          toast.info("Google sign-in was cancelled");
+          toast.info("Google sign-in was closed or cancelled");
         } else if (error.code === "auth/unauthorized-domain") {
-          toast.error("Firebase Auth Domain not authorized. Switched to Demo mode.");
-          signInAsDemo();
+          toast.error("Domain unauthorized in Firebase. Add 'localhost' to Firebase Console -> Authentication -> Settings -> Authorized domains.");
+        } else if (error.code === "auth/operation-not-allowed") {
+          toast.error("Google provider disabled. Enable Google under Firebase Console -> Authentication -> Sign-in method.");
         } else if (error.message?.includes("Redirecting")) {
           toast.info("Redirecting to Google login...");
         } else {
-          console.warn("Google Sign-In failed, activating workspace in demo mode:", err);
-          toast.info("Signed in in local demo mode.");
-          signInAsDemo();
+          const detail = error.message || error.code || "Unknown error";
+          console.error("Google Sign-In failed:", err);
+          toast.error(`Google Sign-In failed: ${detail}`);
         }
       } finally {
         setLoading(false);
