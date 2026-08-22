@@ -1,14 +1,16 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, LogIn, ShieldCheck, Zap, Layers } from "lucide-react";
+import { ArrowRight, LogIn, ShieldCheck, Zap, Layers, ChevronRight } from "lucide-react";
 
 import { AnimatedShaderHero } from "@/components/ui/animated-shader-hero";
+import { AnimatedShaderCard } from "@/components/ui/animated-shader-card";
 import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Card } from "@/components/ui/card";
+import { ReactorFooter } from "@/components/reactor-footer";
 
 export default function Home() {
   const { user } = useAuth();
@@ -27,22 +29,28 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen text-foreground relative flex flex-col justify-between overflow-x-hidden selection:bg-primary/30 selection:text-foreground">
-      {/* Top Floating Glassmorphism Header */}
-      <header className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-10 h-10 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/80 flex items-center justify-center overflow-hidden shadow-xl group-hover:scale-105 transition-transform">
+    <div className="min-h-screen text-foreground relative selection:bg-[#2BA648]/30 selection:text-foreground bg-black overflow-x-hidden">
+      {/* Top Floating Luxury Glass Header */}
+      <header className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-5 max-w-7xl mx-auto w-full">
+        <Link href="/" className="flex items-center gap-3.5 group">
+          <div className="relative w-10 h-10 rounded-2xl bg-white/[0.04] backdrop-blur-2xl border border-white/15 flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-105 group-hover:border-[#2BA648]/40 transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#2BA648]/10 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <Image
               src="/polaris-logo.png"
               alt="Polaris Logo"
-              width={32}
-              height={32}
-              className="object-contain"
+              width={26}
+              height={26}
+              className="object-contain relative z-10"
             />
           </div>
-          <span className="font-black text-xl tracking-wider text-foreground drop-shadow">
-            POLARIS
-          </span>
+          <div className="flex flex-col">
+            <span className="polaris-luxury-logo text-sm tracking-[0.24em] font-extrabold uppercase">
+              POLARIS
+            </span>
+            <span className="text-[9px] font-mono text-white/40 tracking-[0.2em] uppercase">
+              Haute Intelligence
+            </span>
+          </div>
         </Link>
 
         <div className="flex items-center gap-3">
@@ -50,7 +58,7 @@ export default function Home() {
           {user ? (
             <Link
               href="/dashboard"
-              className="px-4 py-2 rounded-full bg-primary text-primary-foreground font-bold text-xs flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-primary/20 border border-primary/30"
+              className="px-5 py-2.5 rounded-2xl bg-white text-black font-bold text-xs flex items-center gap-2 hover:bg-slate-200 transition-all shadow-xl hover:scale-105 active:scale-95"
             >
               <span>Workspace</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -58,25 +66,22 @@ export default function Home() {
           ) : (
             <Link
               href="/login"
-              className="px-4 py-2 rounded-full bg-card/80 hover:bg-card border border-border/80 text-foreground font-bold text-xs flex items-center gap-2 backdrop-blur-xl transition-all hover:scale-105 shadow-sm"
+              className="px-5 py-2.5 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-white font-bold text-xs flex items-center gap-2 backdrop-blur-2xl transition-all hover:scale-105 active:scale-95 shadow-md hover:border-[#2BA648]/30"
             >
-              <LogIn className="h-3.5 w-3.5" />
-              <span>Sign In / Register</span>
+              <LogIn className="h-3.5 w-3.5 text-[#2BA648]" />
+              <span>Sign In</span>
             </Link>
           )}
         </div>
       </header>
 
-      {/* Main Animated Full-Page Shader Section */}
-      <main className="flex-1 w-full relative z-10">
+      {/* Main Landing Page Content */}
+      <main className="relative z-10 w-full bg-black">
+        {/* Animated Shader Hero (Polaris Cosmic Shader) */}
         <AnimatedShaderHero
           fullPage
-          trustBadge={{
-            text: "Multimodal Grounded RAG Platform",
-            icons: ["✨", "🚀", "🪐"],
-          }}
           title="POLARIS"
-          subtitle="Supercharge your academic workflow with grounded vector search, instant PDF citations, automated gap analysis, and interactive knowledge graphs."
+          subtitle="Autonomous academic research & intelligence engine. Grounded vector embeddings, page-level citations, and automated prerequisite knowledge graphs."
           buttons={{
             primary: {
               text: user ? "Enter Workspace" : "Get Started Free",
@@ -89,66 +94,112 @@ export default function Home() {
           }}
         />
 
-        {/* Feature Grid Below Shader Hero */}
-        <section className="relative z-20 py-20 px-6 max-w-7xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto space-y-4 mb-16 p-8 rounded-3xl bg-card/75 border border-border/80 backdrop-blur-2xl shadow-2xl">
-            <h2 className="text-3xl sm:text-5xl font-black text-foreground tracking-tight">
-              Academic Research & Intelligence Engine
-            </h2>
-            <p className="text-muted-foreground text-sm sm:text-base font-medium">
-              Polaris indexes your course notes, textbooks, and syllabi to provide cited answers, identify learning gaps, and structure automated revision plans.
-            </p>
-          </div>
+        {/* Feature Section with Precision Intelligence Engine Shader Card & 3 Feature Cards */}
+        <section className="relative z-20 py-24 px-6 max-w-7xl mx-auto space-y-16">
+          {/* Precision Intelligence Engine Banner Card with Polaris Hero Shader */}
+          <AnimatedShaderCard className="max-w-4xl mx-auto">
+            <div className="relative z-10 text-center p-8 sm:p-14 space-y-5">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.08] border border-white/20 backdrop-blur-xl text-white text-xs font-mono tracking-[0.2em] uppercase shadow-lg">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2BA648] animate-pulse" />
+                <span className="font-semibold">Academic Architecture</span>
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <FeatureCard
-              icon={<Zap className="h-6 w-6 text-primary" />}
+              <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight drop-shadow-md">
+                Precision Intelligence Engine
+              </h2>
+
+              <p className="text-slate-200 text-sm sm:text-base font-light leading-relaxed max-w-2xl mx-auto drop-shadow-sm">
+                Polaris indexes your course notes, textbooks, and syllabi to provide verified citations, identify prerequisite gaps, and structure automated revision plans.
+              </p>
+            </div>
+          </AnimatedShaderCard>
+
+          {/* 3 Feature Cards Positioned Just Above Footer */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
+            <PopoutFeatureCard
+              variant="green"
+              icon={<Zap className="h-6 w-6 text-[#2BA648]" />}
+              category="VECTOR RETRIEVAL"
               title="Grounded RAG Search"
-              description="Ask complex questions and receive precise, page-level citations from your own uploaded PDF notes and textbooks."
+              description="Ask complex questions and receive precise, page-level citations from your uploaded PDF notes and textbooks with bounding box previews."
             />
-            <FeatureCard
-              icon={<Layers className="h-6 w-6 text-primary" />}
-              title="Knowledge Graph Indexing"
-              description="Automatically extract concept nodes, prerequisite relationships, and community clusters from your syllabus."
+            <PopoutFeatureCard
+              variant="purple"
+              icon={<Layers className="h-6 w-6 text-purple-400" />}
+              category="KNOWLEDGE GRAPH"
+              title="Concept Topology"
+              description="Automatically extract concept nodes, prerequisite relationships, and interactive community clusters directly from your syllabus."
             />
-            <FeatureCard
-              icon={<ShieldCheck className="h-6 w-6 text-primary" />}
+            <PopoutFeatureCard
+              variant="cyan"
+              icon={<ShieldCheck className="h-6 w-6 text-cyan-400" />}
+              category="DIAGNOSTICS"
               title="Multimodal Gap Analysis"
-              description="Detect missing prerequisite concepts in your knowledge base and receive curated educational YouTube recommendations."
+              description="Detect missing prerequisite concepts in your knowledge base and receive curated educational lecture recommendations."
             />
           </div>
         </section>
+
+        {/* Smooth Dark Fade into ENIGMA Reactor Footer */}
+        <div className="w-full h-24 bg-gradient-to-b from-transparent to-black pointer-events-none" />
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-20 border-t border-border/80 bg-card/60 backdrop-blur-xl py-8 text-center text-xs text-muted-foreground font-mono">
-        Polaris Academic RAG Engine • Powered by Next.js, Qdrant & Gemini
-      </footer>
+      {/* ENIGMA Negative-Inversion 3D Reactor Footer with GLB Model */}
+      <ReactorFooter customModelUrl="/models/bouche_a_levres.glb" />
     </div>
   );
 }
 
-function FeatureCard({
+function PopoutFeatureCard({
   icon,
+  category,
   title,
   description,
+  variant = "green",
 }: {
   icon: React.ReactNode;
+  category: string;
   title: string;
   description: string;
+  variant?: "green" | "purple" | "cyan";
 }) {
+  const variantClasses = {
+    green: "luxury-glass-card group",
+    purple: "luxury-glass-card luxury-glass-card-purple group",
+    cyan: "luxury-glass-card luxury-glass-card-cyan group",
+  }[variant];
+
+  const glowAccent = {
+    green: "bg-[#2BA648]/10 border-[#2BA648]/20 text-[#2BA648] group-hover:bg-[#2BA648]/20 group-hover:border-[#2BA648]/50 group-hover:shadow-[0_0_20px_rgba(43,166,72,0.4)]",
+    purple: "bg-purple-500/10 border-purple-500/20 text-purple-400 group-hover:bg-purple-500/20 group-hover:border-purple-500/50 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]",
+    cyan: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400 group-hover:bg-cyan-500/20 group-hover:border-cyan-500/50 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]",
+  }[variant];
+
   return (
-    <Card className="relative p-7 rounded-2xl bg-card/75 border border-border/80 shadow-xl backdrop-blur-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-primary/50 group overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      <div className="p-3 w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-all duration-300">
-        {icon}
+    <div className={`p-8 rounded-3xl ${variantClasses} cursor-pointer`}>
+      {/* Top subtle highlight line */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:via-white/60 transition-all duration-500" />
+
+      <div className="flex items-center justify-between mb-8">
+        <div className={`p-3.5 rounded-2xl border flex items-center justify-center transition-all duration-500 group-hover:scale-110 ${glowAccent}`}>
+          {icon}
+        </div>
+        <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-white/40 group-hover:text-white transition-colors">
+          {category}
+        </span>
       </div>
-      <h3 className="text-lg font-extrabold text-foreground tracking-tight mb-2 group-hover:text-primary transition-colors">
+
+      <h3 className="text-xl font-black text-foreground tracking-tight mb-3 group-hover:text-white transition-colors duration-300">
         {title}
       </h3>
-      <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed font-normal">
+      <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed font-light group-hover:text-slate-200 transition-colors duration-300">
         {description}
       </p>
-    </Card>
+
+      <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono text-white/40 group-hover:text-white transition-colors">
+        <span>Explore Module</span>
+        <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+      </div>
+    </div>
   );
 }

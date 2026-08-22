@@ -270,6 +270,7 @@ export function NavDrawer() {
                       key={item.href}
                       href={item.href as Parameters<typeof Link>[0]["href"]}
                       onClick={() => setIsOpen(false)}
+                      data-agent-target={`nav-item-${item.href.replace('/', '')}`}
                       className={cn(
                         "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all select-none",
                         isActive

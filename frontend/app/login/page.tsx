@@ -1,10 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, Sparkles, ArrowRight, UserPlus, LogIn, Eye, EyeOff, ShieldCheck, Zap } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Sparkles,
+  ArrowRight,
+  UserPlus,
+  LogIn,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  Zap,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/lib/auth-context";
@@ -20,11 +35,32 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+
   useEffect(() => {
     if (user && !loading) {
       router.replace("/dashboard");
     }
   }, [user, loading, router]);
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+      setIsPlaying(true);
+    } else {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const toggleMute = () => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = !videoRef.current.muted;
+    setIsMuted(videoRef.current.muted);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,19 +85,24 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full flex bg-background text-foreground overflow-hidden">
-      {/* LEFT COLUMN: High-Art Space Astronaut Image Split */}
-      <div className="hidden lg:flex lg:w-7/12 relative bg-black overflow-hidden flex-col justify-between p-12 select-none">
-        {/* Background Image */}
-        <Image
-          src="/login-bg.jpg"
-          alt="Deep Space Astronaut"
-          fill
-          priority
-          className="object-cover object-center opacity-85 hover:scale-105 transition-transform duration-1000 ease-out"
-        />
+      {/* LEFT COLUMN: Cinematic Video Background */}
+      <div className="hidden lg:flex lg:w-7/12 relative bg-black overflow-hidden flex-col justify-between p-8 xl:p-12 select-none">
+        {/* Background Looping Video with Poster Fallback */}
+        <video
+          ref={videoRef}
+          autoPlay
+          loop
+          muted={isMuted}
+          playsInline
+          poster="/login-bg.jpg"
+          className="absolute inset-0 w-full h-full object-cover opacity-90 scale-[1.02] transition-transform duration-1000"
+        >
+          <source src="/login-video.mp4" type="video/mp4" />
+        </video>
 
-        {/* Gradient Overlay for Readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-black/60 z-10" />
+        {/* Cinematic Gradient Overlays for Readability & Depth */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/70 z-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-radial-gradient from-transparent via-black/20 to-black/60 z-10 pointer-events-none" />
 
         {/* Top Branding Header */}
         <div className="relative z-20 flex items-center justify-between">
@@ -77,41 +118,72 @@ export default function LoginPage() {
             </div>
             <div className="flex flex-col">
               <span className="font-black text-xl tracking-wider text-white">POLARIS</span>
-              <span className="text-[10px] font-mono tracking-widest text-purple-300 uppercase">Academic Knowledge Engine</span>
+              <span className="text-[10px] font-mono tracking-widest text-purple-300 uppercase">
+                Academic Knowledge Engine
+              </span>
             </div>
           </Link>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-mono text-white">
-            <Sparkles className="h-3.5 w-3.5 text-purple-400 animate-pulse" />
-            <span>v2.4 Grounded RAG</span>
+          {/* Top Controls & Status Badge */}
+          <div className="flex items-center gap-2">
+            {/* Video Controls Toggle */}
+            <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md border border-white/15 rounded-full p-1 text-white">
+              <button
+                type="button"
+                onClick={togglePlay}
+                aria-label={isPlaying ? "Pause video" : "Play video"}
+                className="p-1.5 rounded-full hover:bg-white/20 transition-colors text-white/90 hover:text-white"
+                title={isPlaying ? "Pause video" : "Play video"}
+              >
+                {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+              </button>
+              <button
+                type="button"
+                onClick={toggleMute}
+                aria-label={isMuted ? "Unmute audio" : "Mute audio"}
+                className="p-1.5 rounded-full hover:bg-white/20 transition-colors text-white/90 hover:text-white"
+                title={isMuted ? "Unmute audio" : "Mute audio"}
+              >
+                {isMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-mono text-white">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>v2.4 Grounded RAG</span>
+            </div>
           </div>
         </div>
 
         {/* Bottom Cosmic Quote & Testimonial Banner */}
-        <div className="relative z-20 space-y-4 max-w-xl">
+        <div className="relative z-20 space-y-3 max-w-xl pb-8 xl:pb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-200 text-xs font-semibold backdrop-blur-md">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
             <span>Multi-Tenant Qdrant Vector Indexing</span>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight drop-shadow-lg">
+          <h2 className="text-xl xl:text-2xl font-extrabold text-white leading-snug tracking-tight drop-shadow-lg">
             "Explore strange new concepts, discover deep citations, and learn without limits."
           </h2>
 
-          <p className="text-gray-300 text-sm leading-relaxed font-light">
+          <p className="text-gray-300 text-xs xl:text-sm leading-relaxed font-light drop-shadow">
             Polaris pairs state-of-the-art grounded RAG search with automated PDF OCR, gap analysis, and interactive knowledge graphs to accelerate your learning.
           </p>
 
-          <div className="pt-2 flex items-center gap-6 text-xs text-gray-400 font-mono">
-            <span className="flex items-center gap-1.5"><Zap className="h-3.5 w-3.5 text-amber-400" /> Instant PDF Indexing</span>
-            <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5 text-purple-400" /> Page-Level Citations</span>
+          <div className="pt-1 flex items-center gap-6 text-xs text-gray-300 font-mono drop-shadow">
+            <span className="flex items-center gap-1.5">
+              <Zap className="h-3.5 w-3.5 text-amber-400" /> Instant PDF Indexing
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-purple-400" /> Page-Level Citations
+            </span>
           </div>
         </div>
       </div>
 
       {/* RIGHT COLUMN: Modern Split Login & Sign-up Form */}
       <div className="w-full lg:w-5/12 flex flex-col justify-between p-6 sm:p-12 bg-background relative z-20 overflow-y-auto">
-        
+
         {/* Top Action Bar */}
         <div className="flex items-center justify-between w-full">
           <Link href="/" className="lg:hidden flex items-center gap-2">
@@ -125,7 +197,7 @@ export default function LoginPage() {
 
         {/* Form Container */}
         <div className="max-w-md w-full mx-auto my-auto space-y-8 py-8">
-          
+
           {/* Header Title */}
           <div className="space-y-2 text-center lg:text-left">
             <h1 className="text-3xl font-black tracking-tight text-foreground">
@@ -143,11 +215,10 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setMode("login")}
-              className={`flex-1 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
-                mode === "login"
+              className={`flex-1 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${mode === "login"
                   ? "bg-background text-foreground shadow-sm font-bold border border-border/50"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               <LogIn className="h-3.5 w-3.5" />
               <span>Log In</span>
@@ -155,11 +226,10 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setMode("signup")}
-              className={`flex-1 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${
-                mode === "signup"
+              className={`flex-1 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${mode === "signup"
                   ? "bg-background text-foreground shadow-sm font-bold border border-border/50"
                   : "text-muted-foreground hover:text-foreground"
-              }`}
+                }`}
             >
               <UserPlus className="h-3.5 w-3.5" />
               <span>Sign Up</span>

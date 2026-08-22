@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 const ACCEPTED = "application/pdf,image/jpeg,image/png,image/webp";
-const MAX_BYTES = 50 * 1024 * 1024;
+const MAX_BYTES = 500 * 1024 * 1024; // 500 MiB limit
 
 interface Props {
   onUploaded: (doc: DocumentResponse) => void;
@@ -25,7 +25,7 @@ export function UploadCard({ onUploaded }: Props) {
 
   const onFile = async (file: File) => {
     if (file.size > MAX_BYTES) {
-      toast.error("File too large", { description: "Limit is 50 MiB." });
+      toast.error("File too large", { description: "Limit is 500 MiB." });
       return;
     }
     setBusy(true);
@@ -78,7 +78,7 @@ export function UploadCard({ onUploaded }: Props) {
               </span>
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Drag & drop files or browse. Supports PDF, JPEG, PNG up to 50 MiB.
+              Drag & drop files or browse. Supports PDF, JPEG, PNG up to 500 MiB.
             </p>
           </div>
         </div>

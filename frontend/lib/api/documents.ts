@@ -82,15 +82,23 @@ export async function uploadDocument(
     }),
   });
 
-  try {
-    await putWithProgress(create.upload_url, file, create.required_headers, onProgress);
-    return await api<DocumentResponse>(`/api/documents/${create.document_id}/finalize`, {
-      method: "POST",
-    });
-  } catch (err) {
-    console.warn("Signed URL upload failed, falling back to direct upload", err);
-    return await uploadDirect(create.document_id, file, onProgress);
+  if (create.upload_url && (create.upload_url.startsWith("http://") || create.upload_url.startsWith("https://"))) {
+    try {
+      await putWithProgress(
+        create.upload_url,
+        file,
+        create.required_headers || { "Content-Type": file.type || "application/octet-stream" },
+        onProgress,
+      );
+      return await api<DocumentResponse>(`/api/documents/${create.document_id}/finalize`, {
+        method: "POST",
+      });
+    } catch (err) {
+      console.warn("Signed URL upload failed, falling back to direct upload", err);
+    }
   }
+
+  return await uploadDirect(create.document_id, file, onProgress);
 }
 
 export async function uploadDirect(

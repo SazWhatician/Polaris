@@ -16,7 +16,7 @@ from opentelemetry import trace
 
 from app.core.logging import get_logger
 from app.models.document import DocumentStatus, Page
-from app.services.page_extractor import extract_pages
+from app.services.page_extractor import extract_pages, extract_pdf_page_texts
 from app.services.status_transition import assert_transition
 
 if TYPE_CHECKING:
@@ -104,7 +104,13 @@ class OcrService:
                         f"Document has {len(images)} pages, exceeds limit {self._max_pages}"
                     )
 
-                pages = self._ocr_each(document_id, images)
+                native_texts = (
+                    extract_pdf_page_texts(blob_bytes)
+                    if doc.mime_type == "application/pdf"
+                    else []
+                )
+
+                pages = self._ocr_each(document_id, images, native_texts)
                 await self._page_repo.write_pages(user_id, document_id, pages)
 
                 await self._doc_repo.update_status(
@@ -139,22 +145,49 @@ class OcrService:
                 span.set_attribute("ocr.failed", True)
                 raise
 
-    def _ocr_each(self, document_id: str, images: list[PILImage]) -> list[Page]:
+    def _ocr_each(
+        self,
+        document_id: str,
+        images: list[PILImage],
+        native_texts: list[str] | None = None,
+    ) -> list[Page]:
         pages: list[Page] = []
         now = datetime.now(UTC)
+        texts = native_texts or []
         for i, img in enumerate(images, start=1):
-            with tracer.start_as_current_span("ocr.page") as span:
-                span.set_attribute("page.number", i)
-                result = self._engine.ocr_image(img)
+            native = texts[i - 1] if i - 1 < len(texts) else ""
+            if len(native.strip()) > 30:
+                # Fast & pristine native digital PDF text
                 pages.append(
                     Page(
                         document_id=document_id,
                         page_number=i,
-                        text=result.text,
-                        confidence=result.confidence,
-                        ocr_engine=self._engine.name,
+                        text=native,
+                        confidence=1.0,
+                        ocr_engine="pdf-native",
                         processed_at=now,
                     )
                 )
-                span.set_attribute("ocr.confidence", result.confidence)
+            else:
+                with tracer.start_as_current_span("ocr.page") as span:
+                    span.set_attribute("page.number", i)
+                    try:
+                        result = self._engine.ocr_image(img)
+                        final_text = (native + "\n" + result.text).strip() if native else result.text
+                        conf = result.confidence if result.confidence > 0 else (1.0 if native else 0.9)
+                    except Exception as e:
+                        log.warning("ocr.page_fallback", page=i, error=str(e))
+                        final_text = native
+                        conf = 1.0 if native else 0.0
+                    pages.append(
+                        Page(
+                            document_id=document_id,
+                            page_number=i,
+                            text=final_text,
+                            confidence=conf,
+                            ocr_engine=self._engine.name,
+                            processed_at=now,
+                        )
+                    )
+                    span.set_attribute("ocr.confidence", conf)
         return pages

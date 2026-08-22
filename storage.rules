@@ -13,8 +13,8 @@ service firebase.storage {
     }
 
     function withinSizeLimit() {
-      // 50 MiB, matches backend max_upload_bytes.
-      return request.resource.size < 50 * 1024 * 1024;
+      // 500 MiB, matches backend max_upload_bytes.
+      return request.resource.size < 500 * 1024 * 1024;
     }
 
     // Files live at: users/{uid}/{docId}/{filename}

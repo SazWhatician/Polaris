@@ -1,4 +1,5 @@
 import json
+import re
 from typing import AsyncIterator, Type, TypeVar
 from pydantic import BaseModel
 
@@ -51,13 +52,20 @@ class GroqProvider(BaseLLMProvider):
         *,
         temperature: float = 0.1,
     ) -> T:
-        json_prompt = f"{prompt}\n\nReturn ONLY a valid JSON object matching schema: {schema_class.model_json_schema()}"
-        response_text = await self.complete(json_prompt, temperature=temperature)
+        json_prompt = (
+            f"{prompt}\n\n"
+            f"IMPORTANT: Respond with ONLY a valid JSON object matching this schema. No markdown formatting, no thinking tags.\n"
+            f"Schema: {schema_class.model_json_schema()}"
+        )
+        response_text = await self.complete(json_prompt, temperature=temperature, max_tokens=2048)
         
-        # Clean JSON markdown fences
-        clean_text = response_text.replace("```json", "").replace("```", "").strip()
-        data = json.loads(clean_text)
+        # Clean think tags and extract JSON substring
+        cleaned = re.sub(r"<think>.*?</think>", "", response_text, flags=re.DOTALL).strip()
+        match = re.search(r"\{[\s\S]*\}", cleaned)
+        json_str = match.group(0) if match else cleaned.replace("```json", "").replace("```", "").strip()
+        data = json.loads(json_str)
         return schema_class.model_validate(data)
 
 
 GroqLLMProvider = GroqProvider
+

@@ -145,31 +145,31 @@ def create_default_llm_router(
     providers = []
 
     if task == "chat":
-        # Chat -> NVIDIA DeepSeek V4 Pro -> Groq -> Gemini
-        for p in (nv_provider, gq_provider, gm_provider):
+        # Chat -> Groq (ultra fast) -> Gemini -> NVIDIA
+        for p in (gq_provider, gm_provider, nv_provider):
             if p:
                 providers.append(p)
 
     elif task in ("graph", "gap"):
-        # Graph & Gap Extraction -> Groq (Fast JSON) -> NVIDIA DeepSeek -> Gemini
-        for p in (gq_provider, nv_provider, gm_provider):
+        # Graph & Gap Extraction -> Groq (Fast JSON) -> Gemini -> NVIDIA
+        for p in (gq_provider, gm_provider, nv_provider):
             if p:
                 providers.append(p)
 
     elif task == "syllabus":
-        # Syllabus Parsing -> Gemini (1M Token Context) -> Groq -> NVIDIA DeepSeek
+        # Syllabus Parsing -> Gemini (1M Token Context) -> Groq -> NVIDIA
         for p in (gm_provider, gq_provider, nv_provider):
             if p:
                 providers.append(p)
 
     else:
         # Fallback default order
-        for p in (nv_provider, gq_provider, gm_provider):
+        for p in (gq_provider, gm_provider, nv_provider):
             if p:
                 providers.append(p)
 
     if not providers:
-        dummy_groq = GroqClient(api_key="dummy_key", model="llama-3.3-70b-versatile")
+        dummy_groq = GroqClient(api_key="dummy_key", model="qwen/qwen3.6-27b")
         providers.append(GroqLLMProvider(groq_client=dummy_groq))
 
     return LLMRouter(providers)

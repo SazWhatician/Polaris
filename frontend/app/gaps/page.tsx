@@ -584,6 +584,7 @@ export default function GapsPage() {
                   <Button
                     onClick={handleRunAgent}
                     disabled={agentStatus === "running" || !coverage}
+                    data-agent-target="run-gap-agent-btn"
                     className="w-full gap-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0 shadow-sm"
                   >
                     {agentStatus === "running" ? (

@@ -7,9 +7,9 @@ from qdrant_client import AsyncQdrantClient
 
 from app.api import agent_llm, agents, chat, documents, graph, graph_embeddings, health, me, pages, pathfinder, planner_agent, resource_agent, syllabus, twin
 from app.core.config import Settings, get_settings
-from app.core.firebase import initialize_firebase
 from app.core.logging import RequestIdMiddleware, configure_logging, get_logger
 from app.core.otel import configure_tracing, instrument_app
+from app.core.supabase import initialize_supabase
 from app.repositories.qdrant_repo import QdrantRepository
 from app.services.embedding_service import EmbeddingService
 from app.services.groq_client import GroqClient
@@ -24,7 +24,7 @@ def _build_app(settings: Settings) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app_: FastAPI) -> AsyncIterator[None]:
-        initialize_firebase(settings)
+        initialize_supabase(settings)
 
         # arq pool for enqueueing OCR jobs.
         try:

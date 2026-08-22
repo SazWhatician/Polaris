@@ -1,0 +1,242 @@
+/* ==========================================================================
+   Polaris Autonomous Page Agent - Virtual AI Cursor & Edge Aura Styles
+   ========================================================================== */
+
+:root {
+  --agent-cursor-size: 32px;
+  --agent-cursor-glow: rgba(56, 189, 248, 0.6);
+  --agent-cursor-primary: #38bdf8;
+  --agent-cursor-secondary: #818cf8;
+  --agent-cursor-accent: #c084fc;
+}
+
+/* ==========================================================================
+   Autonomous Agent Active Rainbow Edge Aura (Zero Page Blur)
+   ========================================================================== */
+.polaris-rainbow-aura-active {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999990;
+  box-shadow: 
+    inset 0 0 25px 4px rgba(255, 0, 128, 0.4),
+    inset 0 0 60px 10px rgba(0, 200, 255, 0.35),
+    inset 0 0 100px 20px rgba(138, 43, 226, 0.25);
+  animation: polaris-rainbow-pulse 3s ease-in-out infinite alternate;
+}
+
+.polaris-rainbow-aura-active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  padding: 3.5px;
+  background: linear-gradient(
+    135deg,
+    #ff0080,
+    #7928ca,
+    #0070f3,
+    #00dfd8,
+    #7928ca,
+    #ff0080
+  );
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  background-size: 300% 300%;
+  animation: polaris-rainbow-flow 4s linear infinite;
+  opacity: 0.95;
+}
+
+@keyframes polaris-rainbow-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes polaris-rainbow-pulse {
+  0% {
+    opacity: 0.7;
+    filter: brightness(1) saturate(1.2);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.25) saturate(1.6);
+  }
+  100% {
+    opacity: 0.75;
+    filter: brightness(1.1) saturate(1.3);
+  }
+}
+
+/* Virtual Cursor Layer */
+.polaris-virtual-cursor-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999999;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+}
+
+/* Main Animated Cursor Container */
+.polaris-ai-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--agent-cursor-size);
+  height: var(--agent-cursor-size);
+  pointer-events: none;
+  z-index: 1000000;
+  transform: translate(-4px, -4px);
+  will-change: transform, left, top;
+  filter: drop-shadow(0 0 12px var(--agent-cursor-glow)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.polaris-ai-cursor.clicking {
+  transform: translate(-4px, -4px) scale(0.85);
+}
+
+.polaris-ai-cursor.typing {
+  transform: translate(-4px, -4px) scale(0.95);
+}
+
+/* High-Tech Vector Pointer Graphic */
+.polaris-cursor-icon {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.polaris-cursor-svg {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* Glowing Pulsing Trail */
+.polaris-cursor-trail {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--agent-cursor-primary) 0%, transparent 70%);
+  animation: cursor-trail-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes cursor-trail-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(2.2);
+    opacity: 0.2;
+  }
+}
+
+/* Click Ripple Wave */
+.polaris-cursor-ripple {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2.5px solid var(--agent-cursor-primary);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+}
+
+.polaris-ai-cursor.clicking .polaris-cursor-ripple {
+  animation: polaris-click-wave 0.55s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes polaris-click-wave {
+  0% {
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 1;
+    border-color: #38bdf8;
+  }
+  50% {
+    opacity: 0.8;
+    border-color: #818cf8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3.5);
+    opacity: 0;
+    border-color: #c084fc;
+  }
+}
+
+/* Cursor Status Label Pill */
+.polaris-cursor-badge {
+  position: absolute;
+  left: 28px;
+  top: 12px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  backdrop-filter: blur(8px);
+  color: #38bdf8;
+  font-size: 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.025em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+.polaris-cursor-badge.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Target Element Highlight Box */
+.polaris-target-highlight-box {
+  position: absolute;
+  pointer-events: none;
+  z-index: 999998;
+  border-radius: 8px;
+  border: 2px solid #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4), inset 0 0 10px rgba(56, 189, 248, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: target-box-glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes target-box-glow {
+  0% {
+    border-color: rgba(56, 189, 248, 0.8);
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.3), inset 0 0 8px rgba(56, 189, 248, 0.15);
+  }
+  100% {
+    border-color: rgba(129, 140, 248, 1);
+    box-shadow: 0 0 25px rgba(129, 140, 248, 0.5), inset 0 0 14px rgba(129, 140, 248, 0.25);
+  }
+}
+
+/* Pulsing aura on target element */
+.polaris-agent-target-pulse {
+  outline: 2px solid #38bdf8 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.5) !important;
+  transition: outline 0.2s ease, box-shadow 0.2s ease;
+}

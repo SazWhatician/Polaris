@@ -22,9 +22,9 @@ from arq.connections import RedisSettings
 from qdrant_client import AsyncQdrantClient
 
 from app.core.config import get_settings
-from app.core.firebase import get_firestore, get_storage_bucket, initialize_firebase
 from app.core.logging import configure_logging, get_logger
 from app.core.otel import configure_tracing
+from app.core.supabase import initialize_supabase
 from app.repositories.document_repo import DocumentRepository
 from app.repositories.page_repo import PageRepository
 from app.repositories.qdrant_repo import QdrantRepository
@@ -72,17 +72,16 @@ async def _startup(ctx: dict[str, Any]) -> None:
     configure_logging(settings)
     configure_tracing(settings)
 
-    if not initialize_firebase(settings):
-        raise RuntimeError("Firebase failed to initialize in worker; check credentials mount")
+    initialize_supabase(settings)
 
     from app.workers.paddle_engine import PaddleOcrEngine
 
     engine = PaddleOcrEngine()
 
     ctx["ocr_service"] = OcrService(
-        doc_repo=DocumentRepository(get_firestore()),
-        page_repo=PageRepository(get_firestore()),
-        storage=StorageService(get_storage_bucket()),
+        doc_repo=DocumentRepository(),
+        page_repo=PageRepository(),
+        storage=StorageService(bucket_name=settings.supabase_storage_bucket),
         engine=engine,
         max_pages=settings.ocr_max_pages,
         render_scale=settings.ocr_render_scale,
@@ -113,8 +112,8 @@ async def _startup(ctx: dict[str, Any]) -> None:
 
     ctx["qdrant_client"] = qdrant_client
     ctx["ingest_service"] = IngestService(
-        doc_repo=DocumentRepository(get_firestore()),
-        page_repo=PageRepository(get_firestore()),
+        doc_repo=DocumentRepository(),
+        page_repo=PageRepository(),
         qdrant_repo=qdrant_repo,
         chunker=chunker,
         embedder=embedder,

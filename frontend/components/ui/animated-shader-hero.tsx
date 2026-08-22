@@ -453,7 +453,7 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
   fullPage = true,
 }) => {
   const { theme, resolvedTheme } = useTheme();
-  
+
   let themeModeCode = 0; // default dark
   const activeTheme = theme || resolvedTheme;
   if (activeTheme === "light") themeModeCode = 1;
@@ -466,39 +466,35 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
 
   return (
     <div className={`relative w-full ${fullPage ? "min-h-screen" : "h-screen"} overflow-hidden ${className}`}>
-      {/* Full Page Fixed Canvas Background */}
+      {/* Hero Section Scoped Canvas Background */}
       <canvas
         ref={canvasRef}
-        className="fixed inset-0 w-full h-full object-cover touch-none pointer-events-none z-0"
+        className="absolute inset-0 w-full h-full object-cover touch-none pointer-events-none z-0"
       />
 
       {/* Hero Content Overlay */}
       <div className="relative z-10 flex flex-col items-center justify-center text-foreground p-6 pt-28 pb-16 min-h-screen">
-        {/* Trust Badge */}
+        {/* Optional Clean Minimalist Tag if provided */}
         {trustBadge && (
-          <div className="mb-8">
-            <div className="flex items-center gap-2 px-6 py-2.5 bg-primary/10 border border-primary/20 backdrop-blur-2xl rounded-full text-sm shadow-xl transition-all">
-              {trustBadge.icons && (
-                <div className="flex gap-1 text-sm">
-                  {trustBadge.icons.map((icon, index) => (
-                    <span key={index}>{icon}</span>
-                  ))}
-                </div>
-              )}
-              <span className="text-primary font-bold">{trustBadge.text}</span>
+          <div className="mb-6">
+            <div className="flex items-center gap-2 px-5 py-2 bg-white/[0.04] border border-white/10 backdrop-blur-2xl rounded-full text-xs shadow-xl transition-all">
+              <span className="font-mono tracking-widest uppercase text-white/70">{trustBadge.text}</span>
             </div>
           </div>
         )}
 
-        <div className="text-center space-y-6 max-w-4xl mx-auto px-4">
-          {/* Theme-Adaptive Gradient Title "POLARIS" */}
-          <h1 className="text-6xl sm:text-8xl lg:text-9xl font-black tracking-tighter bg-gradient-to-r from-foreground via-primary to-accent bg-clip-text text-transparent drop-shadow-2xl">
-            {title}
-          </h1>
+        <div className="text-center space-y-6 max-w-5xl mx-auto px-4">
+          {/* Haute-Tech Ultra-Luxurious Title "POLARIS" */}
+          <div className="relative inline-block">
+            <h1 className="polaris-luxury-title text-6xl sm:text-8xl lg:text-9xl tracking-[0.14em] sm:tracking-[0.18em] uppercase select-none">
+              {title}
+            </h1>
+            <div className="absolute -inset-x-8 -inset-y-4 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent blur-2xl -z-10 pointer-events-none" />
+          </div>
 
           {/* Subtitle */}
           <div className="max-w-2xl mx-auto">
-            <p className="text-base sm:text-xl lg:text-2xl text-muted-foreground font-medium leading-relaxed drop-shadow-sm">
+            <p className="text-base sm:text-lg lg:text-xl text-slate-300/90 font-light leading-relaxed drop-shadow-sm">
               {subtitle}
             </p>
           </div>
@@ -509,17 +505,17 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
               {buttons.primary && (
                 <button
                   onClick={buttons.primary.onClick}
-                  className="px-8 py-4 bg-primary text-primary-foreground hover:opacity-90 rounded-full font-bold text-base sm:text-lg transition-all duration-300 hover:scale-105 shadow-xl shadow-primary/25 border border-primary/30"
+                  className="px-8 py-4 bg-white text-black hover:bg-slate-100 rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 hover:scale-105 shadow-2xl active:scale-95 flex items-center justify-center gap-2"
                 >
-                  {buttons.primary.text}
+                  <span>{buttons.primary.text}</span>
                 </button>
               )}
               {buttons.secondary && (
                 <button
                   onClick={buttons.secondary.onClick}
-                  className="px-8 py-4 bg-secondary/80 hover:bg-secondary border border-border/80 text-secondary-foreground rounded-full font-bold text-base sm:text-lg transition-all duration-300 hover:scale-105 backdrop-blur-xl shadow-md"
+                  className="px-8 py-4 bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 hover:scale-105 backdrop-blur-2xl shadow-md active:scale-95 flex items-center justify-center gap-2"
                 >
-                  {buttons.secondary.text}
+                  <span>{buttons.secondary.text}</span>
                 </button>
               )}
             </div>

@@ -844,12 +844,14 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
                       onChange={(e) => setPrompt(e.target.value)}
                       placeholder={animatedPlaceholder}
                       rows={5}
+                      data-agent-target="chat-input"
                       className="w-full h-32 sm:h-36 resize-none rounded-2xl bg-white/85 dark:bg-[rgba(15,15,20,0.55)] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-white/40 outline-none focus:ring-2 focus:ring-[#1f3dbc]/40 focus:border-[#1f3dbc]/40 backdrop-blur-md px-4 py-4 pr-16 shadow-xl"
                     />
                   </div>
                   <button
                     type="submit"
                     aria-label={buttonText}
+                    data-agent-target="chat-send-btn"
                     className="absolute right-3 bottom-3 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-[#f0f2ff] dark:text-black dark:hover:bg-white transition-colors shadow-md"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">

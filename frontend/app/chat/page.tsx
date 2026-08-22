@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, type FormEvent, type KeyboardEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect, Suspense, type FormEvent, type KeyboardEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Square, Bot, User, Copy, Check, Settings2, Sparkles, RefreshCw, Mic } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,9 +21,10 @@ interface Message {
   timestamp: string;
 }
 
-export default function ChatPage() {
+function ChatContent() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -34,6 +35,7 @@ export default function ChatPage() {
 
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const initialQueryExecuted = useRef(false);
   useGsapEntrance(".chat-msg-reveal", 0.05);
 
   useEffect(() => {
@@ -43,6 +45,14 @@ export default function ChatPage() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    const qParam = searchParams.get("q");
+    if (qParam && !initialQueryExecuted.current && !streaming) {
+      initialQueryExecuted.current = true;
+      sendQuestion(qParam);
+    }
+  }, [searchParams, streaming]);
 
   const sendQuestion = async (question: string) => {
     const q = question.trim();
@@ -244,6 +254,7 @@ export default function ChatPage() {
                     onKeyDown={onKey}
                     placeholder="Ask Polaris RAG a question..."
                     disabled={streaming}
+                    data-agent-target="chat-input"
                     rows={2}
                     className="flex-1 bg-transparent border-none outline-none resize-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-xs sm:text-sm px-3 py-2"
                   />
@@ -265,7 +276,7 @@ export default function ChatPage() {
                         <span>Stop</span>
                       </Button>
                     ) : (
-                      <Button type="submit" disabled={!input.trim()} size="sm" className="h-9 px-4 gap-1 font-bold">
+                      <Button type="submit" disabled={!input.trim()} data-agent-target="chat-send-btn" size="sm" className="h-9 px-4 gap-1 font-bold">
                         <span>Send</span>
                         <Sparkles className="h-3.5 w-3.5" />
                       </Button>
@@ -285,3 +296,12 @@ function cryptoId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
   return Math.random().toString(36).slice(2);
 }
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center text-xs font-mono text-muted-foreground">Loading RAG Chat...</div>}>
+      <ChatContent />
+    </Suspense>
+  );
+}
+

@@ -18,12 +18,20 @@ class Settings(BaseSettings):
 
     allowed_origins: str = "http://localhost:3000"
 
+    # --- Supabase ---
+    supabase_url: str = ""
+    supabase_key: str = ""  # Service role key for admin/backend
+    supabase_anon_key: str = ""
+    supabase_jwt_secret: str = ""
+    supabase_storage_bucket: str = "polaris-documents"
+
+    # --- Legacy / optional Firebase fields ---
     firebase_project_id: str = "polaris-dev"
     firebase_credentials_path: str | None = None
-    firebase_storage_bucket: str | None = None  # defaults to <project>.firebasestorage.app
+    firebase_storage_bucket: str | None = None
 
     signed_url_ttl_seconds: int = 15 * 60  # 15 minutes for upload URLs
-    max_upload_bytes: int = 50 * 1024 * 1024  # 50 MiB per file
+    max_upload_bytes: int = 500 * 1024 * 1024  # 500 MiB per file
     document_list_limit: int = 50
 
     redis_url: str = "redis://redis:6379"
@@ -47,8 +55,8 @@ class Settings(BaseSettings):
     # --- LLM ---
     groq_api_key: str | None = None
     groq_api_keys: str | None = None  # comma-separated list of Groq keys
-    groq_model: str = "llama-3.3-70b-versatile"
-    groq_judge_model: str = "llama-3.3-70b-versatile"  # used by answer eval
+    groq_model: str = "qwen/qwen3.6-27b"
+    groq_judge_model: str = "qwen/qwen3.6-27b"  # used by answer eval
 
     gemini_api_key: str | None = None
     gemini_api_keys: str | None = None  # comma-separated list of Gemini keys

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 
 from app.core.config import get_settings
 from app.core.deps import CurrentUser
-from app.core.firebase import get_firestore, get_storage_bucket, is_initialized
+from app.core.supabase import get_supabase_client, is_initialized
 from app.models.document import (
     DocumentCreateRequest,
     DocumentCreateResponse,
@@ -36,15 +36,10 @@ def get_document_service(
     request: Request,
     queue: Annotated[TaskQueue, Depends(get_task_queue)],
 ) -> DocumentService:
-    if not is_initialized():
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Storage backend unavailable",
-        )
     settings = get_settings()
     return DocumentService(
-        repo=DocumentRepository(get_firestore()),
-        storage=StorageService(get_storage_bucket()),
+        repo=DocumentRepository(),
+        storage=StorageService(bucket_name=settings.supabase_storage_bucket),
         task_queue=queue,
         signed_url_ttl_seconds=settings.signed_url_ttl_seconds,
         max_upload_bytes=settings.max_upload_bytes,

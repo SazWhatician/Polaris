@@ -49,3 +49,27 @@ def _render_pdf_pages(blob_bytes: bytes, *, render_scale: float) -> list[PILImag
     finally:
         pdf.close()
     return images
+
+
+def extract_pdf_page_texts(blob_bytes: bytes) -> list[str]:
+    """Extract embedded digital text per page from a PDF using pypdfium2."""
+    try:
+        import pypdfium2 as pdfium
+
+        pdf = pdfium.PdfDocument(blob_bytes)
+        texts: list[str] = []
+        try:
+            for i in range(len(pdf)):
+                page = pdf[i]
+                try:
+                    textpage = page.get_textpage()
+                    text = textpage.get_text_range() or ""
+                except Exception:
+                    text = ""
+                texts.append(text.strip())
+                page.close()
+        finally:
+            pdf.close()
+        return texts
+    except Exception:
+        return []

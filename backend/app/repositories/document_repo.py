@@ -1,8 +1,4 @@
-"""Firestore data access for documents.
-
-Only this module touches Firestore for documents. Services call methods here.
-Path convention: users/{uid}/documents/{doc_id}.
-"""
+"""Supabase PostgreSQL / Memory data access for documents."""
 
 from __future__ import annotations
 
@@ -10,52 +6,79 @@ import asyncio
 from datetime import UTC, datetime
 from typing import Any
 
-from google.cloud.firestore import Client as FirestoreClient
-from google.cloud.firestore_v1 import DocumentSnapshot
-
+from app.core.logging import get_logger
+from app.core.supabase import get_supabase_client
 from app.models.document import Document, DocumentStatus
 
-_COLLECTION = "documents"
+log = get_logger(__name__)
+
 _mem_docs: dict[tuple[str, str], Document] = {}
 
 
 class DocumentRepository:
-    def __init__(self, client: FirestoreClient) -> None:
+    def __init__(self, client: Any = None) -> None:
         self._client = client
 
-    # ------- public API (async; wrap sync Firestore in to_thread) -------
+    def _get_sb_table(self) -> Any:
+        sb = get_supabase_client()
+        if sb is not None:
+            try:
+                return sb.table("documents")
+            except Exception:
+                pass
+        return None
+
+    # ------- public API (async) -------
 
     async def create(self, doc: Document) -> Document:
         _mem_docs[(doc.user_id, doc.id)] = doc
-        try:
-            await asyncio.to_thread(self._create_sync, doc)
-        except Exception:
-            pass
+        tbl = self._get_sb_table()
+        if tbl is not None:
+            try:
+                await asyncio.to_thread(
+                    lambda: tbl.insert(_to_supabase_dict(doc)).execute()
+                )
+            except Exception as exc:
+                log.warning("supabase.document_insert_fallback", error=str(exc))
         return doc
 
     async def get(self, user_id: str, doc_id: str) -> Document | None:
-        if (user_id, doc_id) in _mem_docs:
-            return _mem_docs[(user_id, doc_id)]
-        try:
-            snap = await asyncio.to_thread(self._get_sync, user_id, doc_id)
-            doc = _from_snapshot(snap) if snap and snap.exists else None
-            if doc:
-                _mem_docs[(user_id, doc_id)] = doc
-            return doc
-        except Exception:
-            return _mem_docs.get((user_id, doc_id))
+        tbl = self._get_sb_table()
+        if tbl is not None:
+            try:
+                res = await asyncio.to_thread(
+                    lambda: tbl.select("*").eq("user_id", user_id).eq("id", doc_id).execute()
+                )
+                if res.data and len(res.data) > 0:
+                    doc = _from_supabase_dict(res.data[0])
+                    _mem_docs[(user_id, doc_id)] = doc
+                    return doc
+            except Exception as exc:
+                log.warning("supabase.document_get_fallback", error=str(exc))
+        return _mem_docs.get((user_id, doc_id))
 
     async def list(self, user_id: str, *, limit: int) -> list[Document]:
-        try:
-            snaps = await asyncio.to_thread(self._list_sync, user_id, limit)
-            docs = [_from_snapshot(s) for s in snaps]
-            for d in docs:
-                _mem_docs[(d.user_id, d.id)] = d
-            return docs
-        except Exception:
-            items = [d for (uid, _), d in _mem_docs.items() if uid == user_id]
-            items.sort(key=lambda d: d.created_at, reverse=True)
-            return items[:limit]
+        tbl = self._get_sb_table()
+        if tbl is not None:
+            try:
+                res = await asyncio.to_thread(
+                    lambda: tbl.select("*")
+                    .eq("user_id", user_id)
+                    .order("created_at", desc=True)
+                    .limit(limit)
+                    .execute()
+                )
+                if res.data is not None:
+                    docs = [_from_supabase_dict(row) for row in res.data]
+                    for d in docs:
+                        _mem_docs[(d.user_id, d.id)] = d
+                    return docs
+            except Exception as exc:
+                log.warning("supabase.document_list_fallback", error=str(exc))
+
+        items = [d for (uid, _), d in _mem_docs.items() if uid == user_id]
+        items.sort(key=lambda d: d.created_at, reverse=True)
+        return items[:limit]
 
     async def update_status(
         self,
@@ -64,69 +87,65 @@ class DocumentRepository:
         status: DocumentStatus,
         **extra_fields: Any,
     ) -> Document:
-        if (user_id, doc_id) in _mem_docs:
-            old = _mem_docs[(user_id, doc_id)]
-            new_doc = old.model_copy(update={"status": status, "updated_at": datetime.now(UTC), **extra_fields})
+        now = datetime.now(UTC)
+        old = _mem_docs.get((user_id, doc_id))
+        if old is None:
+            old = await self.get(user_id, doc_id)
+
+        if old is not None:
+            new_doc = old.model_copy(update={"status": status, "updated_at": now, **extra_fields})
             _mem_docs[(user_id, doc_id)] = new_doc
-        try:
-            await asyncio.to_thread(self._update_status_sync, user_id, doc_id, status, extra_fields)
-            result = await self.get(user_id, doc_id)
-            if result is not None:
-                return result
-        except Exception:
-            pass
-        if (user_id, doc_id) in _mem_docs:
-            return _mem_docs[(user_id, doc_id)]
-        raise KeyError(f"Document {doc_id} disappeared after update")
+        else:
+            new_doc = Document(
+                id=doc_id,
+                user_id=user_id,
+                filename="document",
+                mime_type="application/pdf",
+                size_bytes=int(extra_fields.get("size_bytes") or 1),
+                status=status,
+                storage_path=f"users/{user_id}/{doc_id}/document",
+                created_at=now,
+                updated_at=now,
+                **extra_fields,
+            )
+            _mem_docs[(user_id, doc_id)] = new_doc
+
+        tbl = self._get_sb_table()
+        if tbl is not None:
+            try:
+                payload = {
+                    "status": status.value,
+                    "updated_at": now.isoformat(),
+                }
+                for k, v in extra_fields.items():
+                    if isinstance(v, datetime):
+                        payload[k] = v.isoformat()
+                    else:
+                        payload[k] = v
+                await asyncio.to_thread(
+                    lambda: tbl.update(payload).eq("user_id", user_id).eq("id", doc_id).execute()
+                )
+            except Exception as exc:
+                log.warning("supabase.document_update_fallback", error=str(exc))
+
+        return _mem_docs[(user_id, doc_id)]
 
     async def delete(self, user_id: str, doc_id: str) -> None:
         _mem_docs.pop((user_id, doc_id), None)
-        try:
-            await asyncio.to_thread(self._delete_sync, user_id, doc_id)
-        except Exception:
-            pass
-
-    # ------- sync internals -------
-
-    def _user_col(self, user_id: str) -> Any:
-        return self._client.collection("users").document(user_id).collection(_COLLECTION)
-
-    def _create_sync(self, doc: Document) -> None:
-        self._user_col(doc.user_id).document(doc.id).set(_to_firestore(doc))
-
-    def _get_sync(self, user_id: str, doc_id: str) -> DocumentSnapshot:
-        return self._user_col(user_id).document(doc_id).get()
-
-    def _list_sync(self, user_id: str, limit: int) -> list[DocumentSnapshot]:
-        from google.cloud.firestore_v1 import Query
-
-        query = (
-            self._user_col(user_id).order_by("created_at", direction=Query.DESCENDING).limit(limit)
-        )
-        return list(query.stream())
-
-    def _update_status_sync(
-        self,
-        user_id: str,
-        doc_id: str,
-        status: DocumentStatus,
-        extra: dict[str, Any],
-    ) -> None:
-        payload: dict[str, Any] = {
-            "status": status.value,
-            "updated_at": datetime.now(UTC),
-            **extra,
-        }
-        self._user_col(user_id).document(doc_id).update(payload)
-
-    def _delete_sync(self, user_id: str, doc_id: str) -> None:
-        self._user_col(user_id).document(doc_id).delete()
+        tbl = self._get_sb_table()
+        if tbl is not None:
+            try:
+                await asyncio.to_thread(
+                    lambda: tbl.delete().eq("user_id", user_id).eq("id", doc_id).execute()
+                )
+            except Exception as exc:
+                log.warning("supabase.document_delete_fallback", error=str(exc))
 
 
 # ------- (de)serialization helpers -------
 
 
-def _to_firestore(doc: Document) -> dict[str, Any]:
+def _to_supabase_dict(doc: Document) -> dict[str, Any]:
     return {
         "id": doc.id,
         "user_id": doc.user_id,
@@ -137,15 +156,29 @@ def _to_firestore(doc: Document) -> dict[str, Any]:
         "storage_path": doc.storage_path,
         "content_hash": doc.content_hash,
         "page_count": doc.page_count,
-        "ocr_completed_at": doc.ocr_completed_at,
+        "ocr_completed_at": doc.ocr_completed_at.isoformat() if doc.ocr_completed_at else None,
         "error": doc.error,
-        "created_at": doc.created_at,
-        "updated_at": doc.updated_at,
+        "created_at": doc.created_at.isoformat(),
+        "updated_at": doc.updated_at.isoformat(),
     }
 
 
-def _from_snapshot(snap: DocumentSnapshot) -> Document:
-    data = snap.to_dict() or {}
+def _from_supabase_dict(data: dict[str, Any]) -> Document:
+    created = data["created_at"]
+    if isinstance(created, str):
+        created_dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
+    else:
+        created_dt = created
+
+    updated = data.get("updated_at")
+    if isinstance(updated, str):
+        updated_dt = datetime.fromisoformat(updated.replace("Z", "+00:00"))
+    else:
+        updated_dt = updated or created_dt
+
+    ocr_at = data.get("ocr_completed_at")
+    ocr_dt = datetime.fromisoformat(ocr_at.replace("Z", "+00:00")) if isinstance(ocr_at, str) else ocr_at
+
     return Document(
         id=data["id"],
         user_id=data["user_id"],
@@ -156,8 +189,9 @@ def _from_snapshot(snap: DocumentSnapshot) -> Document:
         storage_path=data["storage_path"],
         content_hash=data.get("content_hash"),
         page_count=data.get("page_count"),
-        ocr_completed_at=data.get("ocr_completed_at"),
+        ocr_completed_at=ocr_dt,
         error=data.get("error"),
-        created_at=data["created_at"],
-        updated_at=data["updated_at"],
+        created_at=created_dt,
+        updated_at=updated_dt,
     )
+

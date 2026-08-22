@@ -1,18 +1,15 @@
-"""Firebase Storage: signed URL generation + blob ops.
-
-We never proxy file bytes through the API. The flow is:
-  client -> POST /api/documents -> get signed PUT URL
-  client -> PUT file directly to GCS
-  client -> POST /api/documents/{id}/finalize -> we verify the blob exists
-"""
-
 from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from datetime import timedelta
+import os
+from pathlib import Path
+from typing import Any
 
-from google.cloud.storage import Bucket
+from app.core.logging import get_logger
+from app.core.supabase import get_supabase_client
+
+log = get_logger(__name__)
 
 
 @dataclass(frozen=True)
@@ -24,8 +21,13 @@ class UploadAuthorization:
 
 
 class StorageService:
-    def __init__(self, bucket: Bucket) -> None:
-        self._bucket = bucket
+    def __init__(self, bucket_name: str = "polaris-documents") -> None:
+        self._bucket_name = bucket_name
+        self._storage_dir = Path(os.environ.get("STORAGE_DIR", "/app/storage"))
+        self._storage_dir.mkdir(parents=True, exist_ok=True)
+
+    def _local_path(self, storage_path: str) -> Path:
+        return self._storage_dir / storage_path
 
     async def authorize_upload(
         self,
@@ -59,31 +61,106 @@ class StorageService:
 
     # ------- sync internals -------
 
+    def _get_sb_bucket(self) -> Any:
+        sb = get_supabase_client()
+        if sb is not None:
+            try:
+                return sb.storage.from_(self._bucket_name)
+            except Exception:
+                pass
+        return None
+
     def _sign_upload_url(self, storage_path: str, mime_type: str, ttl_seconds: int) -> str:
-        blob = self._bucket.blob(storage_path)
-        return blob.generate_signed_url(
-            version="v4",
-            expiration=timedelta(seconds=ttl_seconds),
-            method="PUT",
-            content_type=mime_type,
-        )
+        bucket = self._get_sb_bucket()
+        if bucket is not None:
+            try:
+                res = bucket.create_signed_upload_url(storage_path)
+                if isinstance(res, dict) and res.get("signed_url"):
+                    return res["signed_url"]
+                if hasattr(res, "signed_url") and res.signed_url:
+                    return res.signed_url
+            except Exception as exc:
+                log.warning("supabase.signed_upload_url_fallback", error=str(exc))
+        return f"/api/documents/direct"
 
     def _exists_sync(self, storage_path: str) -> bool:
-        return self._bucket.blob(storage_path).exists()
+        local_file = self._local_path(storage_path)
+        if local_file.is_file() and local_file.stat().st_size > 0:
+            return True
+        bucket = self._get_sb_bucket()
+        if bucket is not None:
+            try:
+                parent_dir = str(Path(storage_path).parent).replace("\\", "/")
+                filename = Path(storage_path).name
+                items = bucket.list(parent_dir if parent_dir != "." else "")
+                return any(item.get("name") == filename for item in items if isinstance(item, dict))
+            except Exception:
+                pass
+        return False
 
     def _size_sync(self, storage_path: str) -> int | None:
-        blob = self._bucket.blob(storage_path)
-        blob.reload()  # populate size from server
-        return blob.size
+        local_file = self._local_path(storage_path)
+        if local_file.is_file():
+            return local_file.stat().st_size
+        bucket = self._get_sb_bucket()
+        if bucket is not None:
+            try:
+                parent_dir = str(Path(storage_path).parent).replace("\\", "/")
+                filename = Path(storage_path).name
+                items = bucket.list(parent_dir if parent_dir != "." else "")
+                for item in items:
+                    if isinstance(item, dict) and item.get("name") == filename:
+                        metadata = item.get("metadata")
+                        if isinstance(metadata, dict) and "size" in metadata:
+                            return int(metadata["size"])
+            except Exception as exc:
+                log.warning("supabase.storage_size_failed", error=str(exc))
+        return None
 
     def _download_sync(self, storage_path: str) -> bytes:
-        return self._bucket.blob(storage_path).download_as_bytes()
+        local_file = self._local_path(storage_path)
+        if local_file.is_file():
+            return local_file.read_bytes()
+        bucket = self._get_sb_bucket()
+        if bucket is not None:
+            try:
+                data = bucket.download(storage_path)
+                if isinstance(data, bytes):
+                    return data
+            except Exception as exc:
+                log.warning("supabase.storage_download_failed", error=str(exc))
+        raise FileNotFoundError(f"Blob not found in local disk or Supabase Storage: {storage_path}")
 
     def _delete_sync(self, storage_path: str) -> None:
-        blob = self._bucket.blob(storage_path)
-        if blob.exists():
-            blob.delete()
+        local_file = self._local_path(storage_path)
+        if local_file.is_file():
+            try:
+                local_file.unlink(missing_ok=True)
+            except Exception:
+                pass
+        bucket = self._get_sb_bucket()
+        if bucket is not None:
+            try:
+                bucket.remove([storage_path])
+            except Exception:
+                pass
 
     def _upload_sync(self, storage_path: str, data: bytes, mime_type: str) -> None:
-        blob = self._bucket.blob(storage_path)
-        blob.upload_from_string(data, content_type=mime_type)
+        # 1. Local disk persistence
+        local_file = self._local_path(storage_path)
+        local_file.parent.mkdir(parents=True, exist_ok=True)
+        local_file.write_bytes(data)
+
+        # 2. Supabase Storage upload if connected
+        bucket = self._get_sb_bucket()
+        if bucket is not None:
+            try:
+                bucket.upload(
+                    storage_path,
+                    data,
+                    file_options={"content-type": mime_type, "upsert": "true"},
+                )
+            except Exception as exc:
+                log.warning("supabase.storage_upload_skipped", error=str(exc), path=storage_path)
+
+

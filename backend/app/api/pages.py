@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.deps import CurrentUser
-from app.core.firebase import get_firestore, is_initialized
+from app.core.supabase import is_initialized
 from app.models.document import PageListResponse
 from app.repositories.document_repo import DocumentRepository
 from app.repositories.page_repo import PageRepository
@@ -12,19 +12,11 @@ router = APIRouter(prefix="/api/documents", tags=["pages"])
 
 
 def get_page_repo() -> PageRepository:
-    if not is_initialized():
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, detail="Storage backend unavailable"
-        )
-    return PageRepository(get_firestore())
+    return PageRepository()
 
 
 def get_doc_repo() -> DocumentRepository:
-    if not is_initialized():
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, detail="Storage backend unavailable"
-        )
-    return DocumentRepository(get_firestore())
+    return DocumentRepository()
 
 
 PageRepo = Annotated[PageRepository, Depends(get_page_repo)]

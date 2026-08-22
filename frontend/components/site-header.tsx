@@ -58,7 +58,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 shadow-xs transition-colors">
       <div className="max-w-7xl mx-auto flex h-14 items-center justify-between px-4 sm:px-6">
-        
+
         {/* Left: Drawer Toggle Button & Brand / Breadcrumb */}
         <div className="flex items-center gap-3 sm:gap-4">
           {/* Side Drawer Toggle Button */}
@@ -67,6 +67,7 @@ export function SiteHeader() {
             className="p-2 rounded-xl border border-border/60 bg-card/80 hover:bg-muted/80 text-foreground transition-all flex items-center gap-2 group shadow-2xs hover:scale-102"
             title="Open Navigation Menu (Ctrl+B)"
             aria-label="Open Navigation Sidebar"
+            data-agent-target="nav-menu-btn"
           >
             <Menu className="h-4.5 w-4.5 text-foreground group-hover:text-primary transition-colors" />
             <span className="text-xs font-bold hidden sm:inline text-muted-foreground group-hover:text-foreground">
@@ -115,6 +116,7 @@ export function SiteHeader() {
             onClick={openCopilotModal}
             className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary transition-all text-xs font-bold shadow-2xs group"
             title="Launch Page Agent Copilot (⌘K / Ctrl+K)"
+            data-agent-target="copilot-header-btn"
           >
             <Bot className="h-4 w-4 text-primary group-hover:rotate-12 transition-transform" />
             <span className="hidden sm:inline">Copilot</span>
@@ -128,6 +130,7 @@ export function SiteHeader() {
             onClick={openTodoDrawer}
             className="relative flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border/60 bg-card/80 hover:bg-muted/80 text-foreground transition-all text-xs font-semibold shadow-2xs group"
             title="Open Academic Tasks & To-Do List (Alt+T)"
+            data-agent-target="tasks-btn"
           >
             <ListTodo className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
             <span className="hidden sm:inline">Tasks</span>

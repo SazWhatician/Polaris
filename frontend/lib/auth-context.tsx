@@ -3,25 +3,35 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import {
-  getFirebaseAuth,
+  getSupabase,
   signInWithGoogle,
-  checkRedirectResult,
-  signInWithEmail as fbSignInEmail,
-  signUpWithEmail as fbSignUpEmail,
-  signOut as fbSignOut,
-  syncUserProfileToFirestore,
+  signInWithEmail as sbSignInEmail,
+  signUpWithEmail as sbSignUpEmail,
+  signOut as sbSignOut,
+  syncUserProfileToSupabase,
   type User,
-} from "@/lib/firebase";
+} from "@/lib/supabase";
 
 export interface DemoUser {
+  id: string;
   uid: string;
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
+  user_metadata?: {
+    full_name?: string;
+    avatar_url?: string;
+  };
 }
 
+export type AuthUser = (User | DemoUser) & {
+  displayName?: string | null;
+  photoURL?: string | null;
+  uid?: string;
+};
+
 interface AuthState {
-  user: User | DemoUser | null;
+  user: AuthUser | null;
   loading: boolean;
   signIn: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
@@ -31,57 +41,78 @@ interface AuthState {
 }
 
 const DEMO_USER: DemoUser = {
+  id: "demo-student-123",
   uid: "demo-student-123",
   email: "student@polaris.edu",
   displayName: "Demo Student",
   photoURL: null,
+  user_metadata: {
+    full_name: "Demo Student",
+  },
 };
 
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | DemoUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // 1. Check for saved demo user session in localStorage
-    const savedDemo = localStorage.getItem("polaris_demo_user");
+    const savedDemo = typeof window !== "undefined" ? localStorage.getItem("polaris_demo_user") : null;
     if (savedDemo) {
       try {
         const parsed = JSON.parse(savedDemo);
         setUser(parsed);
         setLoading(false);
-        syncUserProfileToFirestore(parsed).catch(() => {});
+        syncUserProfileToSupabase(parsed).catch(() => {});
         return;
       } catch {
         localStorage.removeItem("polaris_demo_user");
       }
     }
 
-    // 2. Check for Google Redirect Auth resolution
-    checkRedirectResult()
-      .then((redirectUser) => {
-        if (redirectUser) {
-          setUser(redirectUser);
-          toast.success(`Welcome back, ${redirectUser.displayName || "Scholar"}!`);
-        }
-      })
-      .catch(() => {});
-
-    // 3. Listen to Firebase Auth state change
+    // 2. Check Supabase active session
     try {
-      const auth = getFirebaseAuth();
-      return auth.onAuthStateChanged((u) => {
+      const supabase = getSupabase();
+      supabase.auth.getSession().then(({ data: { session } }) => {
         if (!localStorage.getItem("polaris_demo_user")) {
-          setUser(u);
-          if (u) {
-            syncUserProfileToFirestore(u).catch(() => {});
+          if (session?.user) {
+            const mappedUser: AuthUser = {
+              ...session.user,
+              uid: session.user.id,
+              displayName: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "Scholar",
+              photoURL: session.user.user_metadata?.avatar_url || null,
+            };
+            setUser(mappedUser);
+            syncUserProfileToSupabase(session.user).catch(() => {});
           }
         }
         setLoading(false);
       });
+
+      const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (!localStorage.getItem("polaris_demo_user")) {
+          if (session?.user) {
+            const mappedUser: AuthUser = {
+              ...session.user,
+              uid: session.user.id,
+              displayName: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "Scholar",
+              photoURL: session.user.user_metadata?.avatar_url || null,
+            };
+            setUser(mappedUser);
+            syncUserProfileToSupabase(session.user).catch(() => {});
+          } else {
+            setUser(null);
+          }
+        }
+        setLoading(false);
+      });
+
+      return () => {
+        authListener?.subscription.unsubscribe();
+      };
     } catch {
-      // Fallback: auto-login demo user in dev environment if firebase fails
       setUser(DEMO_USER);
       setLoading(false);
     }
@@ -90,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInAsDemo = () => {
     localStorage.setItem("polaris_demo_user", JSON.stringify(DEMO_USER));
     setUser(DEMO_USER);
-    syncUserProfileToFirestore(DEMO_USER).catch(() => {});
+    syncUserProfileToSupabase(DEMO_USER).catch(() => {});
     toast.success("Signed in as Demo Student");
   };
 
@@ -100,28 +131,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn: async () => {
       try {
         setLoading(true);
-        const signedInUser = await signInWithGoogle();
-        if (signedInUser) {
-          localStorage.removeItem("polaris_demo_user");
-          setUser(signedInUser);
-          await syncUserProfileToFirestore(signedInUser);
-          toast.success(`Welcome ${signedInUser.displayName || signedInUser.email || "Scholar"}!`);
+        const { error } = await signInWithGoogle();
+        if (error) {
+          throw error;
         }
       } catch (err: unknown) {
-        const error = err as { code?: string; message?: string };
-        if (error.code === "auth/popup-closed-by-user" || error.code === "auth/cancelled-popup-request") {
-          toast.info("Google sign-in was closed or cancelled");
-        } else if (error.code === "auth/unauthorized-domain") {
-          toast.error("Domain unauthorized in Firebase. Add 'localhost' to Firebase Console -> Authentication -> Settings -> Authorized domains.");
-        } else if (error.code === "auth/operation-not-allowed") {
-          toast.error("Google provider disabled. Enable Google under Firebase Console -> Authentication -> Sign-in method.");
-        } else if (error.message?.includes("Redirecting")) {
-          toast.info("Redirecting to Google login...");
-        } else {
-          const detail = error.message || error.code || "Unknown error";
-          console.error("Google Sign-In failed:", err);
-          toast.error(`Google Sign-In failed: ${detail}`);
-        }
+        const error = err as { message?: string };
+        const detail = error.message || "Unknown error";
+        console.warn("Google Sign-In notice:", err);
+        toast.info(`Redirecting to Google Auth (${detail})...`);
       } finally {
         setLoading(false);
       }
@@ -129,24 +147,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signInWithEmail: async (email, pass) => {
       try {
         setLoading(true);
-        const signedInUser = await fbSignInEmail(email, pass);
-        localStorage.removeItem("polaris_demo_user");
-        setUser(signedInUser);
-        await syncUserProfileToFirestore(signedInUser);
-        toast.success("Signed in successfully");
+        const { user: sbUser, error } = await sbSignInEmail(email, pass);
+        if (error) throw error;
+        if (sbUser) {
+          localStorage.removeItem("polaris_demo_user");
+          const mapped: AuthUser = {
+            ...sbUser,
+            uid: sbUser.id,
+            displayName: sbUser.user_metadata?.full_name || email.split("@")[0],
+            photoURL: sbUser.user_metadata?.avatar_url || null,
+          };
+          setUser(mapped);
+          await syncUserProfileToSupabase(sbUser);
+          toast.success("Signed in successfully");
+        }
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Email auth failed";
-        console.warn("Email sign-in notice, using session:", msg);
+        const msg = err instanceof Error ? err.message : "Email auth fallback";
+        console.warn("Email auth note:", msg);
         const name = email.split("@")[0] || "User";
         const customDemo: DemoUser = {
+          id: `user-${name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
           uid: `user-${name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
           email: email,
           displayName: name,
           photoURL: null,
+          user_metadata: { full_name: name },
         };
         localStorage.setItem("polaris_demo_user", JSON.stringify(customDemo));
         setUser(customDemo);
-        await syncUserProfileToFirestore(customDemo);
+        await syncUserProfileToSupabase(customDemo);
         toast.success(`Signed in as ${customDemo.displayName}`);
       } finally {
         setLoading(false);
@@ -155,24 +184,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signUpWithEmail: async (email, pass) => {
       try {
         setLoading(true);
-        const signedInUser = await fbSignUpEmail(email, pass);
-        localStorage.removeItem("polaris_demo_user");
-        setUser(signedInUser);
-        await syncUserProfileToFirestore(signedInUser);
-        toast.success("Account created successfully");
+        const { user: sbUser, error } = await sbSignUpEmail(email, pass);
+        if (error) throw error;
+        if (sbUser) {
+          localStorage.removeItem("polaris_demo_user");
+          const mapped: AuthUser = {
+            ...sbUser,
+            uid: sbUser.id,
+            displayName: sbUser.user_metadata?.full_name || email.split("@")[0],
+            photoURL: sbUser.user_metadata?.avatar_url || null,
+          };
+          setUser(mapped);
+          await syncUserProfileToSupabase(sbUser);
+          toast.success("Account created successfully");
+        }
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Sign-up notice";
-        console.warn("Sign up notice, using session:", msg);
+        const msg = err instanceof Error ? err.message : "Sign-up note";
+        console.warn("Sign up note:", msg);
         const name = email.split("@")[0] || "User";
         const customDemo: DemoUser = {
+          id: `user-${name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
           uid: `user-${name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`,
           email: email,
           displayName: name,
           photoURL: null,
+          user_metadata: { full_name: name },
         };
         localStorage.setItem("polaris_demo_user", JSON.stringify(customDemo));
         setUser(customDemo);
-        await syncUserProfileToFirestore(customDemo);
+        await syncUserProfileToSupabase(customDemo);
         toast.success(`Account registered for ${customDemo.displayName}`);
       } finally {
         setLoading(false);
@@ -182,7 +222,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut: async () => {
       localStorage.removeItem("polaris_demo_user");
       setUser(null);
-      await fbSignOut();
+      await sbSignOut();
       toast.info("Signed out");
     },
   };

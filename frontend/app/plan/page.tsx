@@ -143,6 +143,7 @@ export default function RevisionPlanPage() {
                 type="date"
                 value={examDate}
                 onChange={(e) => setExamDate(e.target.value)}
+                data-agent-target="plan-exam-date"
                 className="bg-transparent border-input text-foreground text-xs rounded-xl"
               />
             </div>
@@ -156,6 +157,7 @@ export default function RevisionPlanPage() {
                 max="12"
                 value={dailyHours}
                 onChange={(e) => setDailyHours(parseFloat(e.target.value) || 1)}
+                data-agent-target="plan-daily-hours"
                 className="bg-transparent border-input text-foreground text-xs rounded-xl"
               />
             </div>
@@ -164,6 +166,7 @@ export default function RevisionPlanPage() {
               <Button
                 onClick={generatePlan}
                 disabled={generating}
+                data-agent-target="generate-plan-btn"
                 className="w-full h-10 text-xs font-semibold"
               >
                 {generating ? (
