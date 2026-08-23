@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { api } from "@/lib/api/client";
-import { useGsapEntrance } from "@/lib/use-gsap-animations";
+import { useGsapEntrance } from "@/lib/use-animation-system";
 
 interface StudyBlock {
   topic_id: string;

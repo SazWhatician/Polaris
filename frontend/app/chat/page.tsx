@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { SiteHeader } from "@/components/site-header";
 import { useAuth } from "@/lib/auth-context";
 import { streamChat, type Citation } from "@/lib/api/chat";
-import { useGsapEntrance } from "@/lib/use-gsap-animations";
+import { useGsapEntrance } from "@/lib/use-animation-system";
 import { Button } from "@/components/ui/button";
 import { HeroWave } from "@/components/ui/ai-input-hero";
 import { ChatMessage } from "@/components/chat-message";
