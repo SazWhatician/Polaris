@@ -10,10 +10,10 @@
 | Path | Purpose |
 |---|---|
 | `app/models/document.py` | `Document`, `DocumentStatus` enum, `DocumentCreateRequest`/`Response`, `DocumentListResponse` · MIME whitelist constant |
-| `app/repositories/document_repo.py` | Only place Firestore is touched for documents · `create/get/list/update_status/delete` · sync Firestore wrapped in `asyncio.to_thread` |
-| `app/services/storage_service.py` | v4 signed PUT URL generation, blob existence + size, blob delete · `UploadAuthorization` value object |
-| `app/services/document_service.py` | Orchestration: `request_upload` (validate → sign → persist), `finalize_upload` (verify blob → mark uploaded), `list/delete_document` · raises typed errors (`DocumentNotFoundError`, `DocumentValidationError`, `DocumentNotUploadedError`) |
-| `app/api/documents.py` | 4 routes: POST `/api/documents` (201) · POST `/{id}/finalize` (200) · GET `/api/documents` (200) · DELETE `/{id}` (204) · maps service errors to 400/404/409/503 |
+| `app/repositories/document_repo.py` | Document metadata persistence with Supabase PostgreSQL integration and fallback · `create/get/list/update_status/delete` |
+| `app/services/storage_service.py` | Local disk volume storage (`STORAGE_DIR`) and signed storage URL management · `UploadAuthorization` value object |
+| `app/services/document_service.py` | Orchestration: `request_upload` (validate → sign → persist), `finalize_upload` (verify blob → mark uploaded), `list/delete_document` · raises typed errors |
+| `app/api/documents.py` | 4 routes: POST `/api/documents` (201) · POST `/{id}/finalize` (200) · GET `/api/documents` (200) · DELETE `/{id}` (204) |
 | `app/core/config.py` (modified) | `firebase_storage_bucket`, `signed_url_ttl_seconds`, `max_upload_bytes`, `document_list_limit` |
 | `app/core/firebase.py` (modified) | Pass `storageBucket` into `initialize_app` · expose `get_firestore()` + `get_storage_bucket()` helpers |
 | `app/main.py` (modified) | Include documents router |

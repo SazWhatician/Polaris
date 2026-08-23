@@ -1,6 +1,6 @@
 # Phase 0 — Foundation + Engineering Spine
 
-> **Outcome:** `just up` boots FastAPI + Qdrant + Jaeger. Next.js dev server runs on host, signs you in with Google or Demo Mode, and round-trips a Firebase ID token through `/api/me`. CI lints, type-checks, tests, and builds both stacks. Every non-obvious choice is captured in an ADR (including [ADR 0014: Firebase Auth & Demo Fallback](file:///c:/Users/saswa/Desktop/Polaris/docs/adr/0014-firebase-authentication-and-demo-fallback.md)).
+> **Outcome:** `just up` (or `docker-compose up -d`) boots FastAPI (mapped to host port **8010**) + Qdrant (6333) + Jaeger (16686). Next.js dev server runs on host (port 3000), signs in with Google, Supabase, or Demo Mode (`demo-student-123`), and round-trips bearer tokens through `/api/me`. CI lints, type-checks, tests, and builds both stacks. Every non-obvious choice is captured in an ADR.
 
 ---
 
@@ -10,22 +10,23 @@
 | Path | Purpose |
 |---|---|
 | `pyproject.toml` | ruff (lint + format) · mypy (strict) · pytest (asyncio mode + coverage) config |
-| `requirements.txt` | Pinned deps: FastAPI · Pydantic · structlog · OpenTelemetry · firebase-admin · httpx · pytest |
+| `requirements.txt` | Pinned deps: FastAPI · Pydantic · structlog · OpenTelemetry · supabase · firebase-admin · httpx · pytest |
 | `.env.example` | Documented env contract; commit-safe template |
 | `Dockerfile` | Multi-stage: builder installs into `/opt/venv`, runtime copies venv + app, runs as non-root, has HTTP healthcheck |
 | `.dockerignore` | Excludes caches, secrets, tests from the image |
-| `app/main.py` | App factory: load config → configure logging → configure tracing → register middleware → include routers → instrument FastAPI |
+| `app/main.py` | App factory: load config → configure logging → configure tracing → register middleware → include routers |
 | `app/core/config.py` | `pydantic-settings` singleton (`lru_cache`'d); env-driven; `cors_origins` helper |
 | `app/core/logging.py` | structlog JSON in prod / console in dev · `RequestIdMiddleware` (ContextVar) · echoes `X-Request-Id` header |
 | `app/core/otel.py` | OTel SDK · OTLP gRPC exporter to Jaeger · auto-instruments FastAPI + httpx |
+| `app/core/supabase.py` | Supabase client singleton initialization for PostgreSQL queries and storage |
 | `app/core/firebase.py` | Idempotent Admin SDK init · falls back to "not initialized" cleanly (so `/health` works without secrets) |
-| `app/core/deps.py` | `verify_id_token` FastAPI dependency · maps `Expired/Revoked/Invalid` to specific 401 reasons |
-| `app/api/health.py` | `GET /health` — public; exposes `firebase_ready` for dashboard checks |
+| `app/core/deps.py` | `verify_id_token` FastAPI dependency · validates Supabase Auth JWTs, Firebase tokens, and `demo-student-123` fallback |
+| `app/api/health.py` | `GET /health` — public; exposes `supabase_ready` and `firebase_ready` status |
 | `app/api/me.py` | `GET /api/me` — protected; returns the authenticated user from token claims |
 | `app/models/user.py` | `AuthenticatedUser` Pydantic model (frozen) |
 | `tests/conftest.py` | Test env defaults · async httpx client fixture · lifespan-aware |
 | `tests/unit/test_health.py` | Healthcheck + request-ID middleware tests |
-| `tests/unit/test_me_requires_auth.py` | 503 when Firebase unconfigured · 401 when bearer missing |
+| `tests/unit/test_me_requires_auth.py` | 401 when bearer missing · validates demo token resolution |
 
 ### Frontend (`frontend/`)
 | Path | Purpose |

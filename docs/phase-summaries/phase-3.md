@@ -55,9 +55,9 @@
 ### Frontend
 | Path | Purpose |
 |---|---|
-| `lib/api/chat.ts` | fetch-based SSE consumer (EventSource can't send Bearer token); manual `\n\n`-frame parsing; `AbortSignal` support |
-| `components/chat-message.tsx` | Bubble UI; streaming cursor; **clickable citation chips** that open a Dialog with full chunk text + similarity score |
-| `app/chat/page.tsx` | Chat page: messages list (auto-scroll), textarea (Enter to send, Shift-Enter newline), Send/Stop button, optimistic placeholder for streaming assistant message |
+| `lib/api/chat.ts` | Resilient fetch-based SSE consumer with CRLF normalization (`\r\n` $\rightarrow$ `\n`), header token injection, and `AbortSignal` support |
+| `components/chat-message.tsx` | Concise chat bubbles with user/assistant visual hierarchy, `cleanModelAnswer` thinking suppression, animated shimmer loader, and clickable citation inspection popups |
+| `app/chat/page.tsx` | Grounded RAG chat page: glassmorphism stream container, model selector dropdown, Enter-to-send keyboard handler, and error resilience |
 | `components/site-header.tsx` (modified) | Adds `/dashboard` and `/chat` nav links with active styling |
 
 ### Eval harness
