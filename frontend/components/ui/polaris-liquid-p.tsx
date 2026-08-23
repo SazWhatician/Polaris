@@ -52,7 +52,11 @@ out vec4 outColor;
 vec2 ur, U;
 
 float ln(vec2 p, vec2 a, vec2 b) {
-  return length(p - a - (b - a) * clamp(dot(p - a, b - a) / dot(b - a, b - a), 0.0, 1.0));
+  vec2 ba = b - a;
+  float d2 = dot(ba, ba);
+  if (d2 < 1e-6) return length(p - a);
+  float t = clamp(dot(p - a, ba) / d2, 0.0, 1.0);
+  return length(p - a - ba * t);
 }
 
 vec4 tOff(vec2 v, int a, int b) {
@@ -132,7 +136,11 @@ void main() {
     float falloff = exp(-brushSizeFactor * q * q * q);
     falloff = pow(falloff, 0.5);
 
-    me.xyw += strengthFactor * falloff * vec3(m, 10.0);
+    vec3 impulse = strengthFactor * falloff * vec3(m, 10.0);
+    me.x += impulse.x;
+    me.y += impulse.y;
+    me.w += impulse.z;
+
     if (velMag < 2.0) {
       float distToCursor = length(U - mousePos);
       float influence    = exp(-distToCursor * 0.01);
@@ -146,12 +154,13 @@ void main() {
   float mask = sampleMask(vUv);
   me *= smoothstep(0.02, 0.30, mask);
 
-  outColor = clamp(me, -0.4, 0.4);
-}`;
+  outColor = clamp(me, vec4(-0.4), vec4(0.4));
+}
+`;
 
 /* ---------- Display ---------- */
 
-const FS_DISPLAY = /* glsl */ `#version 300 es
+const FS_DISPLAY = `#version 300 es
 precision highp float;
 
 uniform float     iTime;
@@ -195,9 +204,10 @@ void main() {
 
   float d = -iTime * 0.5;
   float a = 0.0;
-  for (float i = 0.0; i < 8.0; ++i) {
-    a += cos(i - d - a * uv.x);
-    d += sin(uv.y * i + a);
+  for (int i = 0; i < 8; i++) {
+    float fi = float(i);
+    a += cos(fi - d - a * uv.x);
+    d += sin(uv.y * fi + a);
   }
   d += iTime * 0.5;
 
@@ -307,10 +317,11 @@ export function PolarisLiquidP({
     const compile = (type: number, src: string) => {
       const sh = gl.createShader(type);
       if (!sh) return null;
-      gl.shaderSource(sh, src);
+      gl.shaderSource(sh, src.trim());
       gl.compileShader(sh);
       if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
-        console.error("[PolarisLiquidP] shader:", gl.getShaderInfoLog(sh));
+        const info = gl.getShaderInfoLog(sh);
+        console.error("[PolarisLiquidP] shader compile failed:", info || "(no log)");
         gl.deleteShader(sh);
         return null;
       }

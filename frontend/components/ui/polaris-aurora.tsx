@@ -69,7 +69,7 @@ out vec4 outColor;
 /* ─── hash / noise ─── */
 float hash21(vec2 p) {
   p = fract(p * vec2(233.34, 851.73));
-  p += dot(p, p + 23.45);
+  p += dot(p, p + vec2(23.45, 23.45));
   return fract(p.x * p.y);
 }
 float vnoise(vec2 p) {
@@ -126,7 +126,7 @@ float starLayer(vec2 uv, float density, float twinkleSpeed) {
   vec2  f = fract(p);
   float h = hash21(i);
   if (h < 1.0 - density) return 0.0;
-  vec2  s = vec2(hash21(i + 1.7), hash21(i - 1.3));
+  vec2  s = vec2(hash21(i + vec2(1.7, 1.7)), hash21(i - vec2(1.3, 1.3)));
   float d = length(f - s);
   float br = smoothstep(0.045, 0.0, d);
   br *= 0.55 + 0.45 * sin(uTime * twinkleSpeed + h * 100.0);

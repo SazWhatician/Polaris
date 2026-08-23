@@ -2,16 +2,16 @@
 
 import { useState, useRef, useEffect, Suspense, type FormEvent, type KeyboardEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Square, Bot, User, Copy, Check, Settings2, Sparkles, RefreshCw, Mic } from "lucide-react";
+import { Square, Settings2, Sparkles, RefreshCw, Mic } from "lucide-react";
 import { toast } from "sonner";
 
 import { SiteHeader } from "@/components/site-header";
 import { useAuth } from "@/lib/auth-context";
 import { streamChat, type Citation } from "@/lib/api/chat";
 import { useGsapEntrance } from "@/lib/use-gsap-animations";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HeroWave } from "@/components/ui/ai-input-hero";
+import { ChatMessage } from "@/components/chat-message";
 
 interface Message {
   id: string;
@@ -31,7 +31,6 @@ function ChatContent() {
   const [streaming, setStreaming] = useState(false);
   const [micActive, setMicActive] = useState(false);
   const [selectedModel, setSelectedModel] = useState("groq-llama3-70b");
-  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -121,13 +120,6 @@ function ChatContent() {
 
   const cancel = () => abortRef.current?.abort();
 
-  const handleCopy = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    toast.success("Copied to clipboard!");
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
   const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -189,68 +181,18 @@ function ChatContent() {
               {/* Glassmorphism Chat Stream Container */}
               <div
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto space-y-4 my-4 p-4 rounded-2xl bg-white/75 dark:bg-zinc-950/75 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-2xl max-h-[62vh]"
+                className="flex-1 overflow-y-auto space-y-2 my-3 p-3 sm:p-5 rounded-2xl bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-2xl max-h-[64vh]"
               >
-                {messages.map((msg) => (
-                  <Card
-                    key={msg.id}
-                    className={`chat-msg-reveal flex gap-3.5 p-4 transition-all shadow-md ${
-                      msg.role === "user"
-                        ? "ml-8 sm:ml-16 bg-primary/15 border-primary/30 text-slate-900 dark:text-slate-100 font-medium"
-                        : "mr-8 sm:mr-16 bg-white/90 dark:bg-zinc-900/90 border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100"
-                    }`}
-                  >
-                    <div
-                      className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 text-white font-bold text-xs shadow-sm ${
-                        msg.role === "user" ? "bg-primary" : "bg-purple-600"
-                      }`}
-                    >
-                      {msg.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
-                    </div>
-
-                    <div className="flex-1 space-y-2 text-xs sm:text-sm leading-relaxed">
-                      <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-zinc-800 pb-1 font-semibold">
-                        <span>{msg.role === "user" ? "You" : "Polaris RAG AI"}</span>
-                        <div className="flex items-center gap-2">
-                          <span>{msg.timestamp}</span>
-                          {msg.role === "assistant" && (
-                            <button
-                              onClick={() => handleCopy(msg.content, msg.id)}
-                              className="hover:text-slate-900 dark:hover:text-white transition-colors"
-                            >
-                              {copiedId === msg.id ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="whitespace-pre-wrap text-slate-900 dark:text-slate-100 font-normal">
-                        {msg.content || (streaming && (
-                          <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 font-mono text-xs">
-                            <Sparkles className="h-3.5 w-3.5 text-primary animate-spin" />
-                            <span>Retrieving cited answer...</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Citations List */}
-                      {msg.citations && msg.citations.length > 0 && (
-                        <div className="pt-2 border-t border-slate-200 dark:border-zinc-800 space-y-1">
-                          <p className="text-[10px] text-primary font-bold uppercase tracking-wider">Citations & References:</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {msg.citations.map((c, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-0.5 rounded-md text-[10px] bg-primary/10 text-primary font-mono border border-primary/20"
-                              >
-                                [{c.document_id || "Doc"} Pg.{c.page_number}]
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </Card>
+                {messages.map((msg, idx) => (
+                  <ChatMessage
+                    key={msg.id || idx}
+                    role={msg.role}
+                    content={msg.content}
+                    citations={msg.citations}
+                    streaming={streaming && idx === messages.length - 1 && msg.role === "assistant"}
+                    timestamp={msg.timestamp}
+                    modelName={selectedModel === "groq-llama3-70b" ? "Groq Llama-3.1 70B" : "NVIDIA NIM Grounded"}
+                  />
                 ))}
               </div>
 

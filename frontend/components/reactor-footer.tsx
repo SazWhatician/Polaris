@@ -8,18 +8,146 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Move3d, Loader2 } from "lucide-react";
+import { Move3d, Loader2, Sparkles, Palette } from "lucide-react";
+
+export type ModelColorway =
+  | "emerald"
+  | "amethyst"
+  | "cyan"
+  | "gold"
+  | "crimson"
+  | "chrome"
+  | "aurora";
+
+export interface ColorwayConfig {
+  id: ModelColorway;
+  label: string;
+  dotColor: string;
+  modelColor: string;
+  emissiveColor: string;
+  emissiveIntensity: number;
+  roughness: number;
+  metalness: number;
+  rimColor: number;
+  bottomColor: number;
+  coreLightColor: number;
+  particleColor: number;
+}
+
+export const MODEL_COLORWAYS: Record<ModelColorway, ColorwayConfig> = {
+  emerald: {
+    id: "emerald",
+    label: "Cyber Emerald",
+    dotColor: "#10b981",
+    modelColor: "#94a3b8",
+    emissiveColor: "#064e3b",
+    emissiveIntensity: 0.28,
+    roughness: 0.22,
+    metalness: 0.85,
+    rimColor: 0x10b981,
+    bottomColor: 0x06b6d4,
+    coreLightColor: 0x10b981,
+    particleColor: 0x6ee7b7,
+  },
+  amethyst: {
+    id: "amethyst",
+    label: "Cosmic Amethyst",
+    dotColor: "#a855f7",
+    modelColor: "#475569",
+    emissiveColor: "#581c87",
+    emissiveIntensity: 0.35,
+    roughness: 0.20,
+    metalness: 0.90,
+    rimColor: 0xc084fc,
+    bottomColor: 0xe879f9,
+    coreLightColor: 0x9333ea,
+    particleColor: 0xd8b4fe,
+  },
+  cyan: {
+    id: "cyan",
+    label: "Arctic Neon",
+    dotColor: "#06b6d4",
+    modelColor: "#64748b",
+    emissiveColor: "#083344",
+    emissiveIntensity: 0.32,
+    roughness: 0.18,
+    metalness: 0.88,
+    rimColor: 0x22d3ee,
+    bottomColor: 0x38bdf8,
+    coreLightColor: 0x06b6d4,
+    particleColor: 0xa5f3fc,
+  },
+  gold: {
+    id: "gold",
+    label: "Solar Gold",
+    dotColor: "#f59e0b",
+    modelColor: "#ca8a04",
+    emissiveColor: "#78350f",
+    emissiveIntensity: 0.30,
+    roughness: 0.24,
+    metalness: 0.92,
+    rimColor: 0xfbbf24,
+    bottomColor: 0xf97316,
+    coreLightColor: 0xf59e0b,
+    particleColor: 0xfde68a,
+  },
+  crimson: {
+    id: "crimson",
+    label: "Reactor Ruby",
+    dotColor: "#f43f5e",
+    modelColor: "#334155",
+    emissiveColor: "#881337",
+    emissiveIntensity: 0.38,
+    roughness: 0.20,
+    metalness: 0.88,
+    rimColor: 0xf43f5e,
+    bottomColor: 0xfb7185,
+    coreLightColor: 0xe11d48,
+    particleColor: 0xfecdd3,
+  },
+  chrome: {
+    id: "chrome",
+    label: "Liquid Chrome",
+    dotColor: "#f8fafc",
+    modelColor: "#e2e8f0",
+    emissiveColor: "#0f172a",
+    emissiveIntensity: 0.10,
+    roughness: 0.08,
+    metalness: 0.98,
+    rimColor: 0xffffff,
+    bottomColor: 0x94a3b8,
+    coreLightColor: 0xffffff,
+    particleColor: 0xffffff,
+  },
+  aurora: {
+    id: "aurora",
+    label: "Prism Shift",
+    dotColor: "#ec4899",
+    modelColor: "#cbd5e1",
+    emissiveColor: "#4338ca",
+    emissiveIntensity: 0.35,
+    roughness: 0.15,
+    metalness: 0.90,
+    rimColor: 0x818cf8,
+    bottomColor: 0x34d399,
+    coreLightColor: 0xf472b6,
+    particleColor: 0xfbcfe8,
+  },
+};
 
 interface ReactorFooterProps {
   /** Custom 3D model URL (e.g. "/models/bouche_a_levres.glb") */
   customModelUrl?: string;
   /** Scale factor for custom 3D model (default: 1.0) */
   modelScale?: number;
+  /** Initial colorway preset (default: "emerald") */
+  initialColorway?: ModelColorway;
 }
 
 export function ReactorFooter({
   customModelUrl = "/models/bouche_a_levres.glb",
   modelScale = 1.0,
+  initialColorway = "emerald",
 }: ReactorFooterProps) {
   const footerRef = useRef<HTMLElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -29,8 +157,88 @@ export function ReactorFooter({
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const modelGroupRef = useRef<THREE.Group | null>(null);
 
+  const materialsRef = useRef<THREE.MeshStandardMaterial[]>([]);
+  const rimLightRef = useRef<THREE.DirectionalLight | null>(null);
+  const bottomLightRef = useRef<THREE.DirectionalLight | null>(null);
+  const corePointLightRef = useRef<THREE.PointLight | null>(null);
+  const particlesMatRef = useRef<THREE.PointsMaterial | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState(0);
+  const [selectedColorway, setSelectedColorway] = useState<ModelColorway>(initialColorway);
+  const selectedColorwayRef = useRef<ModelColorway>(initialColorway);
+  selectedColorwayRef.current = selectedColorway;
+
+  // Apply colorway transitions to 3D materials and lights
+  const handleColorwayChange = (cwKey: ModelColorway) => {
+    setSelectedColorway(cwKey);
+    const cfg = MODEL_COLORWAYS[cwKey];
+    if (!cfg) return;
+
+    materialsRef.current.forEach((mat) => {
+      const targetColor = new THREE.Color(cfg.modelColor);
+      const targetEmissive = new THREE.Color(cfg.emissiveColor);
+
+      gsap.to(mat.color, {
+        r: targetColor.r,
+        g: targetColor.g,
+        b: targetColor.b,
+        duration: 0.8,
+        ease: "power2.out",
+      });
+      gsap.to(mat.emissive, {
+        r: targetEmissive.r,
+        g: targetEmissive.g,
+        b: targetEmissive.b,
+        duration: 0.8,
+        ease: "power2.out",
+      });
+      mat.emissiveIntensity = cfg.emissiveIntensity;
+      mat.roughness = cfg.roughness;
+      mat.metalness = cfg.metalness;
+      mat.needsUpdate = true;
+    });
+
+    if (rimLightRef.current) {
+      const targetRim = new THREE.Color(cfg.rimColor);
+      gsap.to(rimLightRef.current.color, {
+        r: targetRim.r,
+        g: targetRim.g,
+        b: targetRim.b,
+        duration: 0.8,
+      });
+    }
+
+    if (bottomLightRef.current) {
+      const targetBottom = new THREE.Color(cfg.bottomColor);
+      gsap.to(bottomLightRef.current.color, {
+        r: targetBottom.r,
+        g: targetBottom.g,
+        b: targetBottom.b,
+        duration: 0.8,
+      });
+    }
+
+    if (corePointLightRef.current) {
+      const targetCore = new THREE.Color(cfg.coreLightColor);
+      gsap.to(corePointLightRef.current.color, {
+        r: targetCore.r,
+        g: targetCore.g,
+        b: targetCore.b,
+        duration: 0.8,
+      });
+    }
+
+    if (particlesMatRef.current) {
+      const targetPart = new THREE.Color(cfg.particleColor);
+      gsap.to(particlesMatRef.current.color, {
+        r: targetPart.r,
+        g: targetPart.g,
+        b: targetPart.b,
+        duration: 0.8,
+      });
+    }
+  };
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -74,42 +282,41 @@ export function ReactorFooter({
     canvasEl.innerHTML = "";
     canvasEl.appendChild(renderer.domElement);
 
-    // 2. Passive OrbitControls — no user interaction, just autorotation.
+    // 2. Passive OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 1.1;
     controls.enableRotate = false;
-    controls.enableZoom   = false;
-    controls.enablePan    = false;
+    controls.enableZoom = false;
+    controls.enablePan = false;
     controls.target.set(0, 0, 0);
     controlsRef.current = controls;
 
-    // 3. Studio PBR Lighting Setup for High Contrast & Definition
-    // Soft ambient for base visibility without washing out shadows
+    // 3. Studio PBR Lighting Setup
+    const initialCfg = MODEL_COLORWAYS[selectedColorwayRef.current];
+
     const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
 
-    // Key directional light (Clean Cool White from top-right)
     const keyLight = new THREE.DirectionalLight(0xf8fafc, 2.6);
     keyLight.position.set(3, 5, 4);
     scene.add(keyLight);
 
-    // Fill light (Soft Neutral from left)
     const fillLight = new THREE.DirectionalLight(0x94a3b8, 1.5);
     fillLight.position.set(-4, 2, 3);
     scene.add(fillLight);
 
-    // Polaris Emerald Rim Light (Backlighting to create sharp glowing silhouettes)
-    const rimLight = new THREE.DirectionalLight(0x10b981, 3.4);
+    const rimLight = new THREE.DirectionalLight(initialCfg.rimColor, 3.4);
     rimLight.position.set(0, 4, -4);
     scene.add(rimLight);
+    rimLightRef.current = rimLight;
 
-    // Cyan Bottom Bounce Light for rich underside highlights
-    const bottomLight = new THREE.DirectionalLight(0x06b6d4, 1.6);
+    const bottomLight = new THREE.DirectionalLight(initialCfg.bottomColor, 1.6);
     bottomLight.position.set(0, -3, 2);
     scene.add(bottomLight);
+    bottomLightRef.current = bottomLight;
 
     // 4. 3D Model Root Group
     const modelGroup = new THREE.Group();
@@ -117,13 +324,14 @@ export function ReactorFooter({
     scene.add(modelGroup);
     modelGroupRef.current = modelGroup;
 
-    // Glowing core point light
-    const corePointLight = new THREE.PointLight(0x10b981, 2.0, 15);
+    const corePointLight = new THREE.PointLight(initialCfg.coreLightColor, 2.0, 15);
     corePointLight.position.set(0, 0, 0);
     modelGroup.add(corePointLight);
+    corePointLightRef.current = corePointLight;
 
     let innerMesh: THREE.Object3D | null = null;
     let outerCage: THREE.Mesh | null = null;
+    materialsRef.current = [];
 
     if (customModelUrl) {
       const loader = new GLTFLoader();
@@ -132,30 +340,22 @@ export function ReactorFooter({
         (gltf) => {
           const model = gltf.scene;
 
-          // Apply high-contrast metallic titanium shader with emerald specular response
           model.traverse((child) => {
             if ((child as THREE.Mesh).isMesh) {
               const mesh = child as THREE.Mesh;
               mesh.castShadow = true;
               mesh.receiveShadow = true;
 
-              const prevMat = mesh.material as THREE.MeshStandardMaterial;
-              if (prevMat && prevMat.map) {
-                // If model has texture map, keep textures and enhance PBR response
-                prevMat.roughness = 0.28;
-                prevMat.metalness = 0.65;
-                prevMat.needsUpdate = true;
-              } else {
-                // Cyber titanium material: sharp specular highlights, deep shadows, crisp definition
-                mesh.material = new THREE.MeshStandardMaterial({
-                  color: new THREE.Color("#94a3b8"), // sleek titanium silver
-                  roughness: 0.22,
-                  metalness: 0.85,
-                  emissive: new THREE.Color("#064e3b"), // deep emerald core glow
-                  emissiveIntensity: 0.15,
-                  side: THREE.DoubleSide,
-                });
-              }
+              const mat = new THREE.MeshStandardMaterial({
+                color: new THREE.Color(initialCfg.modelColor),
+                roughness: initialCfg.roughness,
+                metalness: initialCfg.metalness,
+                emissive: new THREE.Color(initialCfg.emissiveColor),
+                emissiveIntensity: initialCfg.emissiveIntensity,
+                side: THREE.DoubleSide,
+              });
+              mesh.material = mat;
+              materialsRef.current.push(mat);
             }
           });
 
@@ -179,7 +379,7 @@ export function ReactorFooter({
           }
         },
         (error) => {
-          console.warn("Failed to load custom 3D model, falling back to reactor crystal:", error);
+          console.warn("Failed to load custom 3D model, falling back to crystal:", error);
           createDefaultCrystal();
           setIsLoading(false);
         }
@@ -192,19 +392,21 @@ export function ReactorFooter({
     function createDefaultCrystal() {
       const innerGeo = new THREE.OctahedronGeometry(1.2, 0);
       const innerMat = new THREE.MeshStandardMaterial({
-        color: 0x10b981,
-        emissive: 0x064e3b,
-        emissiveIntensity: 0.35,
-        roughness: 0.15,
-        metalness: 0.85,
+        color: new THREE.Color(initialCfg.modelColor),
+        emissive: new THREE.Color(initialCfg.emissiveColor),
+        emissiveIntensity: initialCfg.emissiveIntensity,
+        roughness: initialCfg.roughness,
+        metalness: initialCfg.metalness,
       });
+      materialsRef.current.push(innerMat);
+
       const crystal = new THREE.Mesh(innerGeo, innerMat);
       innerMesh = crystal;
       modelGroup.add(crystal);
 
       const outerGeo = new THREE.IcosahedronGeometry(1.6, 0);
       const outerMat = new THREE.MeshBasicMaterial({
-        color: 0x34d399,
+        color: initialCfg.rimColor,
         wireframe: true,
         transparent: true,
         opacity: 0.35,
@@ -223,10 +425,12 @@ export function ReactorFooter({
     particlesGeo.setAttribute("position", new THREE.BufferAttribute(posArray, 3));
     const particlesMat = new THREE.PointsMaterial({
       size: 0.022,
-      color: 0x94a3b8,
+      color: initialCfg.particleColor,
       transparent: true,
       opacity: 0.65,
     });
+    particlesMatRef.current = particlesMat;
+
     const particles = new THREE.Points(particlesGeo, particlesMat);
     modelGroup.add(particles);
 
@@ -278,6 +482,21 @@ export function ReactorFooter({
       // Update Orbit Controls with damping
       controls.update();
 
+      // Dynamic Aurora / Prism Rainbow Shift
+      if (selectedColorwayRef.current === "aurora") {
+        const hue = (time * 0.15) % 1.0;
+        const color = new THREE.Color().setHSL(hue, 0.85, 0.55);
+        const emissive = new THREE.Color().setHSL((hue + 0.5) % 1.0, 0.9, 0.25);
+
+        materialsRef.current.forEach((mat) => {
+          mat.emissive.copy(emissive);
+          mat.color.copy(color);
+        });
+        if (rimLightRef.current) rimLightRef.current.color.copy(color);
+        if (bottomLightRef.current) bottomLightRef.current.color.copy(emissive);
+        if (corePointLightRef.current) corePointLightRef.current.color.copy(color);
+      }
+
       if (outerCage) {
         outerCage.rotation.y -= 0.004;
         outerCage.rotation.z += 0.002;
@@ -319,7 +538,7 @@ export function ReactorFooter({
         ref={footerRef}
         className="reactor-zone relative z-20 w-full min-h-screen overflow-hidden bg-black flex flex-col justify-between"
       >
-        {/* 3D Canvas Layer — purely decorative, non-interactive */}
+        {/* 3D Canvas Layer */}
         <div
           id="footer-canvas"
           ref={canvasContainerRef}
@@ -413,13 +632,56 @@ export function ReactorFooter({
             </div>
           </div>
 
+          {/* Interactive Model Colorway Selector Bar */}
+          <div className="w-full py-4 flex flex-col sm:flex-row items-center justify-between gap-4 pointer-events-auto bg-black/40 backdrop-blur-md rounded-2xl px-5 py-3 border border-white/10 my-4 shadow-2xl">
+            <div className="flex items-center gap-2 text-xs font-mono text-white/70">
+              <Palette className="w-3.5 h-3.5 text-primary" />
+              <span className="tracking-widest uppercase font-semibold text-[11px]">Chamber Colorway:</span>
+              <span className="text-white font-bold ml-1">{MODEL_COLORWAYS[selectedColorway].label}</span>
+            </div>
+
+            {/* Colorway Swatch Chips */}
+            <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-center">
+              {(Object.keys(MODEL_COLORWAYS) as ModelColorway[]).map((cwKey) => {
+                const cw = MODEL_COLORWAYS[cwKey];
+                const isActive = selectedColorway === cwKey;
+                return (
+                  <button
+                    key={cwKey}
+                    type="button"
+                    onClick={() => handleColorwayChange(cwKey)}
+                    className={`group relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
+                      isActive
+                        ? "bg-white/15 border-white/40 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)] scale-105"
+                        : "bg-white/[0.04] border-white/10 text-white/60 hover:text-white hover:bg-white/[0.08] hover:border-white/20"
+                    } border`}
+                    title={cw.label}
+                  >
+                    {cwKey === "aurora" ? (
+                      <Sparkles className="w-3 h-3 text-pink-400 animate-spin" />
+                    ) : (
+                      <span
+                        className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform group-hover:scale-110 shadow-xs"
+                        style={{ backgroundColor: cw.dotColor }}
+                      />
+                    )}
+                    <span className="text-[10px] tracking-wider uppercase font-medium">{cw.label.split(" ")[1] || cw.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Bottom HUD Bar */}
-          <div className="w-full pt-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-white/50 border-t border-white/10 pointer-events-auto">
+          <div className="w-full pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-white/50 border-t border-white/10 pointer-events-auto">
             <div className="flex items-center gap-3">
               <div className="px-3 py-1 rounded-full bg-white/[0.05] border border-white/10 flex items-center gap-2">
                 <Move3d className="w-3.5 h-3.5 text-[#2BA648]" />
                 <span className="text-[10px] tracking-widest uppercase">3D CORE</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-[#2BA648] animate-pulse" />
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-pulse"
+                  style={{ backgroundColor: MODEL_COLORWAYS[selectedColorway].dotColor }}
+                />
               </div>
             </div>
 
@@ -442,3 +704,5 @@ export function ReactorFooter({
     </div>
   );
 }
+
+export default ReactorFooter;
