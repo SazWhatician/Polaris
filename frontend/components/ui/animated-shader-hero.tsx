@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useRef, useEffect } from "react";
+import Image from "next/image";
 import { useTheme } from "next-themes";
 
 export interface HeroProps {
@@ -15,6 +16,8 @@ export interface HeroProps {
   };
   title?: string;
   subtitle: string;
+  logoSrc?: string;
+  logoAlt?: string;
   buttons?: {
     primary?: {
       text: string;
@@ -448,6 +451,8 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
   trustBadge,
   title = "POLARIS",
   subtitle,
+  logoSrc,
+  logoAlt,
   buttons,
   className = "",
   fullPage = true,
@@ -483,14 +488,28 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
           </div>
         )}
 
-        <div className="text-center space-y-6 max-w-5xl mx-auto px-4">
-          {/* Haute-Tech Ultra-Luxurious Title "POLARIS" */}
-          <div className="relative inline-block">
-            <h1 className="polaris-luxury-title text-6xl sm:text-8xl lg:text-9xl tracking-[0.14em] sm:tracking-[0.18em] uppercase select-none">
-              {title}
-            </h1>
-            <div className="absolute -inset-x-8 -inset-y-4 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent blur-2xl -z-10 pointer-events-none" />
-          </div>
+        <div className="text-center space-y-6 max-w-6xl mx-auto px-4 w-full">
+          {/* Landing Page Hero Logo Artwork */}
+          {logoSrc ? (
+            <div className="relative mx-auto w-full max-w-2xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl flex items-center justify-center py-2 sm:py-4">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/30 to-cyan-500/20 blur-3xl -z-10 rounded-full scale-105 pointer-events-none opacity-80" />
+              <Image
+                src={logoSrc}
+                alt={logoAlt || "Polaris Logo"}
+                width={1536}
+                height={1024}
+                priority
+                className="w-full h-auto max-h-[50vh] sm:max-h-[58vh] lg:max-h-[64vh] object-contain drop-shadow-[0_0_60px_rgba(120,119,198,0.45)] select-none transition-transform duration-700 hover:scale-[1.01]"
+              />
+            </div>
+          ) : (
+            <div className="relative inline-block">
+              <h1 className="polaris-luxury-title text-6xl sm:text-8xl lg:text-9xl tracking-[0.14em] sm:tracking-[0.18em] uppercase select-none">
+                {title}
+              </h1>
+              <div className="absolute -inset-x-8 -inset-y-4 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent blur-2xl -z-10 pointer-events-none" />
+            </div>
+          )}
 
           {/* Subtitle */}
           <div className="max-w-2xl mx-auto">
@@ -504,6 +523,7 @@ export const AnimatedShaderHero: React.FC<HeroProps> = ({
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
               {buttons.primary && (
                 <button
+                  data-polaris-cta
                   onClick={buttons.primary.onClick}
                   className="px-8 py-4 bg-white text-black hover:bg-slate-100 rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 hover:scale-105 shadow-2xl active:scale-95 flex items-center justify-center gap-2"
                 >

@@ -842,6 +842,14 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
                     <textarea
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          if (prompt.trim()) {
+                            onPromptSubmit?.(prompt);
+                          }
+                        }
+                      }}
                       placeholder={animatedPlaceholder}
                       rows={5}
                       data-agent-target="chat-input"

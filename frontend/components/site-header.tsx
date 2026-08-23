@@ -82,10 +82,10 @@ export function SiteHeader() {
           <Link href="/dashboard" className="flex items-center gap-2.5 group">
             <div className="relative w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105">
               <Image
-                src="/polaris-logo.png"
+                src="/polaris-standalone.png"
                 alt="Polaris Logo"
-                width={26}
-                height={26}
+                width={28}
+                height={28}
                 className="object-contain"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = "none";

@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="polaris_logo12345.png" alt="Polaris Logo" width="560" />
+</div>
+
 # Polaris — AI Academic Navigator
 
 > Turn handwritten notes + a syllabus into a coverage map, gap analysis, curated free resources, a revision plan, a knowledge graph, and a career path.

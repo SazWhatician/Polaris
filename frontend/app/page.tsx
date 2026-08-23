@@ -4,17 +4,22 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { ArrowRight, LogIn, ShieldCheck, Zap, Layers, ChevronRight } from "lucide-react";
 
-import { AnimatedShaderHero } from "@/components/ui/animated-shader-hero";
 import { AnimatedShaderCard } from "@/components/ui/animated-shader-card";
+import { PolarisAurora } from "@/components/ui/polaris-aurora";
+import { PolarisLiquidP } from "@/components/ui/polaris-liquid-p";
 import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ReactorFooter } from "@/components/reactor-footer";
+import { getTheme } from "@/lib/polaris-themes";
 
 export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
+  const { resolvedTheme, theme } = useTheme();
+  const palette = getTheme(resolvedTheme ?? theme);
 
   const handlePrimaryClick = () => {
     if (user) {
@@ -29,17 +34,20 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen text-foreground relative selection:bg-[#2BA648]/30 selection:text-foreground bg-black overflow-x-hidden">
+    <div className="min-h-screen text-foreground relative selection:bg-[#2BA648]/30 selection:text-foreground overflow-x-hidden">
+      {/* Polaris Aurora — theme-driven cinematic background (sits behind all content) */}
+      <PolarisAurora zIndex={0} {...palette.aurora} />
+
       {/* Top Floating Luxury Glass Header */}
       <header className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-5 max-w-7xl mx-auto w-full">
         <Link href="/" className="flex items-center gap-3.5 group">
           <div className="relative w-10 h-10 rounded-2xl bg-white/[0.04] backdrop-blur-2xl border border-white/15 flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-105 group-hover:border-[#2BA648]/40 transition-all duration-300">
             <div className="absolute inset-0 bg-gradient-to-tr from-[#2BA648]/10 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             <Image
-              src="/polaris-logo.png"
+              src="/polaris-standalone.png"
               alt="Polaris Logo"
-              width={26}
-              height={26}
+              width={28}
+              height={28}
               className="object-contain relative z-10"
             />
           </div>
@@ -76,23 +84,77 @@ export default function Home() {
       </header>
 
       {/* Main Landing Page Content */}
-      <main className="relative z-10 w-full bg-black">
-        {/* Animated Shader Hero (Polaris Cosmic Shader) */}
-        <AnimatedShaderHero
-          fullPage
-          title="POLARIS"
-          subtitle="Autonomous academic research & intelligence engine. Grounded vector embeddings, page-level citations, and automated prerequisite knowledge graphs."
-          buttons={{
-            primary: {
-              text: user ? "Enter Workspace" : "Get Started Free",
-              onClick: handlePrimaryClick,
-            },
-            secondary: {
-              text: "Sign In / Register",
-              onClick: handleSecondaryClick,
-            },
-          }}
-        />
+      <main className="relative z-10 w-full">
+        {/* Hero — Liquid Metal Polaris P + editorial copy (theme-aware) */}
+        <section className="relative w-full min-h-screen flex items-center overflow-hidden">
+          <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-8 items-center px-6 py-24 lg:py-32">
+            {/* Left column — headline + subhead + CTAs */}
+            <div className="relative z-10 text-center lg:text-left space-y-8 order-2 lg:order-1">
+              <div
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border backdrop-blur-xl text-[10px] font-mono tracking-[0.24em] uppercase"
+                style={{
+                  background: "var(--hero-badge-bg)",
+                  borderColor: "var(--hero-badge-border)",
+                  color: "var(--hero-badge-fg)",
+                }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--hero-badge-dot)" }} />
+                <span>Polaris · Academic Navigator</span>
+              </div>
+
+              <h1
+                className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[0.95] drop-shadow-2xl"
+                style={{ color: "var(--hero-heading)" }}
+              >
+                Your entire<br />
+                <span
+                  className="bg-clip-text text-transparent"
+                  style={{
+                    backgroundImage: "linear-gradient(90deg, var(--hero-heading), var(--hero-heading-alt), var(--hero-heading-end))",
+                  }}
+                >
+                  academic world.
+                </span>
+              </h1>
+
+              <p
+                className="text-base sm:text-lg lg:text-xl font-light leading-relaxed max-w-lg mx-auto lg:mx-0"
+                style={{ color: "var(--hero-subhead)" }}
+              >
+                Powered by AI. Autonomous research, page-level citations, and prerequisite knowledge graphs — all in one navigator.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
+                <button
+                  data-polaris-cta
+                  onClick={handlePrimaryClick}
+                  className="px-8 py-4 rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 hover:scale-105 shadow-2xl active:scale-95 flex items-center justify-center gap-2"
+                  style={{ background: "var(--cta-bg)", color: "var(--cta-fg)" }}
+                >
+                  <span>{user ? "Enter Workspace" : "Get Started Free"}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={handleSecondaryClick}
+                  className="px-8 py-4 border rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 hover:scale-105 backdrop-blur-2xl shadow-md active:scale-95 flex items-center justify-center gap-2"
+                  style={{
+                    background: "var(--cta-alt-bg)",
+                    color: "var(--cta-alt-fg)",
+                    borderColor: "var(--cta-alt-border)",
+                  }}
+                >
+                  <LogIn className="h-4 w-4" style={{ color: "var(--cta-icon)" }} />
+                  <span>Sign In / Register</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Right column — liquid-metal Polaris mark (theme-driven palette) */}
+            <div className="relative order-1 lg:order-2 mx-auto w-full max-w-[520px] aspect-square">
+              <PolarisLiquidP {...palette.liquid} />
+            </div>
+          </div>
+        </section>
 
         {/* Feature Section with Precision Intelligence Engine Shader Card & 3 Feature Cards */}
         <section className="relative z-20 py-24 px-6 max-w-7xl mx-auto space-y-16">

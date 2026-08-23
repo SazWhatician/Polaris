@@ -23,6 +23,11 @@ const syncopate = Syncopate({
 export const metadata: Metadata = {
   title: "Polaris — Grounded AI Academic Platform",
   description: "Autonomous academic intelligence engine powered by Grounded RAG, WebGL Shaders & Vector Indexing.",
+  icons: {
+    icon: "/polaris-standalone.png",
+    shortcut: "/polaris-standalone.png",
+    apple: "/polaris-standalone.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

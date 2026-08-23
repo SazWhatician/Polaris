@@ -1,19 +1,14 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import {
-  Play,
-  Pause,
-  RotateCcw,
-  Move3d,
-  Loader2,
-} from "lucide-react";
+import { Move3d, Loader2 } from "lucide-react";
 
 interface ReactorFooterProps {
   /** Custom 3D model URL (e.g. "/models/bouche_a_levres.glb") */
@@ -36,35 +31,6 @@ export function ReactorFooter({
 
   const [isLoading, setIsLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState(0);
-  const [isAutoRotating, setIsAutoRotating] = useState(true);
-
-  // Toggle auto-rotation
-  const toggleAutoRotate = useCallback(() => {
-    if (controlsRef.current) {
-      const nextState = !controlsRef.current.autoRotate;
-      controlsRef.current.autoRotate = nextState;
-      setIsAutoRotating(nextState);
-    }
-  }, []);
-
-  // Reset Camera to initial front view
-  const resetCamera = useCallback(() => {
-    if (controlsRef.current && cameraRef.current) {
-      gsap.to(cameraRef.current.position, {
-        x: 0,
-        y: 0.2,
-        z: 4.2,
-        duration: 0.8,
-        ease: "power2.out",
-        onUpdate: () => {
-          controlsRef.current?.update();
-        },
-      });
-      controlsRef.current.target.set(0, 0, 0);
-      controlsRef.current.autoRotate = true;
-      setIsAutoRotating(true);
-    }
-  }, []);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -108,32 +74,17 @@ export function ReactorFooter({
     canvasEl.innerHTML = "";
     canvasEl.appendChild(renderer.domElement);
 
-    // 2. Interactive OrbitControls
+    // 2. Passive OrbitControls — no user interaction, just autorotation.
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
     controls.autoRotate = true;
     controls.autoRotateSpeed = 1.1;
-    controls.enableZoom = true;
-    controls.minDistance = 1.8;
-    controls.maxDistance = 8.0;
-    controls.enablePan = false;
+    controls.enableRotate = false;
+    controls.enableZoom   = false;
+    controls.enablePan    = false;
     controls.target.set(0, 0, 0);
     controlsRef.current = controls;
-
-    let interactionTimeout: NodeJS.Timeout | null = null;
-    controls.addEventListener("start", () => {
-      if (interactionTimeout) clearTimeout(interactionTimeout);
-    });
-
-    controls.addEventListener("end", () => {
-      if (interactionTimeout) clearTimeout(interactionTimeout);
-      interactionTimeout = setTimeout(() => {
-        if (controlsRef.current) {
-          controlsRef.current.autoRotate = isAutoRotating;
-        }
-      }, 4000);
-    });
 
     // 3. Studio PBR Lighting Setup for High Contrast & Definition
     // Soft ambient for base visibility without washing out shadows
@@ -346,7 +297,6 @@ export function ReactorFooter({
     // 8. Cleanup on Unmount
     return () => {
       clearTimeout(refreshTimer);
-      if (interactionTimeout) clearTimeout(interactionTimeout);
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
       resizeObserver.disconnect();
@@ -361,7 +311,7 @@ export function ReactorFooter({
         canvasEl.removeChild(renderer.domElement);
       }
     };
-  }, [customModelUrl, modelScale, isAutoRotating]);
+  }, [customModelUrl, modelScale]);
 
   return (
     <div className="relative z-20 w-full min-h-screen bg-black overflow-hidden select-none flex flex-col justify-between">
@@ -369,12 +319,12 @@ export function ReactorFooter({
         ref={footerRef}
         className="reactor-zone relative z-20 w-full min-h-screen overflow-hidden bg-black flex flex-col justify-between"
       >
-        {/* 3D Interactive Canvas Layer */}
+        {/* 3D Canvas Layer — purely decorative, non-interactive */}
         <div
           id="footer-canvas"
           ref={canvasContainerRef}
-          className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing pointer-events-auto"
-          title="Drag to rotate 3D model, scroll to zoom"
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          aria-hidden="true"
         />
 
         {/* Loading Overlay */}
@@ -471,32 +421,20 @@ export function ReactorFooter({
                 <span className="text-[10px] tracking-widest uppercase">3D CORE</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2BA648] animate-pulse" />
               </div>
-
-              <button
-                type="button"
-                onClick={toggleAutoRotate}
-                className="px-3 py-1 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-[10px] tracking-wider uppercase transition-colors flex items-center gap-1.5"
-              >
-                {isAutoRotating ? <Pause className="w-3 h-3 text-[#2BA648]" /> : <Play className="w-3 h-3 text-white/70" />}
-                <span>{isAutoRotating ? "Orbiting" : "Paused"}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={resetCamera}
-                className="px-3 py-1 rounded-full bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-[10px] tracking-wider uppercase transition-colors flex items-center gap-1.5"
-              >
-                <RotateCcw className="w-3 h-3 text-white" />
-                <span>Reset</span>
-              </button>
-            </div>
-
-            <div className="text-center text-[10px] tracking-widest uppercase text-white/40">
-              Drag to rotate 360° • Scroll / Pinch to zoom
             </div>
 
             <div className="flex items-center gap-4 text-[10px] tracking-widest uppercase">
-              <span>MADE WITH LOVE <span className="text-[#2BA648] font-bold">POLARIS.</span></span>
+              <div className="relative h-6 w-28 sm:w-36 opacity-80 hover:opacity-100 transition-opacity">
+                <Image
+                  src="/polaris-monochrome.png"
+                  alt="Polaris Logo"
+                  fill
+                  className="object-contain invert"
+                />
+              </div>
+              <span className="hidden sm:inline border-l border-white/20 pl-3">
+                MADE WITH LOVE <span className="text-[#2BA648] font-bold">POLARIS.</span>
+              </span>
             </div>
           </div>
         </div>

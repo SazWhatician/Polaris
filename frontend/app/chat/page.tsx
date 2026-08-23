@@ -92,9 +92,21 @@ function ChatContent() {
       });
     } catch (err) {
       if ((err as Error).name !== "AbortError") {
+        const errorDesc = err instanceof Error ? err.message : String(err);
         toast.error("Chat streaming failed", {
-          description: err instanceof Error ? err.message : String(err),
+          description: errorDesc,
         });
+        setMessages((m) =>
+          m.map((msg) =>
+            msg.id === assistantMsg.id && !msg.content
+              ? {
+                  ...msg,
+                  content:
+                    "⚠️ Unable to complete RAG response. Please verify the backend connection and try again.",
+                }
+              : msg
+          )
+        );
       }
     } finally {
       setStreaming(false);

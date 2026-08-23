@@ -175,10 +175,10 @@ export function NavDrawer() {
           >
             <div className="relative w-9 h-9 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105 shadow-sm">
               <Image
-                src="/polaris-logo.png"
+                src="/polaris-standalone.png"
                 alt="Polaris Logo"
-                width={28}
-                height={28}
+                width={30}
+                height={30}
                 className="object-contain"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = "none";

@@ -60,30 +60,39 @@ export async function streamChat(
   const decoder = new TextDecoder();
   let buffer = "";
 
+  const processBuffer = () => {
+    // Normalize CRLF to LF
+    buffer = buffer.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+    let sep: number;
+    while ((sep = buffer.indexOf("\n\n")) !== -1) {
+      const frame = buffer.slice(0, sep);
+      buffer = buffer.slice(sep + 2);
+
+      const dataLine = frame
+        .split("\n")
+        .find((l) => l.startsWith("data:"));
+      if (!dataLine) continue;
+      const payload = dataLine.slice("data:".length).trim();
+      if (!payload) continue;
+      try {
+        options.onEvent(JSON.parse(payload) as ChatEvent);
+      } catch (err) {
+        console.warn("Bad SSE payload", err, payload);
+      }
+    }
+  };
+
   try {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
       buffer += decoder.decode(value, { stream: true });
-
-      // SSE frames are separated by a blank line ("\n\n").
-      let sep: number;
-      while ((sep = buffer.indexOf("\n\n")) !== -1) {
-        const frame = buffer.slice(0, sep);
-        buffer = buffer.slice(sep + 2);
-
-        const dataLine = frame
-          .split("\n")
-          .find((l) => l.startsWith("data:"));
-        if (!dataLine) continue;
-        const payload = dataLine.slice("data:".length).trim();
-        if (!payload) continue;
-        try {
-          options.onEvent(JSON.parse(payload) as ChatEvent);
-        } catch (err) {
-          console.warn("Bad SSE payload", err, payload);
-        }
-      }
+      processBuffer();
+    }
+    // Process any remaining buffered frame
+    if (buffer.trim()) {
+      processBuffer();
     }
   } finally {
     reader.releaseLock();

@@ -10,7 +10,7 @@
     font-family: var(--font-jakarta), var(--font-inter), system-ui, -apple-system, sans-serif;
   }
 
-  /* Default Dark Obsidian Minimalist Theme */
+  /* ── Theme 1 · Cosmic Obsidian (dark, default) ─────────────────────── */
   :root,
   .dark {
     --background: 240 10% 3.9%;
@@ -43,53 +43,140 @@
 
     --radius: 0.875rem;
 
-    /* Base Orbit & Reactor Accent */
-    --base-orbit: #000000;
-    --accent-glow: #2BA648;
+    --base-orbit: #020616;
+    --accent-glow: #7C3AED;
 
-    /* Glassmorphism Variables */
     --glass-bg: rgba(12, 12, 16, 0.78);
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-bevel-top: rgba(255, 255, 255, 0.12);
     --glass-bevel-bottom: rgba(0, 0, 0, 0.6);
     --glass-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 var(--glass-bevel-top);
+
+    /* Landing-page hero + CTA tokens (theme-aware) */
+    --hero-heading:      #FFFFFF;
+    --hero-heading-alt:  #C7D0F5;
+    --hero-heading-end:  #8794E8;
+    --hero-subhead:      rgba(255, 255, 255, 0.62);
+    --hero-badge-bg:     rgba(255, 255, 255, 0.06);
+    --hero-badge-border: rgba(255, 255, 255, 0.15);
+    --hero-badge-fg:     rgba(255, 255, 255, 0.72);
+    --hero-badge-dot:    #7C3AED;
+    --cta-bg:            #FFFFFF;
+    --cta-fg:            #050816;
+    --cta-alt-bg:        rgba(255, 255, 255, 0.06);
+    --cta-alt-fg:        #FFFFFF;
+    --cta-alt-border:    rgba(255, 255, 255, 0.15);
+    --cta-icon:          #7C3AED;
   }
 
-  /* Light Platinum Minimalist Theme */
+  /* ── Theme 2 · Pearl Aurora (light) ────────────────────────────────── */
   .light {
-    --background: 0 0% 98%;
-    --foreground: 240 10% 3.9%;
+    --background: 30 25% 96%;
+    --foreground: 240 10% 8%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card: 30 30% 100%;
+    --card-foreground: 240 10% 8%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+    --popover: 30 30% 100%;
+    --popover-foreground: 240 10% 8%;
 
-    --primary: 246 80% 55%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 340 40% 55%;
+    --primary-foreground: 30 25% 98%;
 
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
+    --secondary: 30 20% 92%;
+    --secondary-foreground: 240 10% 8%;
 
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
+    --muted: 30 20% 92%;
+    --muted-foreground: 240 6% 42%;
 
-    --accent: 240 4.8% 93%;
-    --accent-foreground: 240 5.9% 10%;
+    --accent: 30 20% 88%;
+    --accent-foreground: 240 10% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 30 25% 98%;
 
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 246 80% 55%;
+    --border: 30 15% 84%;
+    --input: 30 15% 84%;
+    --ring: 340 40% 55%;
 
-    --glass-bg: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(228, 228, 231, 0.8);
+    --base-orbit: #F7F1EA;
+    --accent-glow: #C97381;
+
+    --glass-bg: rgba(255, 250, 246, 0.86);
+    --glass-border: rgba(180, 160, 150, 0.32);
     --glass-bevel-top: rgba(255, 255, 255, 0.95);
-    --glass-bevel-bottom: rgba(148, 163, 184, 0.2);
-    --glass-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.08), inset 0 1px 0 0 var(--glass-bevel-top);
+    --glass-bevel-bottom: rgba(150, 130, 120, 0.18);
+    --glass-shadow: 0 12px 32px -8px rgba(80, 40, 30, 0.10), inset 0 1px 0 0 var(--glass-bevel-top);
+
+    --hero-heading:      #1A1A1A;
+    --hero-heading-alt:  #5A3F45;
+    --hero-heading-end:  #8B4C58;
+    --hero-subhead:      rgba(30, 20, 20, 0.62);
+    --hero-badge-bg:     rgba(30, 20, 20, 0.06);
+    --hero-badge-border: rgba(30, 20, 20, 0.15);
+    --hero-badge-fg:     rgba(30, 20, 20, 0.72);
+    --hero-badge-dot:    #C97381;
+    --cta-bg:            #1A1A1A;
+    --cta-fg:            #F7F1EA;
+    --cta-alt-bg:        rgba(30, 20, 20, 0.05);
+    --cta-alt-fg:        #1A1A1A;
+    --cta-alt-border:    rgba(30, 20, 20, 0.18);
+    --cta-icon:          #C97381;
+  }
+
+  /* ── Theme 3 · Solar Amber (rich warm dark) ────────────────────────── */
+  .theme-amber {
+    --background: 30 60% 5%;
+    --foreground: 40 60% 88%;
+
+    --card: 30 55% 8%;
+    --card-foreground: 40 60% 88%;
+
+    --popover: 30 55% 8%;
+    --popover-foreground: 40 60% 88%;
+
+    --primary: 38 70% 55%;
+    --primary-foreground: 30 60% 5%;
+
+    --secondary: 30 40% 12%;
+    --secondary-foreground: 40 60% 88%;
+
+    --muted: 30 40% 12%;
+    --muted-foreground: 40 30% 62%;
+
+    --accent: 30 40% 15%;
+    --accent-foreground: 40 60% 88%;
+
+    --destructive: 0 60% 40%;
+    --destructive-foreground: 40 60% 88%;
+
+    --border: 30 40% 18%;
+    --input: 30 40% 18%;
+    --ring: 38 70% 55%;
+
+    --base-orbit: #0A0704;
+    --accent-glow: #E5A94B;
+
+    --glass-bg: rgba(20, 14, 6, 0.82);
+    --glass-border: rgba(229, 169, 75, 0.14);
+    --glass-bevel-top: rgba(255, 217, 138, 0.18);
+    --glass-bevel-bottom: rgba(0, 0, 0, 0.6);
+    --glass-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 0 var(--glass-bevel-top);
+
+    --hero-heading:      #F5E6C8;
+    --hero-heading-alt:  #FFD98A;
+    --hero-heading-end:  #C9782C;
+    --hero-subhead:      rgba(245, 230, 200, 0.62);
+    --hero-badge-bg:     rgba(229, 169, 75, 0.08);
+    --hero-badge-border: rgba(229, 169, 75, 0.22);
+    --hero-badge-fg:     rgba(245, 230, 200, 0.75);
+    --hero-badge-dot:    #E5A94B;
+    --cta-bg:            #E5A94B;
+    --cta-fg:            #0A0704;
+    --cta-alt-bg:        rgba(229, 169, 75, 0.08);
+    --cta-alt-fg:        #F5E6C8;
+    --cta-alt-border:    rgba(229, 169, 75, 0.22);
+    --cta-icon:          #E5A94B;
   }
 
   body {
@@ -138,6 +225,16 @@
     font-weight: 700;
     letter-spacing: 0.24em;
     background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .light .polaris-luxury-logo {
+    background: linear-gradient(135deg, #1a1a1a 0%, #4a3238 50%, #8b4c58 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .theme-amber .polaris-luxury-logo {
+    background: linear-gradient(135deg, #FFE9BA 0%, #E5A94B 50%, #C9782C 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }

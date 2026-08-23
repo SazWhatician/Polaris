@@ -107,9 +107,9 @@ export default function LoginPage() {
         {/* Top Branding Header */}
         <div className="relative z-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform overflow-hidden">
               <Image
-                src="/polaris-logo.png"
+                src="/polaris-standalone.png"
                 alt="Polaris Logo"
                 width={32}
                 height={32}
@@ -187,7 +187,7 @@ export default function LoginPage() {
         {/* Top Action Bar */}
         <div className="flex items-center justify-between w-full">
           <Link href="/" className="lg:hidden flex items-center gap-2">
-            <Image src="/polaris-logo.png" alt="Logo" width={28} height={28} />
+            <Image src="/polaris-standalone.png" alt="Logo" width={28} height={28} className="object-contain" />
             <span className="font-bold text-base tracking-wider">POLARIS</span>
           </Link>
           <div className="ml-auto">
