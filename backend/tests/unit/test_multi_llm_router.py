@@ -88,9 +88,9 @@ def test_create_default_llm_router_task_specialization():
         task="chat",
     )
     names = [p.provider_name for p in chat_router.providers]
-    assert names[0].startswith("nvidia")
-    assert names[1] == "groq"
-    assert names[2] == "gemini"
+    assert names[0] == "groq"
+    assert names[1] == "gemini"
+    assert names[2].startswith("nvidia")
 
     graph_router = create_default_llm_router(
         groq_api_key="g1",
@@ -100,8 +100,8 @@ def test_create_default_llm_router_task_specialization():
     )
     graph_names = [p.provider_name for p in graph_router.providers]
     assert graph_names[0] == "groq"
-    assert graph_names[1].startswith("nvidia")
-    assert graph_names[2] == "gemini"
+    assert graph_names[1] == "gemini"
+    assert graph_names[2].startswith("nvidia")
 
     syllabus_router = create_default_llm_router(
         groq_api_key="g1",

@@ -41,10 +41,15 @@ export function cleanModelAnswer(raw: string): string {
   // 1. Remove complete <think>...</think> blocks
   text = text.replace(/<think>[\s\S]*?<\/think>/gi, "");
 
-  // 2. If model is currently inside an unclosed <think> tag during streaming, hide it
+  // 2. If text still has <think>, check if there is an unclosed tag
   if (text.includes("<think>")) {
     const startIdx = text.indexOf("<think>");
-    text = text.slice(0, startIdx);
+    const endIdx = text.indexOf("</think>");
+    if (endIdx !== -1) {
+      text = text.slice(0, startIdx) + " " + text.slice(endIdx + 8);
+    } else {
+      text = text.slice(0, startIdx);
+    }
   }
 
   // 3. Strip rule-checking checklists or meta-evaluation text if emitted
@@ -61,7 +66,17 @@ export function cleanModelAnswer(raw: string): string {
     }
   }
 
-  return text.trim();
+  const cleaned = text.trim();
+  // If cleaned output has text, return it.
+  if (cleaned) return cleaned;
+
+  // If streaming and currently inside <think>, return empty to show loader
+  if (raw.includes("<think>") && !raw.includes("</think>")) {
+    return "";
+  }
+
+  // Otherwise return raw trimmed content so answer is never lost
+  return raw.trim();
 }
 
 export function ChatMessage({
@@ -75,7 +90,9 @@ export function ChatMessage({
   const [openCitation, setOpenCitation] = useState<Citation | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const displayAnswer = role === "assistant" ? cleanModelAnswer(content) : content;
+  const cleaned = role === "assistant" ? cleanModelAnswer(content) : content;
+  // If stream finished and cleaned is empty, guarantee fallback to raw content
+  const displayAnswer = !streaming && !cleaned && content ? content.trim() : cleaned;
   const isThinking = role === "assistant" && streaming && !displayAnswer;
 
   const handleCopy = (text: string) => {

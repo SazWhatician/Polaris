@@ -55,8 +55,8 @@ class Settings(BaseSettings):
     # --- LLM ---
     groq_api_key: str | None = None
     groq_api_keys: str | None = None  # comma-separated list of Groq keys
-    groq_model: str = "qwen/qwen3.6-27b"
-    groq_judge_model: str = "qwen/qwen3.6-27b"  # used by answer eval
+    groq_model: str = "openai/gpt-oss-120b"
+    groq_judge_model: str = "openai/gpt-oss-120b"  # used by answer eval
 
     gemini_api_key: str | None = None
     gemini_api_keys: str | None = None  # comma-separated list of Gemini keys

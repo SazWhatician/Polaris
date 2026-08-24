@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from app.repositories.qdrant_repo import QdrantRepository
     from app.services.embedding_service import EmbeddingService
     from app.services.groq_client import GroqClient
+    from app.services.rerank_service import RerankService
 
 log = get_logger(__name__)
 tracer = trace.get_tracer(__name__)
@@ -40,12 +41,14 @@ class RagService:
         groq: GroqClient,
         default_top_k: int,
         max_context_chars: int,
+        reranker: RerankService | None = None,
     ) -> None:
         self._embedder = embedder
         self._qdrant_repo = qdrant_repo
         self._groq = groq
         self._default_top_k = default_top_k
         self._max_context_chars = max_context_chars
+        self._reranker = reranker
 
     async def stream_answer(
         self,
@@ -61,16 +64,32 @@ class RagService:
             qvec = await self._embedder.embed_one(question)
 
         with tracer.start_as_current_span("rag.search") as span:
-            span.set_attribute("rag.top_k", effective_top_k)
+            # First stage: candidate retrieval with broader top_k for cross-encoder reranker
+            candidate_k = max(20, effective_top_k * 3) if self._reranker else effective_top_k
+            span.set_attribute("rag.candidate_k", candidate_k)
+            span.set_attribute("rag.target_top_k", effective_top_k)
             if document_ids:
                 span.set_attribute("rag.document_scope", len(document_ids))
-            chunks = await self._qdrant_repo.search(
+
+            candidates = await self._qdrant_repo.search(
                 user_id=user_id,
                 query_vector=qvec,
-                top_k=effective_top_k,
+                top_k=candidate_k,
                 document_ids=document_ids,
             )
-            span.set_attribute("rag.retrieved", len(chunks))
+            span.set_attribute("rag.candidates_retrieved", len(candidates))
+
+            # Second stage: FlashRank cross-encoder reranking
+            if self._reranker and candidates:
+                chunks = self._reranker.rerank(
+                    query=question,
+                    chunks=candidates,
+                    top_k=effective_top_k,
+                )
+            else:
+                chunks = candidates[:effective_top_k]
+
+            span.set_attribute("rag.final_chunks", len(chunks))
 
         # Send citations first so the UI can render chips before tokens arrive.
         yield {

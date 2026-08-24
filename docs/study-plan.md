@@ -75,11 +75,11 @@ flowchart LR
 * **Deliverables:** `arq` worker container, PaddleOCR page processing pipeline, document status transitions.
 * **ADRs:** ADR 0004 (arq vs Celery/RQ).
 
-### Phase 3 — RAG Chat Engine + Eval Harness (MVP)
-* **Focus:** Streamed grounded RAG chat with citations and continuous evaluation suite.
-* **GenAI / Engineering Concepts:** Multi-tenant vector retrieval, SSE token streaming, prompt versioning, offline evaluation harness (Precision@K, MRR, LLM-as-Judge), CI eval regression gating.
-* **Deliverables:** `services/rag_service.py`, `evals/` dataset & runners, `/chat` interface with citation chips, LangSmith trace integration.
-* **ADRs:** ADR 0005 (Eval Methodology), ADR 0006 (Chunking Strategy).
+### Phase 3 — Two-Stage RAG Chat Engine + FlashRank Reranking + Eval Harness (MVP)
+* **Focus:** Streamed grounded RAG chat with two-stage retrieval (Dense Qdrant Search + Ultra-fast FlashRank Cross-Encoder reranking) and continuous evaluation suite.
+* **GenAI / Engineering Concepts:** Bi-Encoder vs. Cross-Encoder tradeoffs, multi-tenant vector retrieval, ONNX CPU cross-encoder execution (<15ms), SSE token streaming, prompt versioning, offline evaluation harness (Precision@K, MRR, LLM-as-Judge), CI eval regression gating.
+* **Deliverables:** `services/rag_service.py`, `services/rerank_service.py`, `evals/` dataset & runners, `/chat` interface with citation chips, LangSmith trace integration.
+* **ADRs:** ADR 0005 (Eval Methodology), ADR 0006 (Chunking Strategy), ADR 0015 (Two-Stage Reranking via FlashRank).
 
 ### Phase 4 — Syllabus Intelligence
 * **Focus:** Extracting topic trees from syllabi and mapping coverage scores against user notes.
@@ -105,10 +105,10 @@ flowchart LR
 * **Deliverables:** `planner_agent.py`, schedule diff algorithm, `/plan` calendar view.
 * **ADRs:** ADR 0010 (Plan Representation & Diffing).
 
-### Phase 8 — Knowledge Graph Engine
-* **Focus:** Concept extraction and interactive visualization of relationship networks.
-* **GenAI / Engineering Concepts:** SpaCy NER + LLM triple extraction `(entity, relation, entity)`, NetworkX community detection, Cytoscape node graph visualization.
-* **Deliverables:** `concept_extraction.py`, `graph_repo.py`, `/graph` interactive visualization UI.
+### Phase 8 — Knowledge Graph Engine & Force-Directed Physics Topology
+* **Focus:** Concept extraction and interactive 2D/3D physics-driven force-directed graph with prerequisite flow particles.
+* **GenAI / Engineering Concepts:** SpaCy NER + LLM triple extraction `(entity, relation, entity)`, NetworkX community detection, `react-force-graph` d3-force physics simulation, glowing importance halos, directional particle flows for prerequisite mastery.
+* **Deliverables:** `concept_extraction.py`, `graph_repo.py`, `knowledge-graph-viewer.tsx`, `/graph` interactive physics visualization UI.
 * **ADRs:** ADR 0011 (Graph Storage: Firestore + NetworkX vs. Graph DB).
 
 ### Phase 9 — Academic Digital Twin
@@ -127,6 +127,16 @@ flowchart LR
 * **Focus:** Privacy-preserving on-device browser agent observing study habits locally.
 * **GenAI / Engineering Concepts:** On-device WebAssembly LLMs (LiteRT.js / Gemma 2B), DOM extraction, zero-server-cost ambient agents.
 * **Deliverables:** `PageAgent` DOM extractor, Chrome Extension / web worker runner, local sync service.
+
+### Phase 12 — UI/UX Luxury Overhaul & WebGL2 Shaders
+* **Focus:** Haute Intelligence design system, raw WebGL2 additive aurora shader, stenciled Navier-Stokes fluid logo, and 3D reactor footer.
+* **GenAI / Engineering Concepts:** WebGL2 custom fragment shaders, pointer smoothing dynamics, multi-theme colorway matrices.
+* **Deliverables:** `polaris-aurora.tsx`, `polaris-liquid-p.tsx`, `reactor-footer.tsx`, `crystal-glow.tsx`.
+
+### Phase 13 — High-Precision Retrieval & Spatial Concept Navigation
+* **Focus:** Two-stage RAG precision with FlashRank cross-encoder reranking and interactive physics-directed graph exploration with `react-force-graph-2d`.
+* **GenAI / Engineering Concepts:** Bi-encoder vs. Cross-encoder latency/precision Pareto frontier, zero-GPU ONNX execution, d3-force cluster gravity, directional prerequisite particle animation, deep concept inspection linked to RAG chat.
+* **Deliverables:** `backend/app/services/rerank_service.py`, `backend/tests/unit/test_rerank_service.py`, `frontend/components/knowledge-graph-viewer.tsx`.
 
 ---
 

@@ -69,12 +69,18 @@ def _build_app(settings: Settings) -> FastAPI:
             else:
                 app_.state.gemini = None
 
+            from app.services.rerank_service import RerankService
+
+            reranker = RerankService()
+            app_.state.reranker = reranker
+
             app_.state.rag_service = RagService(
                 embedder=embedder,
                 qdrant_repo=qdrant_repo,
                 groq=groq,
                 default_top_k=settings.rag_top_k,
                 max_context_chars=settings.rag_max_context_chars,
+                reranker=reranker,
             )
             app_.state.qdrant_repo = qdrant_repo
             app_.state.qdrant_client = qdrant_client
@@ -83,6 +89,7 @@ def _build_app(settings: Settings) -> FastAPI:
                 qdrant=settings.qdrant_url,
                 collection=settings.qdrant_collection_name,
                 model=settings.groq_model,
+                reranker="flashrank",
             )
         except Exception as exc:  # noqa: BLE001
             app_.state.rag_service = None

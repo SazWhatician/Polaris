@@ -47,7 +47,7 @@ class GroqClient:
         prompt: str,
         *,
         temperature: float = 0.2,
-        max_tokens: int = 1024,
+        max_tokens: int = 2048,
     ) -> AsyncIterator[str]:
         attempts = 0
         max_attempts = self._key_pool.total_keys
@@ -80,7 +80,7 @@ class GroqClient:
         prompt: str,
         *,
         temperature: float = 0.0,
-        max_tokens: int = 1024,
+        max_tokens: int = 2048,
         json_mode: bool = False,
     ) -> str:
         """Non-streaming; used by the eval harness (LLM-as-judge) and structured JSON tasks."""
