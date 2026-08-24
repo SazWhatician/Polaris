@@ -424,3 +424,114 @@ footer.reactor-zone {
     text-align: left;
   }
 }
+
+/* ==========================================================================
+   CRYSTAL GLOW & SPARKLE HOVER SYSTEM
+   ========================================================================== */
+
+.crystal-glow-wrapper {
+  --padding: 6px 14px;
+  --hover: 0;
+  --pos: 0;
+  padding: var(--padding);
+  border-radius: 16px;
+  text-decoration: none;
+  color: transparent;
+  position: relative;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.crystal-glow-wrapper.crystal-glow-compact {
+  --padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.crystal-glow-wrapper:hover {
+  --hover: 1;
+  --pos: 1;
+}
+
+.crystal-glow-wrapper .crystal-text-base {
+  display: inline-block;
+  font-size: var(--font-size, 20px);
+  text-decoration: none;
+  color: transparent;
+  text-shadow:
+    calc(var(--hover) * (var(--font-size) * -0)) calc(var(--hover) * (var(--font-size) * 0)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.02)) calc(var(--hover) * (var(--font-size) * 0.02)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.04)) calc(var(--hover) * (var(--font-size) * 0.04)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.06)) calc(var(--hover) * (var(--font-size) * 0.06)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.08)) calc(var(--hover) * (var(--font-size) * 0.08)) var(--shadow),
+    calc(var(--hover) * (var(--font-size) * -0.10)) calc(var(--hover) * (var(--font-size) * 0.10)) var(--shadow);
+  transform: translate(calc(var(--hover) * (var(--font-size) * 0.08)), calc(var(--hover) * (var(--font-size) * -0.08)));
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.crystal-glow-wrapper .crystal-text-glare {
+  position: absolute;
+  inset: 0;
+  padding: var(--padding);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size, 20px);
+  background: linear-gradient(
+    108deg,
+    transparent 0 55%,
+    var(--glare) 55% 60%,
+    transparent 60% 70%,
+    var(--glare) 70% 85%,
+    transparent 85%
+  ) calc(var(--pos) * -200%) 0% / 200% 100%, var(--color);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  z-index: 2;
+  text-shadow: none;
+  pointer-events: none;
+  transition: background-position var(--glare-duration, 1s) ease-in-out;
+}
+
+.crystal-glow-wrapper svg {
+  position: absolute;
+  z-index: 3;
+  width: calc(var(--font-size, 20px) * 0.65);
+  aspect-ratio: 1;
+  pointer-events: none;
+  top: calc(var(--y, 50) * 1%);
+  left: calc(var(--x, 0) * 1%);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.crystal-glow-wrapper svg path {
+  fill: var(--glare);
+}
+
+.crystal-glow-wrapper:hover svg {
+  opacity: 1;
+  animation: crystalSparkle 0.85s calc((var(--delay-step) * var(--d)) * 1s) both;
+}
+
+@keyframes crystalSparkle {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(var(--s, 1.1)) rotate(90deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0) rotate(180deg);
+  }
+}
+
+.crystal-glow-wrapper svg:nth-of-type(1) { --x: 2; --y: 18; --s: 1.15; --d: 1; --delay-step: 0.12; }
+.crystal-glow-wrapper svg:nth-of-type(2) { --x: 18; --y: 82; --s: 1.30; --d: 2; --delay-step: 0.12; }
+.crystal-glow-wrapper svg:nth-of-type(3) { --x: 48; --y: 35; --s: 1.10; --d: 3; --delay-step: 0.12; }
+.crystal-glow-wrapper svg:nth-of-type(4) { --x: 78; --y: 65; --s: 0.95; --d: 2; --delay-step: 0.12; }
+.crystal-glow-wrapper svg:nth-of-type(5) { --x: 98; --y: 25; --s: 0.85; --d: 4; --delay-step: 0.12; }

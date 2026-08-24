@@ -13,6 +13,12 @@ import { Button } from "@/components/ui/button";
 import { HeroWave } from "@/components/ui/ai-input-hero";
 import { ChatMessage } from "@/components/chat-message";
 
+import {
+  getStoredChatSessions,
+  saveChatSession,
+  type ChatSession,
+} from "@/lib/chat-history-store";
+
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -26,6 +32,7 @@ function ChatContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [sessionId, setSessionId] = useState<string>(() => cryptoId());
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -35,6 +42,7 @@ function ChatContent() {
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const initialQueryExecuted = useRef(false);
+  const sessionLoaded = useRef(false);
   useGsapEntrance(".chat-msg-reveal", 0.05);
 
   useEffect(() => {
@@ -44,6 +52,23 @@ function ChatContent() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  // Load session from ?session= param if provided
+  useEffect(() => {
+    const sParam = searchParams.get("session");
+    if (sParam && !sessionLoaded.current) {
+      sessionLoaded.current = true;
+      const sessions = getStoredChatSessions();
+      const match = sessions.find((s) => s.id === sParam);
+      if (match) {
+        setSessionId(match.id);
+        setMessages(match.messages);
+        if (match.model) {
+          setSelectedModel(match.model.includes("Groq") ? "groq-llama3-70b" : "nvidia-nim-embed");
+        }
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const qParam = searchParams.get("q");
@@ -61,24 +86,30 @@ function ChatContent() {
     const userMsg: Message = { id: cryptoId(), role: "user", content: q, timestamp: timeStr };
     const assistantMsg: Message = { id: cryptoId(), role: "assistant", content: "", timestamp: timeStr };
 
-    setMessages((m) => [...m, userMsg, assistantMsg]);
+    const updatedMsgs = [...messages, userMsg, assistantMsg];
+    setMessages(updatedMsgs);
     setInput("");
     setStreaming(true);
 
     const controller = new AbortController();
     abortRef.current = controller;
 
+    let accumulatedCitations: Citation[] = [];
+    let accumulatedContent = "";
+
     try {
       await streamChat(q, {
         signal: controller.signal,
         onEvent: (event) => {
           if (event.type === "citations") {
+            accumulatedCitations = event.citations;
             setMessages((m) =>
               m.map((msg) =>
                 msg.id === assistantMsg.id ? { ...msg, citations: event.citations } : msg
               )
             );
           } else if (event.type === "token") {
+            accumulatedContent += event.content;
             setMessages((m) =>
               m.map((msg) =>
                 msg.id === assistantMsg.id
@@ -89,6 +120,26 @@ function ChatContent() {
           }
         },
       });
+
+      // Save complete conversation turn to persistent chat history
+      const finalAssistantMsg: Message = {
+        ...assistantMsg,
+        content: accumulatedContent,
+        citations: accumulatedCitations,
+      };
+      const finalMsgs = [...messages, userMsg, finalAssistantMsg];
+
+      const currentSession: ChatSession = {
+        id: sessionId,
+        userId: user?.uid,
+        title: q.slice(0, 50) + (q.length > 50 ? "..." : ""),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        messages: finalMsgs,
+        model: selectedModel === "groq-llama3-70b" ? "Groq Llama-3.1 70B" : "NVIDIA NIM Grounded",
+        citationCount: finalMsgs.reduce((acc, m) => acc + (m.citations?.length || 0), 0),
+      };
+      saveChatSession(currentSession);
     } catch (err) {
       if ((err as Error).name !== "AbortError") {
         const errorDesc = err instanceof Error ? err.message : String(err);
@@ -111,6 +162,12 @@ function ChatContent() {
       setStreaming(false);
       abortRef.current = null;
     }
+  };
+
+  const handleNewChat = () => {
+    setSessionId(cryptoId());
+    setMessages([]);
+    router.replace("/chat");
   };
 
   const submit = async (e?: FormEvent) => {
@@ -169,7 +226,7 @@ function ChatContent() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setMessages([])}
+                    onClick={handleNewChat}
                     className="h-7 text-[11px] gap-1 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800"
                   >
                     <RefreshCw className="h-3 w-3" />

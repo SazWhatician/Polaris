@@ -52,11 +52,25 @@ export interface LiquidPalette {
   color4: string;
 }
 
+export interface LightBloomPalette {
+  variant: "bloom" | "shafts";
+  direction: "bottom" | "top" | "left" | "right";
+  background: string;
+  baseColor: string;
+  accentColor: string;
+  speed: number;
+  hover: number;
+  light: { rise: number; spread: number };
+  shafts: { count: number; amount: number; drift: number };
+  finish: { grain: number; vignette: number };
+}
+
 export interface PolarisTheme {
   id: PolarisThemeName;
   displayName: string;
   aurora: AuroraPalette;
   liquid: LiquidPalette;
+  lightBloom: LightBloomPalette;
 }
 
 export const POLARIS_THEMES: Record<PolarisThemeName, PolarisTheme> = {
@@ -99,6 +113,18 @@ export const POLARIS_THEMES: Record<PolarisThemeName, PolarisTheme> = {
       color3: "#EC4899",   // magenta pop
       color4: "#FFFFFF",   // pure white highlight
     },
+    lightBloom: {
+      variant: "shafts",
+      direction: "bottom",
+      background: "#020616",
+      baseColor: "#6B2BF5",
+      accentColor: "#EFE6FF",
+      speed: 90,
+      hover: 115,
+      light: { rise: 78, spread: 72 },
+      shafts: { count: 18, amount: 72, drift: 75 },
+      finish: { grain: 12, vignette: 28 },
+    },
   },
 
   /* ── 2 · Pearl Aurora — cream base with soft peachy / mauve iridescence */
@@ -140,6 +166,18 @@ export const POLARIS_THEMES: Record<PolarisThemeName, PolarisTheme> = {
       color3: "#DB2777",   // bold pink
       color4: "#F5E8ED",   // pale rose highlight
     },
+    lightBloom: {
+      variant: "bloom",
+      direction: "bottom",
+      background: "#FAF6F0",
+      baseColor: "#E8B4CB",
+      accentColor: "#FFFFFF",
+      speed: 65,
+      hover: 95,
+      light: { rise: 68, spread: 76 },
+      shafts: { count: 12, amount: 40, drift: 45 },
+      finish: { grain: 6, vignette: 12 },
+    },
   },
 
   /* ── 3 · Solar Amber — espresso base with copper / gold aurora */
@@ -180,6 +218,18 @@ export const POLARIS_THEMES: Record<PolarisThemeName, PolarisTheme> = {
       color2: "#F59E0B",   // amber
       color3: "#FCD34D",   // bright gold
       color4: "#FFFBEB",   // cream white
+    },
+    lightBloom: {
+      variant: "shafts",
+      direction: "bottom",
+      background: "#0B0703",
+      baseColor: "#C2410C",
+      accentColor: "#FCD34D",
+      speed: 95,
+      hover: 120,
+      light: { rise: 82, spread: 72 },
+      shafts: { count: 18, amount: 76, drift: 80 },
+      finish: { grain: 14, vignette: 30 },
     },
   },
 };

@@ -42,6 +42,13 @@ const NAV_GROUPS: NavGroup[] = [
     title: "Core Workspace",
     items: [
       {
+        href: "/user",
+        label: "User Profile & Hub",
+        description: "Uploads, chat history & community",
+        icon: Sparkles,
+        badge: "User",
+      },
+      {
         href: "/dashboard",
         label: "Course Ingestion",
         description: "PDF docs, OCR & Vector indexing",
@@ -322,19 +329,24 @@ export function NavDrawer() {
           {user ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between px-2">
-                <div className="flex items-center gap-2 min-w-0">
+                <Link
+                  href="/user"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2 min-w-0 hover:opacity-80 transition-opacity"
+                  title="View User Profile, Uploads & Community"
+                >
                   <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs uppercase">
-                    {user.email?.charAt(0) || "U"}
+                    {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-foreground truncate">
-                      {user.email?.split("@")[0]}
+                      {user.displayName || user.email?.split("@")[0]}
                     </p>
-                    <p className="text-[10px] text-muted-foreground font-mono truncate max-w-[150px]">
+                    <p className="text-[10px] text-muted-foreground font-mono truncate max-w-[130px]">
                       {user.email}
                     </p>
                   </div>
-                </div>
+                </Link>
 
                 <ThemeToggle />
               </div>

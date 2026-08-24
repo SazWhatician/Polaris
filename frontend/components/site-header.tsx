@@ -149,14 +149,37 @@ export function SiteHeader() {
 
           <ThemeToggle />
 
-          {/* User Info / Sign Out */}
+          {/* User Profile Avatar Link */}
+          {user ? (
+            <Link
+              href="/user"
+              className="flex items-center gap-2 p-1.5 pr-2.5 rounded-xl border border-border/60 bg-card/80 hover:bg-muted/80 text-foreground transition-all hover:scale-105 shadow-2xs group"
+              title="View Profile, Uploads & History"
+            >
+              <div className="w-6 h-6 rounded-lg bg-primary/20 text-primary font-bold text-xs flex items-center justify-center border border-primary/30 uppercase">
+                {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
+              </div>
+              <span className="hidden sm:inline text-xs font-bold text-muted-foreground group-hover:text-foreground truncate max-w-[90px]">
+                {user.displayName || user.email?.split("@")[0] || "Profile"}
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-all"
+            >
+              Sign In
+            </Link>
+          )}
+
+          {/* Sign Out Action */}
           {user && (
-            <div className="flex items-center gap-2 pl-1">
+            <div className="hidden sm:flex items-center gap-2 pl-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={signOut}
-                className="hidden sm:flex text-xs font-semibold text-muted-foreground hover:text-destructive hover:bg-destructive/10 gap-1.5 h-8 px-2.5 rounded-xl"
+                className="text-xs font-semibold text-muted-foreground hover:text-destructive hover:bg-destructive/10 gap-1.5 h-8 px-2.5 rounded-xl"
                 title="Sign Out"
               >
                 <LogOut className="h-3.5 w-3.5" />

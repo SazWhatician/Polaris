@@ -301,7 +301,7 @@ export function PolarisAurora({
     // Palette-derived hex→float colours are cached per unique palette object.
     // The draw loop refreshes this cache when the ref points at a new palette.
     let cachedPalette: AuroraPalette | null = null;
-    let c: {
+    const c: {
       base: [number, number, number];
       bgDepth: [number, number, number];
       atmosphere1: [number, number, number];
