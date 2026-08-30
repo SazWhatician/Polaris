@@ -187,7 +187,7 @@ function ChatContent() {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen text-foreground flex flex-col relative overflow-x-hidden">
+    <div className="min-h-screen text-foreground flex flex-col relative overflow-x-hidden pb-12">
       <SiteHeader />
 
       {/* Unified Shader Screen Wrapper - stays mounted during whole chat */}

@@ -8,7 +8,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Move3d, Loader2, Sparkles, Palette } from "lucide-react";
+import { Move3d, Loader2 } from "lucide-react";
 
 export type ModelColorway =
   | "emerald"
@@ -170,7 +170,7 @@ export function ReactorFooter({
   selectedColorwayRef.current = selectedColorway;
 
   // Apply colorway transitions to 3D materials and lights
-  const handleColorwayChange = (cwKey: ModelColorway) => {
+  const _handleColorwayChange = (cwKey: ModelColorway) => {
     setSelectedColorway(cwKey);
     const cfg = MODEL_COLORWAYS[cwKey];
     if (!cfg) return;
@@ -239,6 +239,7 @@ export function ReactorFooter({
       });
     }
   };
+  void _handleColorwayChange;
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -632,55 +633,14 @@ export function ReactorFooter({
             </div>
           </div>
 
-          {/* Interactive Model Colorway Selector Bar */}
-          <div className="w-full py-4 flex flex-col sm:flex-row items-center justify-between gap-4 pointer-events-auto bg-black/40 backdrop-blur-md rounded-2xl px-5 py-3 border border-white/10 my-4 shadow-2xl">
-            <div className="flex items-center gap-2 text-xs font-mono text-white/70">
-              <Palette className="w-3.5 h-3.5 text-primary" />
-              <span className="tracking-widest uppercase font-semibold text-[11px]">Chamber Colorway:</span>
-              <span className="text-white font-bold ml-1">{MODEL_COLORWAYS[selectedColorway].label}</span>
-            </div>
-
-            {/* Colorway Swatch Chips */}
-            <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-center">
-              {(Object.keys(MODEL_COLORWAYS) as ModelColorway[]).map((cwKey) => {
-                const cw = MODEL_COLORWAYS[cwKey];
-                const isActive = selectedColorway === cwKey;
-                return (
-                  <button
-                    key={cwKey}
-                    type="button"
-                    onClick={() => handleColorwayChange(cwKey)}
-                    className={`group relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 ${
-                      isActive
-                        ? "bg-white/15 border-white/40 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)] scale-105"
-                        : "bg-white/[0.04] border-white/10 text-white/60 hover:text-white hover:bg-white/[0.08] hover:border-white/20"
-                    } border`}
-                    title={cw.label}
-                  >
-                    {cwKey === "aurora" ? (
-                      <Sparkles className="w-3 h-3 text-pink-400 animate-spin" />
-                    ) : (
-                      <span
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform group-hover:scale-110 shadow-xs"
-                        style={{ backgroundColor: cw.dotColor }}
-                      />
-                    )}
-                    <span className="text-[10px] tracking-wider uppercase font-medium">{cw.label.split(" ")[1] || cw.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           {/* Bottom HUD Bar */}
           <div className="w-full pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-white/50 border-t border-white/10 pointer-events-auto">
             <div className="flex items-center gap-3">
               <div className="px-3 py-1 rounded-full bg-white/[0.05] border border-white/10 flex items-center gap-2">
                 <Move3d className="w-3.5 h-3.5 text-[#2BA648]" />
-                <span className="text-[10px] tracking-widest uppercase">3D CORE</span>
+                <span className="text-[10px] tracking-widest uppercase">3D CHAMBER CORE</span>
                 <span
-                  className="w-1.5 h-1.5 rounded-full animate-pulse"
-                  style={{ backgroundColor: MODEL_COLORWAYS[selectedColorway].dotColor }}
+                  className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
                 />
               </div>
             </div>
@@ -695,7 +655,7 @@ export function ReactorFooter({
                 />
               </div>
               <span className="hidden sm:inline border-l border-white/20 pl-3">
-                MADE WITH LOVE <span className="text-[#2BA648] font-bold">POLARIS.</span>
+                AUTONOMOUS RESEARCH <span className="text-[#2BA648] font-bold">POLARIS.</span>
               </span>
             </div>
           </div>

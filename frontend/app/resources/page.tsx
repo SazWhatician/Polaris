@@ -61,7 +61,7 @@ export default function ResourcesPage() {
   };
 
   return (
-    <div className="min-h-screen text-foreground pb-16">
+    <div className="min-h-screen text-foreground pb-32">
       <SiteHeader />
       <main ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <div className="gsap-resources">

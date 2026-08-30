@@ -1,28 +1,25 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
-import { ArrowRight, LogIn, ShieldCheck, Zap, Layers, ChevronRight, User } from "lucide-react";
+import { Zap, Layers, ShieldCheck, ChevronRight, ArrowRight } from "lucide-react";
 
-import { AnimatedShaderCard } from "@/components/ui/animated-shader-card";
-import { LightBloom } from "@/components/ui/light-bloom";
-import { CrystalGlow } from "@/components/ui/crystal-glow";
-import { PolarisLiquidP } from "@/components/ui/polaris-liquid-p";
-import { useAuth } from "@/lib/auth-context";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { LandingLoader } from "@/components/landing/landing-loader";
+import { NotchNavbar } from "@/components/landing/notch-navbar";
+import { OpeningHeroScene } from "@/components/landing/opening-hero-scene";
+import { CascadeHandScrollSection } from "@/components/landing/cascade-hand-scroll-section";
+import { DreamyCloudsParallaxSection } from "@/components/landing/dreamy-clouds-parallax-section";
 import { ReactorFooter } from "@/components/reactor-footer";
-import { getTheme } from "@/lib/polaris-themes";
+import { AnimatedShaderCard } from "@/components/ui/animated-shader-card";
+import { CrystalGlow } from "@/components/ui/crystal-glow";
+import { useAuth } from "@/lib/auth-context";
 
 export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
-  const { resolvedTheme, theme } = useTheme();
-  const palette = getTheme(resolvedTheme ?? theme);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  const handlePrimaryClick = () => {
+  const handlePrimaryCta = () => {
     if (user) {
       router.push("/dashboard");
     } else {
@@ -30,148 +27,32 @@ export default function Home() {
     }
   };
 
-  const handleSecondaryClick = () => {
-    router.push("/login");
-  };
-
   return (
-    <div className="min-h-screen text-foreground relative selection:bg-primary/30 selection:text-foreground overflow-x-hidden">
-      {/* Light Bloom — dynamic theme-aware cinematic WebGL background */}
-      <LightBloom fixedFullscreen zIndex={0} {...palette.lightBloom} />
+    <div className="relative min-h-screen bg-black text-foreground selection:bg-primary/30 selection:text-foreground">
+      {/* 1. INITIAL CURTAIN SPLIT LOADER */}
+      <LandingLoader
+        onComplete={() => setIsLoaded(true)}
+        minDisplayTime={900}
+      />
 
-      {/* Top Floating Luxury Glass Header */}
-      <header className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-5 max-w-7xl mx-auto w-full">
-        <Link href="/" className="flex items-center gap-3.5 group">
-          <div className="relative w-10 h-10 rounded-2xl bg-white/[0.04] backdrop-blur-2xl border border-white/15 flex items-center justify-center overflow-hidden shadow-2xl group-hover:scale-105 group-hover:border-primary/40 transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <Image
-              src="/polaris-standalone.png"
-              alt="Polaris Logo"
-              width={28}
-              height={28}
-              className="object-contain relative z-10"
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="polaris-luxury-logo text-sm tracking-[0.24em] font-extrabold uppercase">
-              POLARIS
-            </span>
-            <span className="text-[9px] font-mono text-white/40 tracking-[0.2em] uppercase">
-              Haute Intelligence
-            </span>
-          </div>
-        </Link>
+      {/* 2. ORGANIC NOTCH NAVBAR */}
+      <NotchNavbar />
 
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          {user ? (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/user"
-                className="px-4 py-2.5 rounded-2xl bg-white/[0.08] hover:bg-white/[0.15] border border-white/15 text-white font-bold text-xs flex items-center gap-2 backdrop-blur-2xl transition-all hover:scale-105 active:scale-95 shadow-md"
-                title="View User Profile & Uploads"
-              >
-                <User className="h-3.5 w-3.5 text-primary" />
-                <span className="hidden sm:inline">Profile</span>
-              </Link>
-              <Link
-                href="/dashboard"
-                className="px-5 py-2.5 rounded-2xl bg-white text-black font-bold text-xs flex items-center gap-2 hover:bg-slate-200 transition-all shadow-xl hover:scale-105 active:scale-95"
-              >
-                <span>Workspace</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-          ) : (
-            <Link
-              href="/login"
-              className="px-5 py-2.5 rounded-2xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/15 text-white font-bold text-xs flex items-center gap-2 backdrop-blur-2xl transition-all hover:scale-105 active:scale-95 shadow-md hover:border-primary/30"
-            >
-              <LogIn className="h-3.5 w-3.5 text-primary" />
-              <span>Sign In</span>
-            </Link>
-          )}
-        </div>
-      </header>
+      {/* 3. MAIN SCROLLABLE CONTENT (Curtain Layer over Drawer Footer) */}
+      <div className="relative z-10 bg-black shadow-[0_50px_100px_rgba(0,0,0,0.95)] border-b border-white/[0.08] rounded-b-[36px] sm:rounded-b-[56px] overflow-hidden">
+        
+        {/* SCENE 1: WebGL Shader + Tactical Blueprint Grid + Fancy Quote + Full-Width POLARIS */}
+        <OpeningHeroScene isLoaded={isLoaded} />
 
-      {/* Main Landing Page Content */}
-      <main className="relative z-10 w-full">
-        {/* Hero — Liquid Metal Polaris P + editorial copy (theme-aware) */}
-        <section className="relative w-full min-h-screen flex items-center overflow-hidden">
-          <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-8 items-center px-6 py-24 lg:py-32">
-            {/* Left column — headline + subhead + CTAs */}
-            <div className="relative z-10 text-center lg:text-left space-y-8 order-2 lg:order-1">
-              <div
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border backdrop-blur-xl text-[10px] font-mono tracking-[0.24em] uppercase"
-                style={{
-                  background: "var(--hero-badge-bg)",
-                  borderColor: "var(--hero-badge-border)",
-                  color: "var(--hero-badge-fg)",
-                }}
-              >
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--hero-badge-dot)" }} />
-                <CrystalGlow fontSize={11} fontWeight={700} compact>
-                  Polaris · Academic Navigator
-                </CrystalGlow>
-              </div>
+        {/* SCENE 2: Cascade of Phones + Silent Video + Scrolling Hand Met-A-Wall Effect */}
+        <CascadeHandScrollSection />
 
-              <h1
-                className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[0.95] drop-shadow-2xl"
-                style={{ color: "var(--hero-heading)" }}
-              >
-                Your entire<br />
-                <span
-                  className="bg-clip-text text-transparent"
-                  style={{
-                    backgroundImage: "linear-gradient(90deg, var(--hero-heading), var(--hero-heading-alt), var(--hero-heading-end))",
-                  }}
-                >
-                  academic world.
-                </span>
-              </h1>
+        {/* SCENE 3: Dreamy Clouds Parallax Section (2 Clouds + Liquid P Shader) */}
+        <DreamyCloudsParallaxSection />
 
-              <p
-                className="text-base sm:text-lg lg:text-xl font-light leading-relaxed max-w-lg mx-auto lg:mx-0"
-                style={{ color: "var(--hero-subhead)" }}
-              >
-                Powered by AI. Autonomous research, page-level citations, and prerequisite knowledge graphs — all in one navigator.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-2">
-                <button
-                  data-polaris-cta
-                  onClick={handlePrimaryClick}
-                  className="px-8 py-4 rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 hover:scale-105 shadow-2xl active:scale-95 flex items-center justify-center gap-2"
-                  style={{ background: "var(--cta-bg)", color: "var(--cta-fg)" }}
-                >
-                  <span>{user ? "Enter Workspace" : "Get Started Free"}</span>
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={handleSecondaryClick}
-                  className="px-8 py-4 border rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 hover:scale-105 backdrop-blur-2xl shadow-md active:scale-95 flex items-center justify-center gap-2"
-                  style={{
-                    background: "var(--cta-alt-bg)",
-                    color: "var(--cta-alt-fg)",
-                    borderColor: "var(--cta-alt-border)",
-                  }}
-                >
-                  <LogIn className="h-4 w-4" style={{ color: "var(--cta-icon)" }} />
-                  <span>Sign In / Register</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Right column — liquid-metal Polaris mark (theme-driven palette) */}
-            <div className="relative order-1 lg:order-2 mx-auto w-full max-w-[520px] aspect-square">
-              <PolarisLiquidP {...palette.liquid} />
-            </div>
-          </div>
-        </section>
-
-        {/* Feature Section with Precision Intelligence Engine Shader Card & 3 Feature Cards */}
-        <section className="relative z-20 py-24 px-6 max-w-7xl mx-auto space-y-16">
-          {/* Precision Intelligence Engine Banner Card with Polaris Hero Shader */}
+        {/* SCENE 4: Tactical Feature Architecture & Intelligence Engine */}
+        <section id="features-section" className="relative z-20 py-28 sm:py-36 px-6 max-w-7xl mx-auto space-y-16 border-t border-white/[0.08]">
+          {/* Precision Intelligence Banner Card */}
           <AnimatedShaderCard className="max-w-4xl mx-auto">
             <div className="relative z-10 text-center p-8 sm:p-14 space-y-5">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.08] border border-white/20 backdrop-blur-xl text-white text-xs font-mono tracking-[0.2em] uppercase shadow-lg">
@@ -192,13 +73,24 @@ export default function Home() {
                 </CrystalGlow>
               </div>
 
-              <p className="text-slate-200 text-sm sm:text-base font-light leading-relaxed max-w-2xl mx-auto drop-shadow-sm">
+              <p className="text-slate-200 text-xs sm:text-base font-light leading-relaxed max-w-2xl mx-auto drop-shadow-sm">
                 Polaris indexes your course notes, textbooks, and syllabi to provide verified citations, identify prerequisite gaps, and structure automated revision plans.
               </p>
+
+              <div className="pt-3 flex justify-center">
+                <button
+                  type="button"
+                  onClick={handlePrimaryCta}
+                  className="px-6 py-3 rounded-2xl bg-white text-black font-bold text-xs sm:text-sm flex items-center gap-2 hover:bg-slate-200 hover:scale-105 active:scale-95 transition-all shadow-xl"
+                >
+                  <span>{user ? "Enter Workspace" : "Launch Navigator"}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </AnimatedShaderCard>
 
-          {/* 3 Popout AI Feature Cards with Crystal Glow Hover Effect */}
+          {/* 3 Core Popout Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
             <PopoutFeatureCard
               variant="green"
@@ -224,12 +116,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Smooth Dark Fade into ENIGMA Reactor Footer */}
-        <div className="w-full h-24 bg-gradient-to-b from-transparent to-black pointer-events-none" />
-      </main>
+        {/* Subtle Bottom Spacer */}
+        <div className="w-full h-12 bg-transparent" />
+      </div>
 
-      {/* ENIGMA Negative-Inversion 3D Reactor Footer with GLB Model */}
-      <ReactorFooter customModelUrl="/models/bouche_a_levres.glb" />
+      {/* 4. DRAWER-REVEAL REACTOR 3D FOOTER */}
+      <div className="relative w-full overflow-hidden">
+        <ReactorFooter customModelUrl="/models/bouche_a_levres.glb" />
+      </div>
     </div>
   );
 }
@@ -290,4 +184,3 @@ function PopoutFeatureCard({
     </div>
   );
 }
-

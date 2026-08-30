@@ -305,7 +305,7 @@ function UserProfileContent() {
   const userInitial = username.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen text-foreground pb-20 relative selection:bg-primary/30 selection:text-foreground">
+    <div className="min-h-screen text-foreground pb-32 relative selection:bg-primary/30 selection:text-foreground">
       <SiteHeader />
 
       <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">

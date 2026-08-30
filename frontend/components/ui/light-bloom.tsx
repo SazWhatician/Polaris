@@ -387,24 +387,16 @@ export function LightBloom(props: LightBloomProps) {
       ptrRef.current.onTarget = 0;
     };
 
-    if (fixedFullscreen) {
-      window.addEventListener("pointermove", onMove, { passive: true });
-    } else {
-      canvas.addEventListener("pointermove", onMove as EventListener);
-      canvas.addEventListener("pointerenter", onEnter);
-      canvas.addEventListener("pointerleave", onLeave);
-    }
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerenter", onEnter, { passive: true });
+    window.addEventListener("pointerleave", onLeave, { passive: true });
     raf = requestAnimationFrame(render);
 
     return () => {
       cancelAnimationFrame(raf);
-      if (fixedFullscreen) {
-        window.removeEventListener("pointermove", onMove);
-      } else {
-        canvas.removeEventListener("pointermove", onMove as EventListener);
-        canvas.removeEventListener("pointerenter", onEnter);
-        canvas.removeEventListener("pointerleave", onLeave);
-      }
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerenter", onEnter);
+      window.removeEventListener("pointerleave", onLeave);
     };
   }, [fixedFullscreen]);
 

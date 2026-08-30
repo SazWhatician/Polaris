@@ -97,7 +97,7 @@ export default function TwinPage() {
   const maxVelocity = Math.max(1, ...velocityData.map((v) => v.concepts_learned));
 
   return (
-    <div className="min-h-screen text-foreground pb-16">
+    <div className="min-h-screen text-foreground pb-32">
       <SiteHeader />
 
       <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">

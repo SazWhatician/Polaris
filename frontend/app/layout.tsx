@@ -9,6 +9,8 @@ import { AgentCopilot } from "@/components/agent-copilot";
 import { NavDrawer } from "@/components/nav-drawer";
 import { TodoDrawer } from "@/components/todo-drawer";
 
+import { SmoothScrollProvider } from "@/components/smooth-scroll-provider";
+
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -39,12 +41,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider>
-            <ShaderBackground />
-            <div className="relative z-10 pointer-events-auto min-h-screen flex flex-col">{children}</div>
-            <NavDrawer />
-            <TodoDrawer />
-            <AgentCopilot />
-            <Toaster position="bottom-right" />
+            <SmoothScrollProvider>
+              <ShaderBackground />
+              <div className="relative z-10 pointer-events-auto min-h-screen flex flex-col">{children}</div>
+              <NavDrawer />
+              <TodoDrawer />
+              <AgentCopilot />
+              <Toaster position="bottom-right" />
+            </SmoothScrollProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

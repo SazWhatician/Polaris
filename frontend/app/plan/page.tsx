@@ -112,7 +112,7 @@ export default function RevisionPlanPage() {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen text-foreground pb-16">
+    <div className="min-h-screen text-foreground pb-32">
       <SiteHeader />
       <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
         {/* Standardized Page Header */}
