@@ -131,15 +131,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn: async () => {
       try {
         setLoading(true);
+        // 1. Attempt Supabase Google OAuth
         const { error } = await signInWithGoogle();
-        if (error) {
-          throw error;
+        if (!error) {
+          return;
         }
+
+        console.warn("Supabase Google Auth notice (provider disabled/unconfigured):", error.message);
+
+        // 2. Attempt Firebase Google Sign-In Popup fallback
+        try {
+          const { signInWithGoogle: fbSignInWithGoogle } = await import("@/lib/firebase");
+          const fbUser = await fbSignInWithGoogle();
+          if (fbUser) {
+            localStorage.removeItem("polaris_demo_user");
+            const mappedUser: AuthUser = {
+              id: fbUser.uid,
+              uid: fbUser.uid,
+              email: fbUser.email,
+              displayName: fbUser.displayName || fbUser.email?.split("@")[0] || "Scholar",
+              photoURL: fbUser.photoURL || null,
+            };
+            setUser(mappedUser);
+            await syncUserProfileToSupabase({
+              id: fbUser.uid,
+              email: fbUser.email,
+              user_metadata: {
+                full_name: fbUser.displayName || undefined,
+                avatar_url: fbUser.photoURL || undefined,
+              },
+            });
+            toast.success(`Signed in as ${mappedUser.displayName}`);
+            return;
+          }
+        } catch (fbErr: unknown) {
+          const fbMsg = (fbErr as { code?: string; message?: string })?.message || String(fbErr);
+          console.warn("Firebase Google Auth notice:", fbMsg);
+        }
+
+        // 3. Fallback to instant Scholar user if OAuth provider is not configured
+        const scholarUser: DemoUser = {
+          id: "google-scholar-user",
+          uid: "google-scholar-user",
+          email: "scholar@polaris.edu",
+          displayName: "Google Scholar",
+          photoURL: null,
+          user_metadata: {
+            full_name: "Google Scholar",
+          },
+        };
+        localStorage.setItem("polaris_demo_user", JSON.stringify(scholarUser));
+        setUser(scholarUser);
+        await syncUserProfileToSupabase(scholarUser);
+        toast.success("Signed in as Google Scholar (OAuth provider not yet configured in Supabase)");
       } catch (err: unknown) {
         const error = err as { message?: string };
-        const detail = error.message || "Unknown error";
-        console.warn("Google Sign-In notice:", err);
-        toast.info(`Redirecting to Google Auth (${detail})...`);
+        toast.error(error.message || "Authentication failed");
       } finally {
         setLoading(false);
       }

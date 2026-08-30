@@ -13,12 +13,6 @@ import {
   LogIn,
   Eye,
   EyeOff,
-  ShieldCheck,
-  Zap,
-  Volume2,
-  VolumeX,
-  Play,
-  Pause,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -36,8 +30,6 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
 
   useEffect(() => {
     if (user && !loading) {
@@ -45,22 +37,41 @@ export default function LoginPage() {
     }
   }, [user, loading, router]);
 
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) {
-      videoRef.current.play();
-      setIsPlaying(true);
-    } else {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    }
-  };
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
 
-  const toggleMute = () => {
-    if (!videoRef.current) return;
-    videoRef.current.muted = !videoRef.current.muted;
-    setIsMuted(videoRef.current.muted);
-  };
+    video.muted = false;
+    video.volume = 1.0;
+
+    const tryPlay = async () => {
+      try {
+        await video.play();
+      } catch (err) {
+        console.warn("Autoplay with audio blocked by browser policy, unmuting on first interaction:", err);
+        video.muted = true;
+        try {
+          await video.play();
+        } catch {}
+
+        const enableAudioOnInteraction = () => {
+          if (!video) return;
+          video.muted = false;
+          video.volume = 1.0;
+          video.play().catch(() => {});
+          window.removeEventListener("click", enableAudioOnInteraction);
+          window.removeEventListener("keydown", enableAudioOnInteraction);
+          window.removeEventListener("touchstart", enableAudioOnInteraction);
+        };
+
+        window.addEventListener("click", enableAudioOnInteraction, { once: true });
+        window.addEventListener("keydown", enableAudioOnInteraction, { once: true });
+        window.addEventListener("touchstart", enableAudioOnInteraction, { once: true });
+      }
+    };
+
+    tryPlay();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,29 +96,24 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full flex bg-background text-foreground overflow-hidden">
-      {/* LEFT COLUMN: Cinematic Video Background */}
+      {/* LEFT COLUMN: Clean Video Showcase */}
       <div className="hidden lg:flex lg:w-7/12 relative bg-black overflow-hidden flex-col justify-between p-8 xl:p-12 select-none">
-        {/* Background Looping Video with Poster Fallback */}
+        {/* Background Looping Video with Sound */}
         <video
           ref={videoRef}
           autoPlay
           loop
-          muted={isMuted}
           playsInline
-          poster="/login-bg.jpg"
-          className="absolute inset-0 w-full h-full object-cover opacity-90 scale-[1.02] transition-transform duration-1000"
+          className="absolute inset-0 w-full h-full object-cover"
         >
+          <source src="/New_Direction_EVERYONE_IS_GO.mp4" type="video/mp4" />
           <source src="/login-video.mp4" type="video/mp4" />
         </video>
 
-        {/* Cinematic Gradient Overlays for Readability & Depth */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/70 z-10 pointer-events-none" />
-        <div className="absolute inset-0 bg-radial-gradient from-transparent via-black/20 to-black/60 z-10 pointer-events-none" />
-
-        {/* Top Branding Header */}
+        {/* Minimal Polaris branding on top */}
         <div className="relative z-20 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform overflow-hidden">
+            <div className="w-10 h-10 rounded-2xl bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform overflow-hidden">
               <Image
                 src="/polaris-standalone.png"
                 alt="Polaris Logo"
@@ -117,68 +123,15 @@ export default function LoginPage() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-xl tracking-wider text-white">POLARIS</span>
-              <span className="text-[10px] font-mono tracking-widest text-purple-300 uppercase">
+              <span className="font-black text-xl tracking-wider text-white drop-shadow-md">POLARIS</span>
+              <span className="text-[10px] font-mono tracking-widest text-purple-300 uppercase drop-shadow-sm">
                 Academic Knowledge Engine
               </span>
             </div>
           </Link>
-
-          {/* Top Controls & Status Badge */}
-          <div className="flex items-center gap-2">
-            {/* Video Controls Toggle */}
-            <div className="flex items-center gap-1 bg-black/40 backdrop-blur-md border border-white/15 rounded-full p-1 text-white">
-              <button
-                type="button"
-                onClick={togglePlay}
-                aria-label={isPlaying ? "Pause video" : "Play video"}
-                className="p-1.5 rounded-full hover:bg-white/20 transition-colors text-white/90 hover:text-white"
-                title={isPlaying ? "Pause video" : "Play video"}
-              >
-                {isPlaying ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-              </button>
-              <button
-                type="button"
-                onClick={toggleMute}
-                aria-label={isMuted ? "Unmute audio" : "Mute audio"}
-                className="p-1.5 rounded-full hover:bg-white/20 transition-colors text-white/90 hover:text-white"
-                title={isMuted ? "Unmute audio" : "Mute audio"}
-              >
-                {isMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
-              </button>
-            </div>
-
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-mono text-white">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>v2.4 Grounded RAG</span>
-            </div>
-          </div>
         </div>
 
-        {/* Bottom Cosmic Quote & Testimonial Banner */}
-        <div className="relative z-20 space-y-3 max-w-xl pb-8 xl:pb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-200 text-xs font-semibold backdrop-blur-md">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Multi-Tenant Qdrant Vector Indexing</span>
-          </div>
-
-          <h2 className="text-xl xl:text-2xl font-extrabold text-white leading-snug tracking-tight drop-shadow-lg">
-            "Explore strange new concepts, discover deep citations, and learn without limits."
-          </h2>
-
-          <p className="text-gray-300 text-xs xl:text-sm leading-relaxed font-light drop-shadow">
-            Polaris pairs state-of-the-art grounded RAG search with automated PDF OCR, gap analysis, and interactive knowledge graphs to accelerate your learning.
-          </p>
-
-          <div className="pt-1 flex items-center gap-6 text-xs text-gray-300 font-mono drop-shadow">
-            <span className="flex items-center gap-1.5">
-              <Zap className="h-3.5 w-3.5 text-amber-400" /> Instant PDF Indexing
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="h-3.5 w-3.5 text-purple-400" /> Page-Level Citations
-            </span>
-          </div>
-        </div>
+        <div />
       </div>
 
       {/* RIGHT COLUMN: Modern Split Login & Sign-up Form */}
