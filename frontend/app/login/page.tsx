@@ -73,6 +73,23 @@ export default function LoginPage() {
     tryPlay();
   }, []);
 
+  const handleGoogleSignIn = async () => {
+    setIsSubmitting(true);
+    try {
+      await signIn();
+      window.location.href = "/dashboard";
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDemoSignIn = () => {
+    signInAsDemo();
+    window.location.href = "/dashboard";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
@@ -87,6 +104,7 @@ export default function LoginPage() {
       } else {
         await signInWithEmail(email, password);
       }
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error(err);
     } finally {
@@ -194,8 +212,9 @@ export default function LoginPage() {
             {/* Google OAuth Button */}
             <button
               type="button"
-              onClick={signIn}
-              className="w-full h-11 px-4 rounded-xl border border-border/60 bg-card hover:bg-muted/60 text-foreground text-xs font-bold transition-all duration-200 flex items-center justify-center gap-3 shadow-sm hover:scale-[1.01]"
+              disabled={isSubmitting}
+              onClick={handleGoogleSignIn}
+              className="w-full h-11 px-4 rounded-xl border border-border/60 bg-card hover:bg-muted/60 text-foreground text-xs font-bold transition-all duration-200 flex items-center justify-center gap-3 shadow-sm hover:scale-[1.01] disabled:opacity-50"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
@@ -221,8 +240,9 @@ export default function LoginPage() {
             {/* One-Click Demo Mode Button */}
             <button
               type="button"
-              onClick={signInAsDemo}
-              className="w-full h-11 px-4 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:scale-[1.01]"
+              disabled={isSubmitting}
+              onClick={handleDemoSignIn}
+              className="w-full h-11 px-4 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:scale-[1.01] disabled:opacity-50"
             >
               <Sparkles className="h-4 w-4 text-primary" />
               <span>Instant Demo Mode — Skip Credentials</span>

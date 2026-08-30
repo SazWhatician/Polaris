@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&display=swap');
 @import "../lib/page-agent/cursor.css";
+@import "katex/dist/katex.min.css";
 
 @tailwind base;
 @tailwind components;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, type ReactNode } from "react";
 import Image from "next/image";
 import {
   Sparkles,
@@ -11,6 +11,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
+import katex from "katex";
 
 import {
   Dialog,
@@ -67,16 +68,383 @@ export function cleanModelAnswer(raw: string): string {
   }
 
   const cleaned = text.trim();
-  // If cleaned output has text, return it.
   if (cleaned) return cleaned;
 
-  // If streaming and currently inside <think>, return empty to show loader
   if (raw.includes("<think>") && !raw.includes("</think>")) {
     return "";
   }
 
-  // Otherwise return raw trimmed content so answer is never lost
   return raw.trim();
+}
+
+/**
+ * Normalize Greek and common math symbols to standard LaTeX commands
+ */
+function normalizeMathToLatex(mathStr: string): string {
+  return mathStr
+    .replace(/Δ/g, "\\Delta ")
+    .replace(/δ/g, "\\delta ")
+    .replace(/α/g, "\\alpha ")
+    .replace(/β/g, "\\beta ")
+    .replace(/γ/g, "\\gamma ")
+    .replace(/θ/g, "\\theta ")
+    .replace(/λ/g, "\\lambda ")
+    .replace(/μ/g, "\\mu ")
+    .replace(/σ/g, "\\sigma ")
+    .replace(/π/g, "\\pi ")
+    .replace(/ω/g, "\\omega ")
+    .replace(/ε/g, "\\epsilon ")
+    .replace(/∇/g, "\\nabla ")
+    .replace(/∂/g, "\\partial ")
+    .replace(/∑/g, "\\sum ")
+    .replace(/∫/g, "\\int ")
+    .replace(/≠/g, "\\neq ")
+    .replace(/≤/g, "\\le ")
+    .replace(/≥/g, "\\ge ")
+    .replace(/±/g, "\\pm ")
+    .replace(/×/g, "\\times ")
+    .replace(/÷/g, "\\div ")
+    .replace(/→/g, "\\to ");
+}
+
+/**
+ * Render LaTeX math string with KaTeX safely
+ */
+function renderKatexHtml(math: string, displayMode: boolean = false): string {
+  try {
+    const normalized = normalizeMathToLatex(math.trim());
+    return katex.renderToString(normalized, {
+      displayMode,
+      throwOnError: false,
+      output: "htmlAndMathml",
+    });
+  } catch {
+    return math;
+  }
+}
+
+/**
+ * Helper to check if backtick content represents a mathematical formula
+ */
+function isMathExpression(str: string): boolean {
+  return (
+    str.includes("=") ||
+    str.includes("\\") ||
+    str.includes("Δ") ||
+    str.includes("δ") ||
+    str.includes("α") ||
+    str.includes("β") ||
+    str.includes("σ") ||
+    str.includes("λ") ||
+    str.includes("+") ||
+    str.includes("-") ||
+    str.includes("*") ||
+    str.includes("/") ||
+    str.includes("^") ||
+    str.includes("_")
+  );
+}
+
+/**
+ * Render inline text with LaTeX ($...$), citations ([#1]), backticks (`...`), bold (**...**), and italics (*...*)
+ */
+function renderInlineContent(
+  text: string,
+  citations?: Citation[],
+  onCitationClick?: (citation: Citation) => void
+): ReactNode[] {
+  // Master regex pattern for:
+  // 1. Block Math: $$...$$
+  // 2. Inline Math: $...$
+  // 3. Citations: [#N] or [N]
+  // 4. Inline Code / Math in backticks: `...`
+  // 5. Bold: **...**
+  // 6. Italic: *...*
+  const pattern = /(\$\$[\s\S]+?\$\$|\$[^\$\n]+?\$|\[#?\s*\d+\]|`[^`\n]+`|\*\*[^\*\n]+?\*\*|\*[^\*\n]+?\*)/g;
+
+  const parts = text.split(pattern);
+
+  return parts.map((part, index) => {
+    if (!part) return null;
+
+    // 1. Block Math $$...$$
+    if (part.startsWith("$$") && part.endsWith("$$") && part.length > 4) {
+      const math = part.slice(2, -2);
+      return (
+        <span
+          key={`block-math-${index}`}
+          className="block my-2 py-1 overflow-x-auto text-center font-mono text-xs sm:text-sm text-indigo-400 dark:text-indigo-300"
+          dangerouslySetInnerHTML={{ __html: renderKatexHtml(math, true) }}
+        />
+      );
+    }
+
+    // 2. Inline Math $...$
+    if (part.startsWith("$") && part.endsWith("$") && part.length > 2) {
+      const math = part.slice(1, -1);
+      return (
+        <span
+          key={`inline-math-${index}`}
+          className="inline-block px-1 font-mono text-[13px] text-indigo-500 dark:text-indigo-300 font-semibold"
+          dangerouslySetInnerHTML={{ __html: renderKatexHtml(math, false) }}
+        />
+      );
+    }
+
+    // 3. Citation tag [#N]
+    const citeMatch = part.match(/\[#?\s*(\d+)\]/);
+    if (citeMatch && citeMatch[1]) {
+      const citeNum = parseInt(citeMatch[1], 10);
+      const targetCitation =
+        citations && citations[citeNum - 1]
+          ? citations[citeNum - 1]
+          : citations?.find((c, idx) => idx + 1 === citeNum || c.chunk_index + 1 === citeNum);
+
+      return (
+        <button
+          key={`cite-${index}`}
+          type="button"
+          onClick={() => targetCitation && onCitationClick?.(targetCitation)}
+          className={`inline-flex items-center mx-0.5 px-1.5 py-0.2 rounded-md font-mono text-[10px] font-bold transition-all align-baseline ${
+            targetCitation
+              ? "bg-purple-500/15 dark:bg-purple-500/25 text-purple-600 dark:text-purple-300 hover:bg-purple-500/30 hover:scale-105 border border-purple-500/30 cursor-pointer shadow-2xs"
+              : "bg-muted text-muted-foreground border border-border/40 cursor-default"
+          }`}
+          title={
+            targetCitation
+              ? `Source #${citeNum}: ${targetCitation.document_filename} (p. ${targetCitation.page_number})`
+              : `Citation #${citeNum}`
+          }
+        >
+          #{citeNum}
+        </button>
+      );
+    }
+
+    // 4. Backticks `...` (Render as KaTeX formula if math symbols exist, else inline code)
+    if (part.startsWith("`") && part.endsWith("`") && part.length > 2) {
+      const inner = part.slice(1, -1);
+      if (isMathExpression(inner)) {
+        return (
+          <span
+            key={`math-backtick-${index}`}
+            className="inline-block px-1.5 py-0.5 rounded-md bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800/40 text-indigo-700 dark:text-indigo-300 font-mono text-xs shadow-2xs"
+            dangerouslySetInnerHTML={{ __html: renderKatexHtml(inner, false) }}
+          />
+        );
+      }
+      return (
+        <code
+          key={`code-${index}`}
+          className="px-1.5 py-0.5 rounded-md bg-muted/80 text-foreground font-mono text-[11px] border border-border/60"
+        >
+          {inner}
+        </code>
+      );
+    }
+
+    // 5. Bold **...**
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+      const inner = part.slice(2, -2);
+      return (
+        <strong key={`bold-${index}`} className="font-bold text-foreground">
+          {renderInlineContent(inner, citations, onCitationClick)}
+        </strong>
+      );
+    }
+
+    // 6. Italic *...*
+    if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
+      const inner = part.slice(1, -1);
+      return (
+        <em key={`italic-${index}`} className="italic text-foreground/90">
+          {renderInlineContent(inner, citations, onCitationClick)}
+        </em>
+      );
+    }
+
+    // Standard raw text
+    return part;
+  });
+}
+
+/**
+ * Structured Markdown & LaTeX Parser Component
+ */
+function MarkdownAnswerView({
+  content,
+  citations,
+  onCitationClick,
+}: {
+  content: string;
+  citations?: Citation[];
+  onCitationClick: (citation: Citation) => void;
+}) {
+  const renderedBlocks = useMemo(() => {
+    if (!content) return null;
+
+    const lines = content.split("\n");
+    const blocks: ReactNode[] = [];
+    let listBuffer: { type: "ul" | "ol"; items: string[] } | null = null;
+    let codeBuffer: { lang: string; lines: string[] } | null = null;
+
+    const flushList = () => {
+      if (!listBuffer) return;
+      const isOrdered = listBuffer.type === "ol";
+      blocks.push(
+        isOrdered ? (
+          <ol
+            key={`ol-${blocks.length}`}
+            className="my-2.5 pl-5 list-decimal space-y-1.5 text-xs sm:text-sm text-slate-800 dark:text-zinc-200"
+          >
+            {listBuffer.items.map((item, i) => (
+              <li key={i} className="pl-1 leading-relaxed">
+                {renderInlineContent(item, citations, onCitationClick)}
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <ul
+            key={`ul-${blocks.length}`}
+            className="my-2.5 pl-5 list-disc space-y-1.5 text-xs sm:text-sm text-slate-800 dark:text-zinc-200"
+          >
+            {listBuffer.items.map((item, i) => (
+              <li key={i} className="pl-1 leading-relaxed">
+                {renderInlineContent(item, citations, onCitationClick)}
+              </li>
+            ))}
+          </ul>
+        )
+      );
+      listBuffer = null;
+    };
+
+    const flushCode = () => {
+      if (!codeBuffer) return;
+      const codeText = codeBuffer.lines.join("\n");
+      blocks.push(
+        <div
+          key={`code-block-${blocks.length}`}
+          className="my-3 rounded-xl overflow-hidden border border-border/70 bg-zinc-950 text-zinc-100 shadow-md font-mono text-xs"
+        >
+          {codeBuffer.lang && (
+            <div className="px-3.5 py-1.5 bg-zinc-900/90 border-b border-zinc-800 text-[10px] text-zinc-400 uppercase tracking-widest font-bold">
+              {codeBuffer.lang}
+            </div>
+          )}
+          <pre className="p-3.5 overflow-x-auto text-xs leading-relaxed text-zinc-200">
+            <code>{codeText}</code>
+          </pre>
+        </div>
+      );
+      codeBuffer = null;
+    };
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i] ?? "";
+      const trimmed = line.trim();
+
+      // 1. Code blocks ```
+      if (trimmed.startsWith("```")) {
+        if (codeBuffer) {
+          flushCode();
+        } else {
+          flushList();
+          const lang = trimmed.slice(3).trim();
+          codeBuffer = { lang, lines: [] };
+        }
+        continue;
+      }
+
+      if (codeBuffer) {
+        codeBuffer.lines.push(line);
+        continue;
+      }
+
+      // 2. Empty Line
+      if (!trimmed) {
+        flushList();
+        continue;
+      }
+
+      // 3. Headings
+      if (trimmed.startsWith("### ")) {
+        flushList();
+        blocks.push(
+          <h3
+            key={`h3-${i}`}
+            className="text-sm sm:text-base font-bold text-foreground mt-3 mb-1.5 flex items-center gap-1.5"
+          >
+            {renderInlineContent(trimmed.slice(4), citations, onCitationClick)}
+          </h3>
+        );
+        continue;
+      }
+      if (trimmed.startsWith("## ")) {
+        flushList();
+        blocks.push(
+          <h2
+            key={`h2-${i}`}
+            className="text-base sm:text-lg font-extrabold text-foreground mt-4 mb-2 pb-1 border-b border-border/40"
+          >
+            {renderInlineContent(trimmed.slice(3), citations, onCitationClick)}
+          </h2>
+        );
+        continue;
+      }
+      if (trimmed.startsWith("# ")) {
+        flushList();
+        blocks.push(
+          <h1
+            key={`h1-${i}`}
+            className="text-lg sm:text-xl font-black text-foreground mt-4 mb-2.5"
+          >
+            {renderInlineContent(trimmed.slice(2), citations, onCitationClick)}
+          </h1>
+        );
+        continue;
+      }
+
+      // 4. Bullet lists: "- " or "* "
+      if (trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+        if (!listBuffer || listBuffer.type !== "ul") {
+          flushList();
+          listBuffer = { type: "ul", items: [] };
+        }
+        listBuffer.items.push(trimmed.slice(2));
+        continue;
+      }
+
+      // 5. Ordered lists: "1. ", "2. "
+      const olMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
+      if (olMatch && olMatch[2]) {
+        if (!listBuffer || listBuffer.type !== "ol") {
+          flushList();
+          listBuffer = { type: "ol", items: [] };
+        }
+        listBuffer.items.push(olMatch[2]);
+        continue;
+      }
+
+      // 6. Standard Paragraph
+      flushList();
+      blocks.push(
+        <p
+          key={`p-${i}`}
+          className="text-xs sm:text-sm leading-relaxed text-slate-800 dark:text-zinc-200 my-2"
+        >
+          {renderInlineContent(line, citations, onCitationClick)}
+        </p>
+      );
+    }
+
+    flushList();
+    flushCode();
+
+    return blocks;
+  }, [content, citations, onCitationClick]);
+
+  return <div className="space-y-1">{renderedBlocks}</div>;
 }
 
 export function ChatMessage({
@@ -91,7 +459,6 @@ export function ChatMessage({
   const [copied, setCopied] = useState(false);
 
   const cleaned = role === "assistant" ? cleanModelAnswer(content) : content;
-  // If stream finished and cleaned is empty, guarantee fallback to raw content
   const displayAnswer = !streaming && !cleaned && content ? content.trim() : cleaned;
   const isThinking = role === "assistant" && streaming && !displayAnswer;
 
@@ -107,12 +474,10 @@ export function ChatMessage({
     return (
       <div className="flex w-full justify-end items-end gap-2.5 my-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div className="flex flex-col items-end max-w-[84%] sm:max-w-[72%]">
-          {/* User Bubble */}
           <div className="relative px-4.5 py-3 rounded-2xl rounded-br-xs bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 text-white shadow-lg shadow-indigo-500/15 border border-indigo-400/30 text-xs sm:text-sm leading-relaxed font-normal break-words selection:bg-white/30 selection:text-white">
             <div className="whitespace-pre-wrap">{content}</div>
           </div>
 
-          {/* User Subtitle Info */}
           {timestamp && (
             <span className="text-[10px] font-mono text-muted-foreground/70 mt-1 mr-1">
               {timestamp}
@@ -120,7 +485,6 @@ export function ChatMessage({
           )}
         </div>
 
-        {/* User Icon Badge */}
         <div className="w-7 h-7 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center flex-shrink-0 mb-4 shadow-xs">
           <User className="w-3.5 h-3.5" />
         </div>
@@ -206,16 +570,20 @@ export function ChatMessage({
               </div>
             </div>
           ) : (
-            /* Answer Text */
-            <div className="text-xs sm:text-sm leading-relaxed text-slate-800 dark:text-zinc-200 whitespace-pre-wrap break-words font-normal">
-              {displayAnswer}
+            /* Rich Formatted Markdown + LaTeX + Citations View */
+            <div className="leading-relaxed">
+              <MarkdownAnswerView
+                content={displayAnswer}
+                citations={citations}
+                onCitationClick={(c) => setOpenCitation(c)}
+              />
               {streaming && (
                 <span className="inline-block w-1.5 h-3.5 ml-1 bg-primary animate-pulse align-middle" />
               )}
             </div>
           )}
 
-          {/* Citations & Evidence Pill Badges */}
+          {/* Citations & Evidence Pill Badges Footer */}
           {citations && citations.length > 0 && !isThinking && (
             <div className="mt-4 pt-3 border-t border-slate-200/70 dark:border-white/[0.08] space-y-2">
               <div className="flex items-center justify-between text-[10px] font-mono tracking-wider uppercase text-muted-foreground">

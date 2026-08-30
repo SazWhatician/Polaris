@@ -47,7 +47,13 @@ export function CrystalGlow({
   compact = false,
 }: CrystalGlowProps) {
   const { resolvedTheme, theme } = useTheme();
-  const activeTheme = resolvedTheme || theme || "dark";
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const activeTheme = mounted ? (resolvedTheme || theme || "dark") : "dark";
 
   // Auto-derived theme palette defaults
   const defaults = React.useMemo(() => {
@@ -83,6 +89,7 @@ export function CrystalGlow({
   return (
     <Component
       onClick={onClick}
+      suppressHydrationWarning
       className={`crystal-glow-wrapper ${compact ? "crystal-glow-compact" : ""} ${className}`}
       style={
         {

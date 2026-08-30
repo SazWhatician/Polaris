@@ -33,7 +33,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
-      <body className={`${inter.variable} ${jakarta.variable} ${syncopate.variable} font-sans relative text-foreground min-h-screen antialiased selection:bg-primary/30 selection:text-foreground`}>
+      <body
+        suppressHydrationWarning
+        className={`${inter.variable} ${jakarta.variable} ${syncopate.variable} font-sans relative text-foreground min-h-screen antialiased selection:bg-primary/30 selection:text-foreground`}
+      >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider>
             <ShaderBackground />

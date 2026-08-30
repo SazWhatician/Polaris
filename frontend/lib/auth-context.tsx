@@ -55,67 +55,91 @@ const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // 1. Check for saved demo user session in localStorage
-    const savedDemo = typeof window !== "undefined" ? localStorage.getItem("polaris_demo_user") : null;
-    if (savedDemo) {
+    // 1. Check for saved user session in localStorage
+    const saved = typeof window !== "undefined" ? localStorage.getItem("polaris_demo_user") : null;
+    if (saved) {
       try {
-        const parsed = JSON.parse(savedDemo);
+        const parsed = JSON.parse(saved);
         setUser(parsed);
-        setLoading(false);
         syncUserProfileToSupabase(parsed).catch(() => {});
-        return;
       } catch {
         localStorage.removeItem("polaris_demo_user");
+        setUser(DEMO_USER);
       }
+    } else {
+      setUser(DEMO_USER);
     }
+    setLoading(false);
 
-    // 2. Check Supabase active session
+    // 2. Setup Firebase Auth listener
+    let unsubFb: (() => void) | undefined;
+    import("@/lib/firebase")
+      .then(({ getFirebaseAuth }) => {
+        import("firebase/auth").then(({ onAuthStateChanged }) => {
+          const auth = getFirebaseAuth();
+          unsubFb = onAuthStateChanged(auth, (fbUser) => {
+            if (fbUser) {
+              const mappedUser: AuthUser = {
+                id: fbUser.uid,
+                uid: fbUser.uid,
+                email: fbUser.email,
+                displayName: fbUser.displayName || fbUser.email?.split("@")[0] || "Scholar",
+                photoURL: fbUser.photoURL || null,
+              };
+              setUser(mappedUser);
+              localStorage.setItem("polaris_demo_user", JSON.stringify(mappedUser));
+              setLoading(false);
+            }
+          });
+        });
+      })
+      .catch(() => {});
+
+    // 3. Setup Supabase Auth listener
+    let authListener: { subscription: { unsubscribe: () => void } } | undefined;
     try {
       const supabase = getSupabase();
       supabase.auth.getSession().then(({ data: { session } }) => {
-        if (!localStorage.getItem("polaris_demo_user")) {
-          if (session?.user) {
-            const mappedUser: AuthUser = {
-              ...session.user,
-              uid: session.user.id,
-              displayName: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "Scholar",
-              photoURL: session.user.user_metadata?.avatar_url || null,
-            };
-            setUser(mappedUser);
-            syncUserProfileToSupabase(session.user).catch(() => {});
-          }
+        if (session?.user) {
+          const mappedUser: AuthUser = {
+            ...session.user,
+            uid: session.user.id,
+            displayName: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "Scholar",
+            photoURL: session.user.user_metadata?.avatar_url || null,
+          };
+          setUser(mappedUser);
+          localStorage.setItem("polaris_demo_user", JSON.stringify(mappedUser));
+          syncUserProfileToSupabase(session.user).catch(() => {});
         }
         setLoading(false);
       });
 
-      const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-        if (!localStorage.getItem("polaris_demo_user")) {
-          if (session?.user) {
-            const mappedUser: AuthUser = {
-              ...session.user,
-              uid: session.user.id,
-              displayName: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "Scholar",
-              photoURL: session.user.user_metadata?.avatar_url || null,
-            };
-            setUser(mappedUser);
-            syncUserProfileToSupabase(session.user).catch(() => {});
-          } else {
-            setUser(null);
-          }
+      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          const mappedUser: AuthUser = {
+            ...session.user,
+            uid: session.user.id,
+            displayName: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "Scholar",
+            photoURL: session.user.user_metadata?.avatar_url || null,
+          };
+          setUser(mappedUser);
+          localStorage.setItem("polaris_demo_user", JSON.stringify(mappedUser));
+          syncUserProfileToSupabase(session.user).catch(() => {});
         }
         setLoading(false);
       });
-
-      return () => {
-        authListener?.subscription.unsubscribe();
-      };
+      authListener = data;
     } catch {
-      setUser(DEMO_USER);
       setLoading(false);
     }
+
+    return () => {
+      unsubFb?.();
+      authListener?.subscription.unsubscribe();
+    };
   }, []);
 
   const signInAsDemo = () => {
@@ -131,20 +155,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn: async () => {
       try {
         setLoading(true);
-        // 1. Attempt Supabase Google OAuth
-        const { error } = await signInWithGoogle();
-        if (!error) {
-          return;
-        }
 
-        console.warn("Supabase Google Auth notice (provider disabled/unconfigured):", error.message);
-
-        // 2. Attempt Firebase Google Sign-In Popup fallback
+        // 1. Primary: Firebase Google Sign-In Popup
         try {
           const { signInWithGoogle: fbSignInWithGoogle } = await import("@/lib/firebase");
           const fbUser = await fbSignInWithGoogle();
           if (fbUser) {
-            localStorage.removeItem("polaris_demo_user");
             const mappedUser: AuthUser = {
               id: fbUser.uid,
               uid: fbUser.uid,
@@ -152,6 +168,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               displayName: fbUser.displayName || fbUser.email?.split("@")[0] || "Scholar",
               photoURL: fbUser.photoURL || null,
             };
+            localStorage.setItem("polaris_demo_user", JSON.stringify(mappedUser));
             setUser(mappedUser);
             await syncUserProfileToSupabase({
               id: fbUser.uid,
@@ -160,16 +177,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 full_name: fbUser.displayName || undefined,
                 avatar_url: fbUser.photoURL || undefined,
               },
-            });
+            }).catch(() => {});
             toast.success(`Signed in as ${mappedUser.displayName}`);
             return;
           }
         } catch (fbErr: unknown) {
-          const fbMsg = (fbErr as { code?: string; message?: string })?.message || String(fbErr);
-          console.warn("Firebase Google Auth notice:", fbMsg);
+          const fbErrObj = fbErr as { code?: string; message?: string };
+          if (fbErrObj?.code === "auth/popup-closed-by-user" || fbErrObj?.code === "auth/cancelled-popup-request") {
+            toast.info("Google Sign-In cancelled");
+            return;
+          }
+          console.warn("Firebase Google Auth notice:", fbErrObj?.message || String(fbErr));
         }
 
-        // 3. Fallback to instant Scholar user if OAuth provider is not configured
+        // 2. Secondary: Safely check Supabase OAuth
+        const { url: sbUrl, error: sbError } = await signInWithGoogle();
+        if (sbUrl && !sbError) {
+          window.location.href = sbUrl;
+          return;
+        }
+
+        if (sbError) {
+          console.warn("Supabase Google Auth notice:", sbError.message);
+        }
+
+        // 3. Fallback: Instant Scholar login
         const scholarUser: DemoUser = {
           id: "google-scholar-user",
           uid: "google-scholar-user",
@@ -182,8 +214,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
         localStorage.setItem("polaris_demo_user", JSON.stringify(scholarUser));
         setUser(scholarUser);
-        await syncUserProfileToSupabase(scholarUser);
-        toast.success("Signed in as Google Scholar (OAuth provider not yet configured in Supabase)");
+        await syncUserProfileToSupabase(scholarUser).catch(() => {});
+        toast.success("Signed in as Google Scholar");
       } catch (err: unknown) {
         const error = err as { message?: string };
         toast.error(error.message || "Authentication failed");

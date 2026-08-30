@@ -320,14 +320,18 @@ function UserProfileContent() {
             {/* Left Avatar & Info */}
             <div className="flex items-center gap-5">
               <div className="relative">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-primary/30 via-primary/10 to-white/20 border-2 border-primary/40 flex items-center justify-center text-3xl sm:text-4xl font-black text-primary shadow-2xl">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-primary/30 via-primary/10 to-white/20 border-2 border-primary/40 flex items-center justify-center text-3xl sm:text-4xl font-black text-primary shadow-2xl overflow-hidden">
                   {user?.photoURL ? (
                     <Image
                       src={user.photoURL}
                       alt="User Avatar"
                       width={96}
                       height={96}
+                      unoptimized
                       className="rounded-3xl object-cover w-full h-full"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = "none";
+                      }}
                     />
                   ) : (
                     <span>{userInitial}</span>

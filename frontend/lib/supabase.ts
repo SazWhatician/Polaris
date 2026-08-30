@@ -90,22 +90,23 @@ export async function getUserProfileFromSupabase(uid: string): Promise<UserProfi
   return null;
 }
 
-export async function signInWithGoogle(): Promise<{ error: Error | null }> {
+export async function signInWithGoogle(): Promise<{ url?: string | null; error: Error | null }> {
   try {
     const supabase = getSupabase();
     const redirectUrl = typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: redirectUrl,
+        skipBrowserRedirect: true,
         queryParams: {
           prompt: "select_account",
         },
       },
     });
-    return { error };
+    return { url: data?.url, error };
   } catch (error) {
-    return { error: error as Error };
+    return { url: null, error: error as Error };
   }
 }
 
