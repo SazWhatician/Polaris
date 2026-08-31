@@ -97,10 +97,10 @@ export default function TwinPage() {
   const maxVelocity = Math.max(1, ...velocityData.map((v) => v.concepts_learned));
 
   return (
-    <div className="min-h-screen text-foreground pb-32">
+    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 selection:bg-primary/30 selection:text-foreground">
       <SiteHeader />
 
-      <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
+      <main ref={containerRef} className="max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
         {/* Standardized Page Header */}
         <div className="gsap-twin">
           <PageHeader
@@ -170,13 +170,18 @@ export default function TwinPage() {
           />
         </div>
 
-        {/* Knowledge Distribution Bar */}
+        {/* Mastery Distribution Bar */}
         {totalCount > 0 && (
-          <Card className="gsap-twin p-6 rounded-3xl bg-card/75 border border-border/80 backdrop-blur-2xl shadow-xl space-y-3">
-            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">
-              Knowledge Distribution & Mastery Ratio
-            </p>
-            <div className="w-full h-3.5 rounded-full overflow-hidden flex bg-muted/60">
+          <Card className="gsap-twin p-4 sm:p-5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs space-y-2.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-bold text-foreground font-mono uppercase tracking-wider text-[10px]">
+                Knowledge Distribution
+              </span>
+              <span className="text-muted-foreground font-mono text-[10px]">
+                {totalCount} Concepts Tracked
+              </span>
+            </div>
+            <div className="h-2 rounded-full overflow-hidden flex bg-muted/60">
               <div
                 className="h-full bg-emerald-500 transition-all duration-700"
                 style={{ width: `${(knownCount / totalCount) * 100}%` }}
@@ -188,22 +193,22 @@ export default function TwinPage() {
                 title={`Weak: ${weakCount}`}
               />
               <div
-                className="h-full bg-rose-500/80 transition-all duration-700"
+                className="h-full bg-rose-500 transition-all duration-700"
                 style={{ width: `${(missingCount / totalCount) * 100}%` }}
                 title={`Missing: ${missingCount}`}
               />
             </div>
-            <div className="flex flex-wrap gap-4 pt-1 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5 font-medium">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shadow-xs" />
+            <div className="flex flex-wrap gap-3 pt-0.5 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5 font-medium text-[11px]">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block shadow-xs" />
                 <span className="text-foreground font-bold">Known:</span> {Math.round((knownCount / totalCount) * 100)}% ({knownCount})
               </span>
-              <span className="flex items-center gap-1.5 font-medium">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-xs" />
+              <span className="flex items-center gap-1.5 font-medium text-[11px]">
+                <span className="w-2 h-2 rounded-full bg-amber-500 inline-block shadow-xs" />
                 <span className="text-foreground font-bold">Weak:</span> {Math.round((weakCount / totalCount) * 100)}% ({weakCount})
               </span>
-              <span className="flex items-center gap-1.5 font-medium">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow-xs" />
+              <span className="flex items-center gap-1.5 font-medium text-[11px]">
+                <span className="w-2 h-2 rounded-full bg-rose-500 inline-block shadow-xs" />
                 <span className="text-foreground font-bold">Missing:</span> {Math.round((missingCount / totalCount) * 100)}% ({missingCount})
               </span>
             </div>
@@ -212,26 +217,26 @@ export default function TwinPage() {
 
         {/* Learning Velocity Sparkline */}
         {velocityData.length > 1 && (
-          <Card className="gsap-twin p-6 rounded-3xl bg-card/75 border border-border/80 backdrop-blur-2xl shadow-xl space-y-4">
+          <Card className="gsap-twin p-4 sm:p-5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs space-y-3">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">
+              <TrendingUp className="h-3.5 w-3.5 text-primary" />
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider font-mono">
                 Learning Velocity (Concepts Mastered / Week)
               </p>
             </div>
-            <div className="flex items-end gap-2 h-20 pt-2">
+            <div className="flex items-end gap-1.5 h-16 pt-1">
               {velocityData.map((point) => (
                 <div
                   key={point.week}
-                  className="flex-1 bg-gradient-to-t from-primary/60 to-indigo-400 rounded-t-xl transition-all duration-500 hover:from-primary hover:to-indigo-300 shadow-xs"
+                  className="flex-1 bg-primary/70 hover:bg-primary rounded-t-lg transition-all duration-300 shadow-xs"
                   style={{
-                    height: `${Math.max(8, (point.concepts_learned / maxVelocity) * 100)}%`,
+                    height: `${Math.max(10, (point.concepts_learned / maxVelocity) * 100)}%`,
                   }}
                   title={`${point.week}: ${point.concepts_learned} concepts`}
                 />
               ))}
             </div>
-            <div className="flex justify-between text-[10px] font-mono text-muted-foreground pt-1 border-t border-border/40">
+            <div className="flex justify-between text-[9px] font-mono text-muted-foreground pt-1 border-t border-border/40">
               <span>{velocityData[0]?.week}</span>
               <span>{velocityData[velocityData.length - 1]?.week}</span>
             </div>
@@ -239,40 +244,40 @@ export default function TwinPage() {
         )}
 
         {/* Readiness Check */}
-        <Card className="gsap-twin p-6 sm:p-8 rounded-3xl bg-card/75 border border-border/80 backdrop-blur-2xl shadow-xl space-y-6">
+        <Card className="gsap-twin p-4 sm:p-5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs space-y-4">
           <div className="flex items-center gap-2.5">
-            <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
+            <div className="p-2 rounded-xl bg-primary/10 text-primary bento-icon-bounce shrink-0">
               <Search className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-foreground">
+              <h3 className="text-xs sm:text-sm font-bold text-foreground font-mono uppercase">
                 Prerequisite Readiness Predictor
               </h3>
-              <p className="text-xs text-muted-foreground">
-                Check whether you have the foundational concepts mastered before diving into a complex topic.
+              <p className="text-[11px] text-muted-foreground">
+                Check whether you have foundational concepts mastered before diving into a complex topic.
               </p>
             </div>
           </div>
 
-          <form onSubmit={handleReadinessCheck} className="flex flex-col sm:flex-row gap-3">
+          <form onSubmit={handleReadinessCheck} className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Enter a topic (e.g. Dynamic Programming, AVL Rotations, Dijkstra)..."
-              className="flex-1 bg-background border border-border/80 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-xs"
+              className="flex-1 bg-muted/40 border border-border/60 rounded-xl px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary shadow-xs"
               data-agent-target="readiness-input"
             />
             <Button
               type="submit"
               disabled={checking || !query.trim()}
-              className="text-xs font-bold px-6 py-2.5 rounded-xl gap-2 shadow-md"
+              className="text-xs font-bold px-4 py-2 rounded-xl gap-1.5 shadow-xs bg-primary text-primary-foreground h-8.5"
               data-agent-target="readiness-check-btn"
             >
               {checking ? (
-                <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                <RefreshCw className="h-3 w-3 animate-spin" />
               ) : (
-                <Sparkles className="h-3.5 w-3.5" />
+                <Sparkles className="h-3 w-3" />
               )}
               <span>{checking ? "Checking..." : "Check Readiness"}</span>
             </Button>
@@ -281,29 +286,29 @@ export default function TwinPage() {
           {/* Readiness Result */}
           {readiness && (
             <div
-              className={`rounded-2xl p-6 border transition-all ${
+              className={`rounded-xl p-4 border transition-all ${
                 readiness.ready
                   ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-300"
                   : "border-amber-500/30 bg-amber-500/5 text-amber-300"
               }`}
             >
-              <div className="flex items-center gap-2.5 mb-3">
+              <div className="flex items-center gap-2 mb-2">
                 {readiness.ready ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                 ) : (
-                  <AlertTriangle className="h-5 w-5 text-amber-400" />
+                  <AlertTriangle className="h-4 w-4 text-amber-500" />
                 )}
-                <span className="font-bold text-sm text-foreground">
+                <span className="font-bold text-xs sm:text-sm text-foreground">
                   {readiness.ready ? "Ready to Learn!" : "Prerequisites Recommended"}
                 </span>
                 <span
-                  className={`text-xs px-2.5 py-0.5 rounded-full font-mono font-bold border ml-auto ${
+                  className={`text-[10px] px-2 py-0.5 rounded-md font-mono font-bold border ml-auto ${
                     readiness.ready
-                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                      : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                      ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                      : "bg-amber-500/10 text-amber-500 border-amber-500/20"
                   }`}
                 >
-                  {readiness.ready_prerequisites.length} / {readiness.ready_prerequisites.length + readiness.missing_prerequisites.length} Prerequisites Ready
+                  {readiness.ready_prerequisites.length} / {readiness.ready_prerequisites.length + readiness.missing_prerequisites.length} Ready
                 </span>
               </div>
 

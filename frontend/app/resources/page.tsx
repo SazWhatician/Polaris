@@ -61,9 +61,9 @@ export default function ResourcesPage() {
   };
 
   return (
-    <div className="min-h-screen text-foreground pb-32">
+    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 selection:bg-primary/30 selection:text-foreground">
       <SiteHeader />
-      <main ref={containerRef} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <main ref={containerRef} className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 space-y-6">
         <div className="gsap-resources">
           <PageHeader
             category="STUDY PLANNING // VIDEO RESOURCES"
@@ -76,29 +76,29 @@ export default function ResourcesPage() {
         </div>
 
         {/* Search Card */}
-        <Card className="gsap-resources p-6 rounded-3xl bg-card/75 border border-border/80 shadow-xl backdrop-blur-2xl">
-          <form onSubmit={handleDiscovery} className="flex flex-col sm:flex-row gap-3">
+        <Card className="gsap-resources p-4 sm:p-5 rounded-2xl bg-card/85 border border-border/80 bento-card shadow-xs backdrop-blur-xl">
+          <form onSubmit={handleDiscovery} className="flex flex-col sm:flex-row gap-2.5">
             <input
               type="text"
               value={topicTitle}
               onChange={(e) => setTopicTitle(e.target.value)}
               placeholder="Enter a syllabus topic (e.g. Binary Search Trees, Dynamic Programming)..."
-              className="flex-1 px-4 py-3 border border-white/10 rounded-lg bg-white/5 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="flex-1 px-3.5 py-2 border border-border/80 rounded-xl bg-muted/40 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary text-xs"
               disabled={loading}
             />
             <button
               type="submit"
               disabled={loading || !topicTitle.trim()}
-              className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 text-white font-semibold rounded-lg shadow-lg transition-all flex items-center justify-center gap-2 text-sm"
+              className="px-5 py-2 bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs h-8.5"
             >
               {loading ? (
                 <>
-                  <Clock className="animate-spin h-4 w-4 text-white" />
+                  <Clock className="animate-spin h-3.5 w-3.5" />
                   <span>Discovering…</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-4 w-4" />
+                  <Sparkles className="h-3.5 w-3.5" />
                   <span>Discover Resources</span>
                 </>
               )}
@@ -106,63 +106,63 @@ export default function ResourcesPage() {
           </form>
 
           {statusMsg && (
-            <div className="mt-4 text-sm text-indigo-400 font-medium animate-pulse flex items-center gap-2">
-              <Sparkles className="h-4 w-4" /> {statusMsg}
+            <div className="mt-3 text-xs font-mono text-primary font-medium animate-pulse flex items-center gap-1.5">
+              <Sparkles className="h-3 w-3" /> {statusMsg}
             </div>
           )}
 
-          {error && <div className="mt-4 text-sm text-rose-400 font-medium">{error}</div>}
+          {error && <div className="mt-3 text-xs text-rose-500 font-medium">{error}</div>}
         </Card>
 
         {/* Discovery Results */}
         {discoveryResult && (
-          <div className="space-y-6">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+              <h2 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2 font-mono uppercase tracking-wider">
                 <span>Ranked Educational Videos</span>
                 {discoveryResult.from_cache && (
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
+                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 font-mono font-medium">
                     Cached
                   </span>
                 )}
               </h2>
-              <span className="text-xs text-slate-400">
+              <span className="text-[10px] text-muted-foreground font-mono">
                 Found {discoveryResult.resources.length} videos
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {discoveryResult.resources.map((item, idx) => (
                 <div
                   key={idx}
-                  className="glass-card p-5 flex flex-col justify-between space-y-4 hover:scale-[1.01] transition-transform"
+                  className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs flex flex-col justify-between space-y-3 group"
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="font-bold text-slate-100 text-base leading-snug line-clamp-2">
+                      <h3 className="font-bold text-foreground text-xs sm:text-sm leading-snug line-clamp-2">
                         {item.title}
                       </h3>
-                      <span className="text-xs font-bold px-2 py-1 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 shrink-0">
                         {(item.rank_score * 100).toFixed(0)}% Rank
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs text-slate-400">
-                      <span className="flex items-center gap-1">
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground font-mono">
+                      <span className="flex items-center gap-1.5">
                         <Youtube className="h-3.5 w-3.5 text-rose-500" />
-                        {item.channel_title}
+                        <span className="text-foreground font-semibold text-[11px]">{item.channel_title}</span>
                       </span>
                       {item.duration !== "N/A" && (
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5 text-slate-400" />
+                        <span className="flex items-center gap-1 text-[11px]">
+                          <Clock className="h-3 w-3 text-muted-foreground" />
                           {item.duration}
                         </span>
                       )}
                     </div>
 
                     {item.why_recommended && (
-                      <p className="text-xs text-slate-300 bg-white/5 p-3 rounded-lg border border-white/5 leading-relaxed">
-                        💡 <span className="font-semibold text-indigo-300">Why Recommended:</span> {item.why_recommended}
+                      <p className="text-[11px] text-muted-foreground bg-muted/40 p-2.5 rounded-xl border border-border/40 leading-relaxed font-sans">
+                        💡 <span className="font-semibold text-foreground">Why Recommended:</span> {item.why_recommended}
                       </p>
                     )}
                   </div>
@@ -171,10 +171,10 @@ export default function ResourcesPage() {
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 text-xs font-semibold transition-colors"
+                    className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-500 text-xs font-bold transition-colors h-8"
                   >
                     <span>Watch Tutorial on YouTube</span>
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
               ))}

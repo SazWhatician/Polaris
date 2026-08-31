@@ -115,9 +115,9 @@ export default function SyllabusPage() {
   );
 
   return (
-    <div className="min-h-screen text-foreground pb-32">
+    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 selection:bg-primary/30 selection:text-foreground">
       <SiteHeader />
-      <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
+      <main ref={containerRef} className="max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
         {/* Standardized Page Header */}
         <div className="gsap-syllabus">
           <PageHeader
@@ -140,9 +140,9 @@ export default function SyllabusPage() {
         </div>
 
         {/* Telemetry Stats Grid */}
-        <div className="gsap-syllabus grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        <div className="gsap-syllabus grid grid-cols-1 sm:grid-cols-3 gap-3">
           <StatCard
-            label="Overall Curriculum Coverage"
+            label="Curriculum Coverage"
             numericValue={82}
             value="82%"
             suffix="%"
@@ -161,95 +161,95 @@ export default function SyllabusPage() {
             colorScheme="primary"
             trend="High Confidence"
             trendPositive
-            tag="Verified in Notes"
+            tag="Verified"
           />
           <StatCard
-            label="Extracted Units & Modules"
+            label="Units & Modules"
             numericValue={SYLLABUS_MODULES.length}
             value={SYLLABUS_MODULES.length.toString()}
             icon={Layers}
             colorScheme="purple"
-            trend="Multi-topic Tree"
+            trend="Topic Tree"
             trendPositive
-            tag="Vector Chunked"
+            tag="Chunked"
           />
         </div>
 
         {/* Search & Tree View Container */}
-        <div className="gsap-syllabus space-y-4">
+        <div className="gsap-syllabus space-y-3">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div className="relative flex-1 max-w-md">
-              <Search className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Search className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search topics, algorithms, or concepts..."
-                className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-card/75 border border-border/80 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 shadow-sm"
+                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-card/85 border border-border/80 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary shadow-xs"
               />
             </div>
 
-            <div className="flex items-center gap-2 text-xs">
-              <span className="text-muted-foreground font-mono text-[11px]">Legend:</span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
+            <div className="flex items-center gap-1.5 text-xs">
+              <span className="text-muted-foreground font-mono text-[10px]">Legend:</span>
+              <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[9px] font-mono font-bold">
                 Mastered (&gt;80%)
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[9px] font-mono font-bold">
                 In Review
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-500 border border-rose-500/20 text-[9px] font-mono font-bold">
                 Gap Detected
               </span>
             </div>
           </div>
 
           {/* Module Nodes Accordion */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {filteredModules.map((module) => {
               const isExpanded = expandedModules[module.id];
 
               return (
                 <Card
                   key={module.id}
-                  className="rounded-3xl bg-card/75 border border-border/80 backdrop-blur-2xl shadow-xl overflow-hidden transition-all duration-200"
+                  className="rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs overflow-hidden transition-all duration-200"
                 >
                   {/* Module Header Bar */}
                   <div
                     onClick={() => toggleModule(module.id)}
-                    className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:bg-muted/30 transition-colors select-none"
+                    className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer hover:bg-muted/30 transition-colors select-none"
                   >
-                    <div className="flex items-center gap-3.5">
+                    <div className="flex items-center gap-3">
                       <button className="p-1 rounded-lg bg-muted/60 text-muted-foreground">
                         {isExpanded ? (
-                          <ChevronDown className="h-4 w-4" />
+                          <ChevronDown className="h-3.5 w-3.5" />
                         ) : (
-                          <ChevronRight className="h-4 w-4" />
+                          <ChevronRight className="h-3.5 w-3.5" />
                         )}
                       </button>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
+                          <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
                             {module.code}
                           </span>
-                          <h3 className="text-base sm:text-lg font-bold text-foreground">
+                          <h3 className="text-sm sm:text-base font-bold text-foreground">
                             {module.title}
                           </h3>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
                           {module.subtopics.length} concept nodes mapped
                         </p>
                       </div>
                     </div>
 
                     {/* Progress Bar & Badge */}
-                    <div className="flex items-center gap-4 pl-8 sm:pl-0">
-                      <div className="w-36 sm:w-48 bg-muted/60 h-2 rounded-full overflow-hidden">
+                    <div className="flex items-center gap-3 pl-7 sm:pl-0">
+                      <div className="w-32 sm:w-44 bg-muted/60 h-1.5 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-primary to-indigo-400 rounded-full transition-all duration-500"
+                          className="h-full bg-primary rounded-full transition-all duration-500"
                           style={{ width: `${module.coverage}%` }}
                         />
                       </div>
-                      <span className="text-xs font-mono font-bold text-primary w-12 text-right">
+                      <span className="text-xs font-mono font-bold text-primary w-10 text-right">
                         {module.coverage}%
                       </span>
                     </div>
@@ -257,7 +257,7 @@ export default function SyllabusPage() {
 
                   {/* Subtopics List */}
                   {isExpanded && (
-                    <div className="px-5 sm:px-6 pb-6 pt-2 border-t border-border/40 space-y-2.5 bg-muted/10">
+                    <div className="px-4 sm:px-5 pb-4 pt-1 border-t border-border/40 space-y-2 bg-muted/10">
                       {module.subtopics.map((sub, idx) => (
                         <div
                           key={idx}

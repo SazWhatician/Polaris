@@ -437,9 +437,9 @@ export default function GapsPage() {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen text-foreground pb-32">
+    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 selection:bg-primary/30 selection:text-foreground">
       <SiteHeader />
-      <main className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
         {/* Standardized Page Header */}
         <PageHeader
           category="ACADEMIC INTELLIGENCE // GAP DETECTOR"
@@ -508,130 +508,131 @@ export default function GapsPage() {
           <div className="space-y-8">
             
             {/* Overview & Action Bar */}
-            <div className="grid gap-6 md:grid-cols-3">
-              <Card className="shadow-sm border-primary/10 bg-primary/[0.01]">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+            <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
+              <Card className="bento-card p-4 sm:p-5 rounded-2xl shadow-xs border-border/80 flex flex-col justify-between">
+                <div>
+                  <CardTitle className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
                     Syllabus Coverage Score
                   </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {coverage ? (
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-4xl font-extrabold tracking-tight text-primary">
-                        {coverage.overall_score.toFixed(0)}%
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        of topics covered by notes
-                      </span>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Not calculated yet</p>
-                  )}
-                  
-                  {coverage && (
-                    <div className="w-full bg-secondary rounded-full h-2">
-                      <div
-                        className="bg-primary h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${coverage.overall_score}%` }}
-                      />
-                    </div>
-                  )}
-                </CardContent>
-                <CardFooter className="pt-0">
+                  <div className="space-y-2 mt-2">
+                    {coverage ? (
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black font-mono tracking-tight text-primary">
+                          {coverage.overall_score.toFixed(0)}%
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          covered by notes
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">Not calculated yet</p>
+                    )}
+                    
+                    {coverage && (
+                      <div className="w-full bg-muted/60 rounded-full h-1.5 overflow-hidden">
+                        <div
+                          className="bg-primary h-full rounded-full transition-all duration-500"
+                          style={{ width: `${coverage.overall_score}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="pt-3">
                   <Button
                     onClick={handleComputeCoverage}
                     disabled={computingCoverage}
                     variant="outline"
                     size="sm"
-                    className="w-full gap-1.5"
+                    className="w-full gap-1.5 h-8 text-xs font-bold rounded-xl"
                   >
                     {computingCoverage ? (
                       <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        Computing...
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <span>Computing...</span>
                       </>
                     ) : (
                       <>
-                        <BookOpen className="h-3.5 w-3.5" />
-                        Analyze Notes Coverage
+                        <BookOpen className="h-3 w-3" />
+                        <span>Analyze Notes Coverage</span>
                       </>
                     )}
                   </Button>
-                </CardFooter>
+                </div>
               </Card>
 
-              <Card className="shadow-sm border-primary/10">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              <Card className="bento-card p-4 sm:p-5 rounded-2xl shadow-xs border-border/80 flex flex-col justify-between">
+                <div>
+                  <CardTitle className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
                     Study Recommendations
                   </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-extrabold tracking-tight text-primary">
-                      {recommendations.length}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      gaps to address
-                    </span>
+                  <div className="mt-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-black font-mono tracking-tight text-primary">
+                        {recommendations.length}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        gaps to address
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      Ranked by prerequisite dependencies.
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Ranked by prerequisite dependencies & coverage status.
-                  </p>
-                </CardContent>
-                <CardFooter className="pt-0">
+                </div>
+                <div className="pt-3">
                   <Button
                     onClick={handleRunAgent}
                     disabled={agentStatus === "running" || !coverage}
                     data-agent-target="run-gap-agent-btn"
-                    className="w-full gap-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0 shadow-sm"
+                    size="sm"
+                    className="w-full gap-1.5 h-8 text-xs font-bold rounded-xl bg-primary text-primary-foreground shadow-xs"
                   >
                     {agentStatus === "running" ? (
                       <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        Agent Assessing Gaps...
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        <span>Assessing Gaps...</span>
                       </>
                     ) : (
                       <>
-                        <Sparkles className="h-3.5 w-3.5" />
-                        {recommendations.length > 0 ? "Re-Run Gap Agent" : "Run Gap Agent"}
+                        <Sparkles className="h-3 w-3" />
+                        <span>{recommendations.length > 0 ? "Re-Run Gap Agent" : "Run Gap Agent"}</span>
                       </>
                     )}
                   </Button>
-                </CardFooter>
+                </div>
               </Card>
 
-              <Card className="shadow-sm border-primary/10">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              <Card className="bento-card p-4 sm:p-5 rounded-2xl shadow-xs border-border/80 flex flex-col justify-between">
+                <div>
+                  <CardTitle className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
                     Total Estimated Study Time
                   </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-extrabold tracking-tight text-primary">
-                      {recommendations.reduce((sum, r) => sum + r.estimated_hours, 0).toFixed(1)}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      hours of focused study
-                    </span>
+                  <div className="mt-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-black font-mono tracking-tight text-primary">
+                        {recommendations.reduce((sum, r) => sum + r.estimated_hours, 0).toFixed(1)}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        hours of focused study
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      Calculated from conceptual complexity.
+                    </p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Calculated based on topics' conceptual complexity.
-                  </p>
-                </CardContent>
-                <CardFooter className="pt-0">
-                  <div className="text-xs text-muted-foreground flex items-center gap-1.5 h-9">
-                    <Info className="h-3.5 w-3.5 text-primary" />
-                    Drag cards below to customize order.
+                </div>
+                <div className="pt-3">
+                  <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 h-8">
+                    <Info className="h-3 w-3 text-primary shrink-0" />
+                    <span>Drag cards below to customize order.</span>
                   </div>
-                </CardFooter>
+                </div>
               </Card>
             </div>
 
             {/* Main Dashboard Layout */}
-            <div className="grid gap-8 lg:grid-cols-12">
+            <div className="grid gap-6 lg:grid-cols-12">
               
               {/* Left Column: Topics Board (7 cols) */}
               <div className="lg:col-span-7 space-y-6">

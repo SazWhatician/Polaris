@@ -112,9 +112,9 @@ export default function RevisionPlanPage() {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen text-foreground pb-32">
+    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 selection:bg-primary/30 selection:text-foreground">
       <SiteHeader />
-      <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
+      <main ref={containerRef} className="max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
         {/* Standardized Page Header */}
         <div className="gsap-plan">
           <PageHeader
@@ -128,28 +128,28 @@ export default function RevisionPlanPage() {
         </div>
 
         {/* Input Configuration Card */}
-        <Card className="gsap-plan p-6 space-y-6">
-          <div className="flex items-center justify-between border-b pb-4">
-            <h3 className="font-semibold text-sm text-foreground tracking-wide">
+        <Card className="gsap-plan p-4 sm:p-5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-border/40 pb-2.5">
+            <h3 className="font-bold text-xs text-foreground tracking-wide font-mono uppercase">
               Configure Revision Constraints
             </h3>
-            <span className="text-[11px] text-muted-foreground">YYYY-MM-DD Date Bounds</span>
+            <span className="text-[10px] font-mono text-muted-foreground">YYYY-MM-DD Bounds</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Target Exam Date</label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-foreground">Target Exam Date</label>
               <Input
                 type="date"
                 value={examDate}
                 onChange={(e) => setExamDate(e.target.value)}
                 data-agent-target="plan-exam-date"
-                className="bg-transparent border-input text-foreground text-xs rounded-xl"
+                className="bg-muted/40 border-border/60 text-foreground text-xs rounded-xl h-8.5"
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Daily Study Target (Hours)</label>
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-foreground">Daily Study Target (Hours)</label>
               <Input
                 type="number"
                 step="0.5"
@@ -158,7 +158,7 @@ export default function RevisionPlanPage() {
                 value={dailyHours}
                 onChange={(e) => setDailyHours(parseFloat(e.target.value) || 1)}
                 data-agent-target="plan-daily-hours"
-                className="bg-transparent border-input text-foreground text-xs rounded-xl"
+                className="bg-muted/40 border-border/60 text-foreground text-xs rounded-xl h-8.5"
               />
             </div>
 
@@ -167,17 +167,17 @@ export default function RevisionPlanPage() {
                 onClick={generatePlan}
                 disabled={generating}
                 data-agent-target="generate-plan-btn"
-                className="w-full h-10 text-xs font-semibold"
+                className="w-full h-8.5 text-xs font-bold rounded-xl bg-primary text-primary-foreground shadow-xs"
               >
                 {generating ? (
                   <>
-                    <Clock className="h-4 w-4 animate-spin mr-2" />
-                    Computing Plan...
+                    <Clock className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                    <span>Computing Plan...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Generate Revision Schedule
+                    <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                    <span>Generate Schedule</span>
                   </>
                 )}
               </Button>
@@ -186,42 +186,42 @@ export default function RevisionPlanPage() {
         </Card>
 
         {/* Plan Output Schedule */}
-        <div className="gsap-plan space-y-4">
-          <h2 className="text-lg font-bold text-foreground">
+        <div className="gsap-plan space-y-3">
+          <h2 className="text-sm sm:text-base font-bold text-foreground font-mono uppercase tracking-wider">
             Active Study Schedule
           </h2>
 
           {plan ? (
-            <div className="space-y-4">
-              <Card className="p-4 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-emerald-500 font-medium">
+            <div className="space-y-3">
+              <Card className="p-3.5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2 text-emerald-500 font-bold font-mono">
                   <CheckCircle2 className="h-4 w-4" />
                   <span>Schedule Synthesized (Exam Date: {plan.exam_date})</span>
                 </div>
-                <span className="text-muted-foreground">Total Allocated: {plan.total_hours_allocated} hrs</span>
+                <span className="text-[10px] font-mono text-muted-foreground font-bold">Allocated: {plan.total_hours_allocated} hrs</span>
               </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {plan.schedules.map((day, idx) => (
-                  <Card key={idx} className="p-4 space-y-3">
-                    <div className="flex items-center justify-between border-b pb-2">
-                      <div className="flex items-center gap-2 font-semibold text-xs text-primary">
-                        <Calendar className="h-4 w-4" />
+                  <Card key={idx} className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs space-y-2.5">
+                    <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-primary font-mono">
+                        <Calendar className="h-3.5 w-3.5" />
                         <span>Date: {day.date}</span>
                       </div>
-                      <span className="text-[11px] text-muted-foreground">{day.available_hours} hrs quota</span>
+                      <span className="text-[10px] font-mono text-muted-foreground">{day.available_hours} hrs quota</span>
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {day.blocks.map((block, bIdx) => (
-                        <div key={bIdx} className="p-3 rounded-xl bg-muted/30 border text-xs space-y-1">
+                        <div key={bIdx} className="p-2.5 rounded-xl bg-muted/40 border border-border/50 text-xs space-y-1">
                           <div className="flex items-center justify-between">
-                            <span className="font-semibold text-foreground">{block.topic_title}</span>
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-primary/10 text-primary border border-primary/20 font-bold">
+                            <span className="font-bold text-foreground text-xs">{block.topic_title}</span>
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-primary/10 text-primary border border-primary/20 font-bold">
                               {block.allocated_minutes} mins
                             </span>
                           </div>
-                          <p className="text-[11px] text-muted-foreground">{block.notes}</p>
+                          <p className="text-[10px] text-muted-foreground">{block.notes}</p>
                         </div>
                       ))}
                     </div>
@@ -230,8 +230,8 @@ export default function RevisionPlanPage() {
               </div>
             </div>
           ) : (
-            <Card className="p-8 text-center text-muted-foreground text-xs space-y-2">
-              <AlertCircle className="h-6 w-6 text-muted-foreground mx-auto" />
+            <Card className="p-8 rounded-2xl bg-card/60 border border-border/80 text-center text-muted-foreground text-xs space-y-2">
+              <AlertCircle className="h-5 w-5 text-muted-foreground mx-auto" />
               <p>No revision plan generated yet. Configure your exam date above and click Generate.</p>
             </Card>
           )}

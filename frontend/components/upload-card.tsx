@@ -58,22 +58,22 @@ export function UploadCard({ onUploaded }: Props) {
       }}
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
-      className={`relative p-8 rounded-3xl bg-card/75 border backdrop-blur-2xl transition-all duration-300 shadow-xl overflow-hidden ${
+      className={`relative p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-card/85 border backdrop-blur-xl transition-all duration-300 shadow-md overflow-hidden ${
         dragOver ? "border-primary ring-2 ring-primary/30 scale-[1.01]" : "border-border/80 hover:border-primary/40"
       }`}
     >
       {/* Top subtle highlight line */}
       <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-4 text-left">
-          <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shadow-md">
-            <Upload className="h-6 w-6" />
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+        <div className="flex items-center gap-3.5 text-left">
+          <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shadow-xs shrink-0">
+            <Upload className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
+            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
               Upload Course Materials
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                 PDF & Images
               </span>
             </h3>

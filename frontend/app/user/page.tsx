@@ -27,15 +27,18 @@ import {
   Check,
   Database,
   Cpu,
+  Zap,
+  Eye,
+  Award,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { SiteHeader } from "@/components/site-header";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { CrystalGlow } from "@/components/ui/crystal-glow";
-import { StatCard } from "@/components/ui/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth-context";
 import {
   listDocuments,
@@ -50,12 +53,13 @@ import {
   type ChatSession,
 } from "@/lib/chat-history-store";
 import { UploadCard } from "@/components/upload-card";
+import { PagesViewer } from "@/components/pages-viewer";
 import { useGsapEntrance } from "@/lib/use-animation-system";
+import { cn } from "@/lib/utils";
 
 interface CommunityPost {
   id: string;
   author: string;
-  authorAvatar?: string;
   title: string;
   description: string;
   category: string;
@@ -121,6 +125,7 @@ function UserProfileContent() {
   const [docsLoading, setDocsLoading] = useState(true);
   const [docSearch, setDocSearch] = useState("");
   const [docFilter, setDocFilter] = useState<"all" | "ocr_complete" | "processing" | "failed">("all");
+  const [viewingDoc, setViewingDoc] = useState<DocumentResponse | null>(null);
 
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [historySearch, setHistorySearch] = useState("");
@@ -136,7 +141,7 @@ function UserProfileContent() {
   const [newPostTags, setNewPostTags] = useState("");
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
 
-  const containerRef = useGsapEntrance(".gsap-user", 0.05);
+  const containerRef = useGsapEntrance(".gsap-user", 0.04);
 
   // Load documents
   const loadDocs = async () => {
@@ -145,7 +150,6 @@ function UserProfileContent() {
       const items = await listDocuments();
       setDocs(items);
     } catch {
-      // Fallback empty if backend unreachable
       setDocs([]);
     } finally {
       setDocsLoading(false);
@@ -305,30 +309,30 @@ function UserProfileContent() {
   const userInitial = username.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen text-foreground pb-32 relative selection:bg-primary/30 selection:text-foreground">
+    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 relative selection:bg-primary/30 selection:text-foreground">
       <SiteHeader />
 
-      <main ref={containerRef} className="max-w-7xl mx-auto space-y-8 py-8 px-4 sm:px-6 lg:px-8">
+      <main ref={containerRef} className="max-w-7xl mx-auto space-y-5 py-4 px-3 sm:px-6 lg:px-8">
         
-        {/* User Identity Banner Card */}
-        <div className="gsap-user relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-card/85 backdrop-blur-2xl border border-border/80 shadow-2xl">
-          {/* Top highlight bar */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+        {/* ── BENTO HERO: Compact Scholar Hologram ID Banner ────────────── */}
+        <div className="gsap-user relative overflow-hidden rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-card/85 backdrop-blur-xl border border-border/80 shadow-lg bento-card">
+          {/* Top highlight line */}
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
 
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
             
-            {/* Left Avatar & Info */}
-            <div className="flex items-center gap-5">
-              <div className="relative">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-primary/30 via-primary/10 to-white/20 border-2 border-primary/40 flex items-center justify-center text-3xl sm:text-4xl font-black text-primary shadow-2xl overflow-hidden">
+            {/* Left: Avatar & Identity details */}
+            <div className="flex items-center gap-4">
+              <div className="relative shrink-0">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-primary/30 via-primary/10 to-indigo-500/20 border-2 border-primary/40 flex items-center justify-center text-2xl font-black text-primary shadow-md overflow-hidden">
                   {user?.photoURL ? (
                     <Image
                       src={user.photoURL}
                       alt="User Avatar"
-                      width={96}
-                      height={96}
+                      width={64}
+                      height={64}
                       unoptimized
-                      className="rounded-3xl object-cover w-full h-full"
+                      className="rounded-2xl object-cover w-full h-full"
                       onError={(e) => {
                         (e.target as HTMLElement).style.display = "none";
                       }}
@@ -337,59 +341,59 @@ function UserProfileContent() {
                     <span>{userInitial}</span>
                   )}
                 </div>
-                <div className="absolute -bottom-1 -right-1 p-1.5 rounded-full bg-emerald-500 text-white border-2 border-background shadow-md" title="Active Session">
-                  <ShieldCheck className="h-4 w-4" />
+                <div className="absolute -bottom-1 -right-1 p-1 rounded-full bg-emerald-500 text-white border-2 border-background shadow-xs" title="Verified Active Session">
+                  <ShieldCheck className="h-3 w-3" />
                 </div>
               </div>
 
-              <div className="space-y-1.5 min-w-0">
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <CrystalGlow as="h1" fontSize="clamp(1.4rem, 2.5vw, 2rem)" fontWeight={900}>
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-lg sm:text-xl font-black tracking-tight text-foreground">
                     {username}
-                  </CrystalGlow>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary/15 text-primary border border-primary/30 uppercase tracking-wider">
-                    Scholar Pro Tier
+                  </h1>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-primary/15 text-primary border border-primary/30 uppercase tracking-wider">
+                    Scholar Pro
                   </span>
                 </div>
 
-                <p className="text-xs text-muted-foreground flex items-center gap-2 font-mono truncate">
-                  <Mail className="h-3.5 w-3.5 text-primary" />
+                <p className="text-xs text-muted-foreground flex items-center gap-1.5 font-mono truncate">
+                  <Mail className="h-3 w-3 text-primary shrink-0" />
                   <span>{user?.email || "student@polaris.edu"}</span>
                 </p>
 
-                <div className="flex items-center gap-4 text-[11px] text-muted-foreground pt-1 flex-wrap font-mono">
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5 text-primary/70" />
-                    <span>Member since Fall 2024</span>
+                <div className="flex items-center gap-3 text-[10px] text-muted-foreground pt-0.5 flex-wrap font-mono">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3 text-primary/70" />
+                    <span>Fall 2024</span>
                   </span>
-                  <span className="flex items-center gap-1.5">
-                    <HardDrive className="h-3.5 w-3.5 text-primary/70" />
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <HardDrive className="h-3 w-3 text-primary/70" />
                     <span>{totalMB} MB Ingested</span>
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Right Quick Actions */}
-            <div className="flex items-center gap-3 flex-wrap">
+            {/* Right: Quick Action Buttons */}
+            <div className="flex items-center gap-2 flex-wrap self-start lg:self-center">
               {user ? (
                 <>
                   <Button
-                    variant="outline"
                     size="sm"
                     onClick={() => router.push("/chat")}
-                    className="rounded-2xl gap-2 font-bold text-xs border-primary/30 hover:bg-primary/10 text-primary"
+                    className="h-8.5 px-3.5 rounded-xl gap-1.5 font-bold text-xs bg-primary text-primary-foreground shadow-sm hover:scale-105 active:scale-95 transition-all"
                   >
-                    <MessageSquare className="h-4 w-4" />
-                    <span>Launch RAG Chat</span>
+                    <MessageSquare className="h-3.5 w-3.5" />
+                    <span>Launch RAG</span>
                   </Button>
                   <Button
-                    variant="destructive"
+                    variant="outline"
                     size="sm"
                     onClick={() => signOut()}
-                    className="rounded-2xl gap-2 font-bold text-xs shadow-md"
+                    className="h-8.5 px-3 rounded-xl gap-1.5 font-bold text-xs text-destructive hover:bg-destructive/10 border-border/80"
                   >
-                    <LogOut className="h-4 w-4" />
+                    <LogOut className="h-3.5 w-3.5" />
                     <span>Sign Out</span>
                   </Button>
                 </>
@@ -398,18 +402,18 @@ function UserProfileContent() {
                   <Button
                     size="sm"
                     onClick={signInAsDemo}
-                    className="rounded-2xl gap-2 font-bold text-xs bg-primary text-primary-foreground shadow-lg"
+                    className="h-8.5 px-3.5 rounded-xl gap-1.5 font-bold text-xs bg-primary text-primary-foreground shadow-sm"
                   >
-                    <Sparkles className="h-4 w-4" />
-                    <span>Demo Mode Sign In</span>
+                    <Sparkles className="h-3.5 w-3.5" />
+                    <span>Demo Mode</span>
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => router.push("/login")}
-                    className="rounded-2xl gap-2 font-bold text-xs"
+                    className="h-8.5 px-3 rounded-xl gap-1.5 font-bold text-xs"
                   >
-                    <LogIn className="h-4 w-4" />
+                    <LogIn className="h-3.5 w-3.5" />
                     <span>Log In</span>
                   </Button>
                 </div>
@@ -418,128 +422,181 @@ function UserProfileContent() {
           </div>
         </div>
 
-        {/* Telemetry Stat Strip */}
-        <div className="gsap-user grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <StatCard
-            label="Ingested Files"
-            numericValue={docs.length}
-            value={docs.length.toString()}
-            icon={FileText}
-            colorScheme="primary"
-            tag="Vectorized"
-          />
-          <StatCard
-            label="Extracted Pages"
-            numericValue={totalPages}
-            value={totalPages.toString()}
-            icon={Layers}
-            colorScheme="purple"
-            tag="OCR Ready"
-          />
-          <StatCard
-            label="Saved Chat Turns"
-            numericValue={sessions.length}
-            value={sessions.length.toString()}
-            icon={MessageSquare}
-            colorScheme="emerald"
-            tag="Multi-Turn"
-          />
-          <StatCard
-            label="Community Ready"
-            numericValue={communityPosts.length}
-            value={communityPosts.length.toString()}
-            icon={Users}
-            colorScheme="purple"
-            tag="Hub Alpha"
-          />
+        {/* ── BENTO TELEMETRY STRIP (4 Compact Metric Bento Cells) ────────── */}
+        <div className="gsap-user grid grid-cols-2 lg:grid-cols-4 gap-3">
+          
+          {/* Bento Stat 1 */}
+          <div className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                Ingested Files
+              </span>
+              <div className="p-1.5 rounded-xl bg-primary/10 text-primary border border-primary/20 bento-icon-bounce">
+                <FileText className="w-3.5 h-3.5" />
+              </div>
+            </div>
+            <div className="mt-2.5">
+              <div className="text-xl sm:text-2xl font-black text-foreground font-mono">
+                {docs.length}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                {totalMB} MB Storage
+              </p>
+            </div>
+          </div>
+
+          {/* Bento Stat 2 */}
+          <div className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                Extracted Pages
+              </span>
+              <div className="p-1.5 rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 bento-icon-bounce">
+                <Layers className="w-3.5 h-3.5" />
+              </div>
+            </div>
+            <div className="mt-2.5">
+              <div className="text-xl sm:text-2xl font-black text-foreground font-mono">
+                {totalPages}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                OCR & Vector ready
+              </p>
+            </div>
+          </div>
+
+          {/* Bento Stat 3 */}
+          <div className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                Saved Chat Turns
+              </span>
+              <div className="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 bento-icon-bounce">
+                <MessageSquare className="w-3.5 h-3.5" />
+              </div>
+            </div>
+            <div className="mt-2.5">
+              <div className="text-xl sm:text-2xl font-black text-foreground font-mono">
+                {sessions.length}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                Multi-Turn Citations
+              </p>
+            </div>
+          </div>
+
+          {/* Bento Stat 4 */}
+          <div className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                Community Hub
+              </span>
+              <div className="p-1.5 rounded-xl bg-purple-500/10 text-purple-500 border border-purple-500/20 bento-icon-bounce">
+                <Users className="w-3.5 h-3.5" />
+              </div>
+            </div>
+            <div className="mt-2.5">
+              <div className="text-xl sm:text-2xl font-black text-foreground font-mono">
+                {communityPosts.length}
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                Peer Knowledge Packs
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Tab Navigation Pill Bar */}
-        <div className="gsap-user flex items-center gap-2 p-1.5 rounded-2xl bg-card/80 border border-border/80 backdrop-blur-xl shadow-lg overflow-x-auto">
+        {/* ── TAB NAVIGATION PILL BAR ──────────────────────────────────── */}
+        <div className="gsap-user flex items-center gap-1.5 p-1 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs overflow-x-auto">
           <button
             onClick={() => setActiveTab("uploads")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+            className={cn(
+              "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap",
               activeTab === "uploads"
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-            }`}
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+            )}
           >
-            <UploadCloud className="h-4 w-4" />
+            <UploadCloud className="h-3.5 w-3.5" />
             <span>My Uploads ({docs.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab("history")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+            className={cn(
+              "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap",
               activeTab === "history"
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-            }`}
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+            )}
           >
-            <MessageSquare className="h-4 w-4" />
+            <MessageSquare className="h-3.5 w-3.5" />
             <span>Chat History ({sessions.length})</span>
           </button>
 
           <button
             onClick={() => setActiveTab("community")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+            className={cn(
+              "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap",
               activeTab === "community"
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-            }`}
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+            )}
           >
-            <Users className="h-4 w-4" />
+            <Users className="h-3.5 w-3.5" />
             <span>Community Hub</span>
-            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-emerald-500/20 text-emerald-500 border border-emerald-500/30">
               NEW
             </span>
           </button>
 
           <button
             onClick={() => setActiveTab("settings")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap ${
+            className={cn(
+              "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all whitespace-nowrap",
               activeTab === "settings"
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-            }`}
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+            )}
           >
-            <Database className="h-4 w-4" />
+            <Database className="h-3.5 w-3.5" />
             <span>Preferences & System</span>
           </button>
         </div>
 
-        {/* TAB 1: MY UPLOADS */}
+        {/* ── TAB 1: MY UPLOADS ────────────────────────────────────────── */}
         {activeTab === "uploads" && (
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="space-y-4 animate-in fade-in duration-200">
             {/* Direct Upload Dropzone */}
             <UploadCard onUploaded={(d) => setDocs((prev) => [d, ...prev])} />
 
             {/* Filter & Search Bar */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-card/75 border border-border/80 backdrop-blur-xl">
-              <div className="relative w-full sm:w-80">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl">
+              <div className="relative w-full sm:w-72">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <input
                   type="text"
                   value={docSearch}
                   onChange={(e) => setDocSearch(e.target.value)}
                   placeholder="Search uploaded files..."
-                  className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/40"
+                  className="w-full h-8.5 pl-9 pr-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary shadow-xs"
                 />
               </div>
 
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/40 border border-border/50 text-xs">
+                <div className="flex items-center gap-0.5 p-0.5 rounded-xl bg-muted/40 border border-border/50 text-[11px]">
                   {(["all", "ocr_complete", "processing", "failed"] as const).map((mode) => (
                     <button
                       key={mode}
                       onClick={() => setDocFilter(mode)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
+                      className={cn(
+                        "px-2.5 py-1 rounded-lg font-bold capitalize transition-all",
                         docFilter === mode
                           ? "bg-background text-foreground shadow-xs"
                           : "text-muted-foreground hover:text-foreground"
-                      }`}
+                      )}
                     >
-                      {mode.replace("_", " ")}
+                      {mode === "ocr_complete" ? "Ready" : mode}
                     </button>
                   ))}
                 </div>
@@ -548,23 +605,23 @@ function UserProfileContent() {
                   variant="outline"
                   size="sm"
                   onClick={loadDocs}
-                  className="h-10 rounded-xl gap-1.5 text-xs font-bold"
+                  className="h-8 rounded-xl gap-1 text-xs font-bold"
                 >
-                  <RefreshCw className={`h-3.5 w-3.5 ${docsLoading ? "animate-spin text-primary" : ""}`} />
-                  <span className="hidden sm:inline">Refresh</span>
+                  <RefreshCw className={cn("h-3 w-3", docsLoading ? "animate-spin text-primary" : "")} />
+                  <span>Refresh</span>
                 </Button>
               </div>
             </div>
 
-            {/* Document List Cards */}
+            {/* Document List Bento Grid */}
             {filteredDocs.length === 0 ? (
-              <Card className="p-12 text-center text-muted-foreground text-xs flex flex-col items-center justify-center gap-3 bg-card/60 backdrop-blur-xl border-border/80 rounded-3xl">
-                <FileText className="h-8 w-8 text-muted-foreground/50" />
-                <span className="font-bold text-sm text-foreground">No documents matching your search</span>
-                <p className="text-xs text-muted-foreground">Upload course notes or syllabus PDFs above to populate your index.</p>
+              <Card className="p-10 text-center text-muted-foreground text-xs flex flex-col items-center justify-center gap-2.5 bg-card/60 backdrop-blur-xl border-border/80 rounded-2xl">
+                <FileText className="h-7 w-7 text-muted-foreground/40" />
+                <span className="font-bold text-sm text-foreground">No documents found</span>
+                <p className="text-xs text-muted-foreground">Upload course notes or syllabus PDFs above to populate your vector index.</p>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {filteredDocs.map((doc) => {
                   const sizeMb = ((doc.size_bytes || 0) / (1024 * 1024)).toFixed(2);
                   const isReady = doc.status === "ocr_complete";
@@ -572,56 +629,64 @@ function UserProfileContent() {
                   return (
                     <div
                       key={doc.id}
-                      className="p-5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl hover:border-primary/40 transition-all shadow-md flex flex-col justify-between space-y-4 group"
+                      className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs flex flex-col justify-between space-y-3 group"
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary shrink-0 group-hover:scale-105 transition-transform">
-                            <FileText className="h-5 w-5" />
+                      <div className="flex items-start justify-between gap-2.5">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-primary shrink-0 bento-icon-bounce">
+                            <FileText className="h-4 w-4" />
                           </div>
                           <div className="min-w-0">
-                            <h4 className="text-sm font-bold text-foreground truncate" title={doc.filename}>
+                            <h4 className="text-xs font-bold text-foreground truncate" title={doc.filename}>
                               {doc.filename}
                             </h4>
-                            <p className="text-[11px] font-mono text-muted-foreground flex items-center gap-2 pt-0.5">
+                            <p className="text-[10px] font-mono text-muted-foreground flex items-center gap-1.5 pt-0.5">
                               <span>{sizeMb} MB</span>
                               <span>•</span>
-                              <span>{doc.page_count || 1} pages</span>
-                              <span>•</span>
-                              <span>{new Date(doc.created_at).toLocaleDateString()}</span>
+                              <span>{doc.page_count || 1} pg</span>
                             </p>
                           </div>
                         </div>
 
                         <span
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider shrink-0 ${
+                          className={cn(
+                            "px-2 py-0.5 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider shrink-0",
                             isReady
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+                              ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
                               : doc.status === "failed"
-                              ? "bg-rose-500/10 text-rose-400 border border-rose-500/30"
-                              : "bg-amber-500/10 text-amber-400 border border-amber-500/30 animate-pulse"
-                          }`}
+                              ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
+                              : "bg-amber-500/10 text-amber-500 border border-amber-500/20 animate-pulse"
+                          )}
                         >
                           {doc.status.replace("_", " ")}
                         </span>
                       </div>
 
-                      <div className="pt-2 border-t border-border/50 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
+                      <div className="pt-2 border-t border-border/40 flex items-center justify-between gap-1.5">
+                        <div className="flex items-center gap-1.5">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => router.push(`/chat?q=Summarize%20${encodeURIComponent(doc.filename)}`)}
-                            className="h-8 rounded-xl text-xs font-bold gap-1.5 text-primary border-primary/30 hover:bg-primary/10"
+                            className="h-7 px-2.5 rounded-lg text-[11px] font-bold gap-1 text-primary border-primary/30 hover:bg-primary/10"
                           >
-                            <MessageSquare className="h-3.5 w-3.5" />
-                            <span>Ask in RAG</span>
+                            <MessageSquare className="h-3 w-3" />
+                            <span>Ask RAG</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setViewingDoc(doc)}
+                            className="h-7 px-2 rounded-lg text-[11px] text-muted-foreground hover:text-foreground"
+                            title="Inspect OCR text"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleReprocessDoc(doc.id)}
-                            className="h-8 rounded-xl text-xs text-muted-foreground hover:text-foreground"
+                            className="h-7 px-2 rounded-lg text-[11px] text-muted-foreground hover:text-foreground"
                             title="Reprocess OCR"
                           >
                             <RefreshCw className="h-3.5 w-3.5" />
@@ -632,7 +697,7 @@ function UserProfileContent() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteDoc(doc.id, doc.filename)}
-                          className="h-8 rounded-xl text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          className="h-7 w-7 p-0 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                           title="Delete Document"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -646,30 +711,30 @@ function UserProfileContent() {
           </div>
         )}
 
-        {/* TAB 2: CHAT HISTORY */}
+        {/* ── TAB 2: CHAT HISTORY ──────────────────────────────────────── */}
         {activeTab === "history" && (
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="space-y-4 animate-in fade-in duration-200">
             {/* Search & Actions Bar */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-card/75 border border-border/80 backdrop-blur-xl">
-              <div className="relative w-full sm:w-80">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl">
+              <div className="relative w-full sm:w-72">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <input
                   type="text"
                   value={historySearch}
                   onChange={(e) => setHistorySearch(e.target.value)}
                   placeholder="Search past questions & citations..."
-                  className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/40"
+                  className="w-full h-8.5 pl-9 pr-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary shadow-xs"
                 />
               </div>
 
-              <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={loadSessions}
-                  className="h-10 rounded-xl gap-1.5 text-xs font-bold"
+                  className="h-8 rounded-xl gap-1 text-xs font-bold"
                 >
-                  <RefreshCw className="h-3.5 w-3.5" />
+                  <RefreshCw className="h-3 w-3" />
                   <span>Refresh</span>
                 </Button>
                 {sessions.length > 0 && (
@@ -677,9 +742,9 @@ function UserProfileContent() {
                     variant="ghost"
                     size="sm"
                     onClick={handleClearHistory}
-                    className="h-10 rounded-xl gap-1.5 text-xs font-bold text-destructive hover:bg-destructive/10"
+                    className="h-8 rounded-xl gap-1 text-xs font-bold text-destructive hover:bg-destructive/10"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2 className="h-3 w-3" />
                     <span>Clear All</span>
                   </Button>
                 )}
@@ -687,34 +752,34 @@ function UserProfileContent() {
             </div>
 
             {filteredSessions.length === 0 ? (
-              <Card className="p-12 text-center text-muted-foreground text-xs flex flex-col items-center justify-center gap-3 bg-card/60 backdrop-blur-xl border-border/80 rounded-3xl">
-                <MessageSquare className="h-8 w-8 text-muted-foreground/50" />
+              <Card className="p-10 text-center text-muted-foreground text-xs flex flex-col items-center justify-center gap-2.5 bg-card/60 backdrop-blur-xl border-border/80 rounded-2xl">
+                <MessageSquare className="h-7 w-7 text-muted-foreground/40" />
                 <span className="font-bold text-sm text-foreground">No chat history recorded yet</span>
                 <p className="text-xs text-muted-foreground">Ask questions in Grounded RAG Chat to automatically record citations and transcripts.</p>
                 <Button
                   size="sm"
                   onClick={() => router.push("/chat")}
-                  className="mt-2 rounded-2xl gap-2 font-bold bg-primary text-primary-foreground"
+                  className="mt-1 rounded-xl gap-1.5 font-bold text-xs bg-primary text-primary-foreground"
                 >
-                  <Sparkles className="h-4 w-4" />
+                  <Sparkles className="h-3.5 w-3.5" />
                   <span>Start New Conversation</span>
                 </Button>
               </Card>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {filteredSessions.map((s) => (
                   <div
                     key={s.id}
-                    className="p-5 sm:p-6 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-md hover:border-primary/40 transition-all space-y-3"
+                    className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card space-y-2.5"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0">
-                          <MessageSquare className="h-4 w-4" />
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0">
+                          <MessageSquare className="h-3.5 w-3.5" />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="text-sm font-bold text-foreground truncate">{s.title}</h4>
-                          <p className="text-[11px] font-mono text-muted-foreground flex items-center gap-2 pt-0.5">
+                          <h4 className="text-xs font-bold text-foreground truncate">{s.title}</h4>
+                          <p className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 pt-0.5">
                             <span>{new Date(s.createdAt).toLocaleString()}</span>
                             <span>•</span>
                             <span>{s.messages.length} messages</span>
@@ -724,30 +789,30 @@ function UserProfileContent() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 self-end sm:self-auto">
+                      <div className="flex items-center gap-1.5 self-end sm:self-auto">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleCopyChat(s)}
-                          className="h-8 px-2.5 rounded-xl text-xs gap-1"
+                          className="h-7 px-2.5 rounded-lg text-[11px] gap-1"
                           title="Copy Full Q&A"
                         >
-                          {copiedId === s.id ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-                          <span className="hidden sm:inline">{copiedId === s.id ? "Copied" : "Copy"}</span>
+                          {copiedId === s.id ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
+                          <span>{copiedId === s.id ? "Copied" : "Copy"}</span>
                         </Button>
                         <Button
                           size="sm"
                           onClick={() => router.push(`/chat?session=${s.id}`)}
-                          className="h-8 px-3 rounded-xl text-xs font-bold gap-1.5 bg-primary text-primary-foreground shadow-sm"
+                          className="h-7 px-3 rounded-lg text-[11px] font-bold gap-1 bg-primary text-primary-foreground shadow-xs"
                         >
-                          <span>Resume in Chat</span>
-                          <ArrowRight className="h-3.5 w-3.5" />
+                          <span>Resume</span>
+                          <ArrowRight className="h-3 w-3" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteSession(s.id)}
-                          className="h-8 w-8 p-0 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                          className="h-7 w-7 p-0 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                           title="Delete Session"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -757,7 +822,7 @@ function UserProfileContent() {
 
                     {/* Preview of latest message */}
                     {s.messages.length > 0 && s.messages[s.messages.length - 1] && (
-                      <div className="p-3 rounded-xl bg-muted/40 border border-border/50 text-xs text-muted-foreground font-sans line-clamp-2">
+                      <div className="p-2.5 rounded-xl bg-muted/40 border border-border/40 text-[11px] text-muted-foreground font-sans line-clamp-2">
                         <span className="font-bold text-foreground">
                           {s.messages[s.messages.length - 1]?.role === "user" ? "Q: " : "A: "}
                         </span>
@@ -771,57 +836,58 @@ function UserProfileContent() {
           </div>
         )}
 
-        {/* TAB 3: COMMUNITY HUB */}
+        {/* ── TAB 3: COMMUNITY HUB ──────────────────────────────────────── */}
         {activeTab === "community" && (
-          <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="space-y-4 animate-in fade-in duration-200">
             
             {/* Banner & Post Share Button */}
-            <div className="relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-primary/15 via-purple-500/10 to-transparent border border-primary/30 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="space-y-2 max-w-xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-primary text-[10px] font-mono tracking-wider uppercase font-bold">
-                  <Sparkles className="h-3.5 w-3.5" />
+            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-primary/15 via-indigo-500/10 to-transparent border border-primary/30 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1.5 max-w-lg">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/20 border border-primary/30 text-primary text-[10px] font-mono tracking-wider uppercase font-bold">
+                  <Sparkles className="h-3 w-3" />
                   <span>Polaris Knowledge Exchange</span>
                 </div>
-                <CrystalGlow as="h2" fontSize="clamp(1.5rem, 2.5vw, 2.2rem)" fontWeight={900}>
+                <h2 className="text-xl sm:text-2xl font-black text-foreground">
                   Community Knowledge Hub
-                </CrystalGlow>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  Discover peer-reviewed syllabus topologies, vetted lecture notes, and share your own academic indexes with researchers worldwide.
+                </h2>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Discover peer-reviewed syllabus topologies, vetted lecture notes, and share your own academic indexes.
                 </p>
               </div>
 
               <Button
                 onClick={() => setShowShareModal(true)}
-                className="h-12 px-6 rounded-2xl font-bold text-sm bg-primary text-primary-foreground shadow-xl hover:scale-105 active:scale-95 transition-transform flex items-center gap-2 shrink-0"
+                className="h-10 px-5 rounded-xl font-bold text-xs bg-primary text-primary-foreground shadow-md hover:scale-105 active:scale-95 transition-transform flex items-center gap-1.5 shrink-0"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-3.5 w-3.5" />
                 <span>Share Knowledge Pack</span>
               </Button>
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-card/75 border border-border/80 backdrop-blur-xl">
-              <div className="relative w-full sm:w-80">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl">
+              <div className="relative w-full sm:w-72">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <input
                   type="text"
                   value={communitySearch}
                   onChange={(e) => setCommunitySearch(e.target.value)}
-                  placeholder="Search community notes, syllabi, topics..."
-                  className="w-full h-10 pl-10 pr-4 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder="Search community notes, topics..."
+                  className="w-full h-8.5 pl-9 pr-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary shadow-xs"
                 />
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto p-1">
+              <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto p-0.5">
                 {["All", "Computer Science", "Biochemistry", "Mathematics", "Physics"].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                    className={cn(
+                      "px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition-all",
                       selectedCategory === cat
                         ? "bg-primary text-primary-foreground shadow-xs"
                         : "bg-muted/40 text-muted-foreground hover:text-foreground"
-                    }`}
+                    )}
                   >
                     {cat}
                   </button>
@@ -830,36 +896,36 @@ function UserProfileContent() {
             </div>
 
             {/* Community Feed Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {filteredCommunity.map((post) => {
                 const isLiked = likedPosts.has(post.id);
 
                 return (
                   <div
                     key={post.id}
-                    className="p-6 rounded-3xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-lg hover:border-primary/40 transition-all flex flex-col justify-between space-y-4 group"
+                    className="p-5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between space-y-3 group"
                   >
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
+                        <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
                           {post.category}
                         </span>
                         <span className="text-[10px] font-mono text-muted-foreground">{post.date}</span>
                       </div>
 
-                      <h3 className="text-base font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
+                      <h3 className="text-sm font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
                         {post.title}
                       </h3>
 
-                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3 font-light">
+                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
                         {post.description}
                       </p>
 
-                      <div className="flex flex-wrap gap-1.5 pt-1">
+                      <div className="flex flex-wrap gap-1 pt-1">
                         {post.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-muted/60 text-muted-foreground"
+                            className="px-2 py-0.5 rounded-md text-[9px] font-mono bg-muted/60 text-muted-foreground"
                           >
                             #{tag}
                           </span>
@@ -867,28 +933,29 @@ function UserProfileContent() {
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="pt-3 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">
                       <div className="flex items-center gap-1.5">
-                        <div className="w-6 h-6 rounded-full bg-primary/20 text-primary font-bold text-[10px] flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-full bg-primary/20 text-primary font-bold text-[9px] flex items-center justify-center">
                           {post.author.charAt(0)}
                         </div>
-                        <span className="font-medium text-foreground text-xs truncate max-w-[110px]">
+                        <span className="font-medium text-foreground text-xs truncate max-w-[100px]">
                           {post.author}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5">
                         <button
                           onClick={() => handleLikePost(post.id)}
-                          className={`flex items-center gap-1 text-xs font-mono transition-colors ${
+                          className={cn(
+                            "flex items-center gap-1 text-xs font-mono transition-colors",
                             isLiked ? "text-rose-500 font-bold" : "hover:text-foreground"
-                          }`}
+                          )}
                         >
-                          <ThumbsUp className="h-3.5 w-3.5" />
+                          <ThumbsUp className="h-3 w-3" />
                           <span>{post.likes}</span>
                         </button>
                         <span className="flex items-center gap-1 text-xs font-mono">
-                          <MessageCircle className="h-3.5 w-3.5" />
+                          <MessageCircle className="h-3 w-3" />
                           <span>{post.comments}</span>
                         </span>
                       </div>
@@ -900,45 +967,45 @@ function UserProfileContent() {
           </div>
         )}
 
-        {/* TAB 4: PREFERENCES & SYSTEM */}
+        {/* ── TAB 4: PREFERENCES & SYSTEM ──────────────────────────────── */}
         {activeTab === "settings" && (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               
               {/* Appearance & Themes */}
-              <div className="p-6 rounded-3xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-lg space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
-                    <Sparkles className="h-5 w-5" />
+              <div className="p-5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card space-y-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20">
+                    <Sparkles className="h-4 w-4" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-foreground">Theme & Visual Engine</h3>
-                    <p className="text-xs text-muted-foreground">Switch between high-contrast Polaris luxury themes</p>
+                    <h3 className="text-sm font-bold text-foreground">Theme & Visual Engine</h3>
+                    <p className="text-[11px] text-muted-foreground">Switch between high-contrast Dark and Light Lumina themes</p>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-border/50 flex items-center justify-between">
-                  <span className="text-xs font-bold text-foreground">Active Palette</span>
+                <div className="pt-2 border-t border-border/40 flex items-center justify-between">
+                  <span className="text-xs font-bold text-foreground">Active Palette Switcher</span>
                   <ThemeToggle />
                 </div>
               </div>
 
               {/* RAG & Vector Engine Diagnostics */}
-              <div className="p-6 rounded-3xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-lg space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <Cpu className="h-5 w-5" />
+              <div className="p-5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card space-y-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                    <Cpu className="h-4 w-4" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-foreground">AI & Vector Store Telemetry</h3>
-                    <p className="text-xs text-muted-foreground">Connected microservices and inference nodes</p>
+                    <h3 className="text-sm font-bold text-foreground">AI & Vector Store Telemetry</h3>
+                    <p className="text-[11px] text-muted-foreground">Connected microservices and vector nodes</p>
                   </div>
                 </div>
 
-                <div className="pt-2 space-y-2.5 text-xs font-mono">
+                <div className="pt-2 space-y-2 text-xs font-mono">
                   <div className="flex items-center justify-between p-2 rounded-xl bg-muted/40">
-                    <span className="text-muted-foreground">Vector Database:</span>
-                    <span className="text-emerald-400 font-bold">Qdrant Multi-Tenant (Active)</span>
+                    <span className="text-muted-foreground">Vector DB:</span>
+                    <span className="text-emerald-500 font-bold">Qdrant Active (1536-dim)</span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-xl bg-muted/40">
                     <span className="text-muted-foreground">RAG Inference:</span>
@@ -946,7 +1013,7 @@ function UserProfileContent() {
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-xl bg-muted/40">
                     <span className="text-muted-foreground">Auth Provider:</span>
-                    <span className="text-foreground font-bold">Supabase / Firebase Multi-Tenant</span>
+                    <span className="text-foreground font-bold">Firebase Multi-Tenant</span>
                   </div>
                 </div>
               </div>
@@ -959,15 +1026,15 @@ function UserProfileContent() {
       {/* Share to Community Modal */}
       {showShareModal && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="max-w-lg w-full rounded-3xl bg-card border border-border/80 p-6 sm:p-8 space-y-6 shadow-2xl relative">
+          <div className="max-w-md w-full rounded-3xl bg-card border border-border/80 p-6 space-y-4 shadow-2xl relative">
             <div className="space-y-1">
-              <h2 className="text-xl font-black text-foreground">Share Knowledge Pack</h2>
+              <h2 className="text-lg font-black text-foreground">Share Knowledge Pack</h2>
               <p className="text-xs text-muted-foreground">
                 Publish a study syllabus, course notes collection, or topic topology to the community.
               </p>
             </div>
 
-            <form onSubmit={handleCreatePost} className="space-y-4">
+            <form onSubmit={handleCreatePost} className="space-y-3">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-foreground">Pack Title</label>
                 <input
@@ -976,7 +1043,7 @@ function UserProfileContent() {
                   onChange={(e) => setNewPostTitle(e.target.value)}
                   placeholder="e.g. CS189 Machine Learning Complete Guide"
                   required
-                  className="w-full h-10 px-3.5 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/40"
+                  className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
 
@@ -985,7 +1052,7 @@ function UserProfileContent() {
                 <select
                   value={newPostCategory}
                   onChange={(e) => setNewPostCategory(e.target.value)}
-                  className="w-full h-10 px-3.5 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/40"
+                  className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
                 >
                   <option value="Computer Science">Computer Science</option>
                   <option value="Biochemistry">Biochemistry</option>
@@ -1001,9 +1068,9 @@ function UserProfileContent() {
                   value={newPostDesc}
                   onChange={(e) => setNewPostDesc(e.target.value)}
                   placeholder="Describe the topics covered, textbook citations, and key prerequisites..."
-                  rows={3}
+                  rows={2}
                   required
-                  className="w-full p-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/40 resize-none"
+                  className="w-full p-2.5 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary resize-none"
                 />
               </div>
 
@@ -1014,22 +1081,22 @@ function UserProfileContent() {
                   value={newPostTags}
                   onChange={(e) => setNewPostTags(e.target.value)}
                   placeholder="e.g. AI, Algorithms, ExamPrep"
-                  className="w-full h-10 px-3.5 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-2 focus:ring-primary/40"
+                  className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-3">
+              <div className="pt-2 flex items-center justify-end gap-2">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setShowShareModal(false)}
-                  className="rounded-xl text-xs"
+                  className="rounded-xl text-xs h-8.5"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="rounded-xl font-bold text-xs bg-primary text-primary-foreground shadow-md"
+                  className="rounded-xl font-bold text-xs h-8.5 bg-primary text-primary-foreground shadow-sm"
                 >
                   Publish to Community
                 </Button>
@@ -1038,6 +1105,9 @@ function UserProfileContent() {
           </div>
         </div>
       )}
+
+      {/* Pages OCR Viewer Modal */}
+      <PagesViewer doc={viewingDoc} onClose={() => setViewingDoc(null)} />
     </div>
   );
 }

@@ -187,11 +187,11 @@ function ChatContent() {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen text-foreground flex flex-col relative overflow-x-hidden pb-12">
+    <div className="h-screen w-full max-h-screen text-foreground flex flex-col relative overflow-hidden pt-14 sm:pt-16">
       <SiteHeader />
 
-      {/* Unified Shader Screen Wrapper - stays mounted during whole chat */}
-      <div className="flex-1 relative w-full flex flex-col">
+      {/* Unified Fullscreen Shader Screen Wrapper */}
+      <div className="flex-1 min-h-0 relative w-full flex flex-col h-full">
         <HeroWave
           hideNavbar
           title="Ask Polaris Grounded RAG."
@@ -201,33 +201,33 @@ function ChatContent() {
           onPromptSubmit={(val) => sendQuestion(val)}
         >
           {messages.length > 0 && (
-            <div className="w-full h-full max-w-5xl mx-auto flex flex-col justify-between p-4 sm:p-6 z-10">
+            <div className="w-full h-full max-w-5xl mx-auto flex flex-col justify-between p-2 sm:p-4 z-10 min-h-0">
               
               {/* Top Settings Bar */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-slate-200/80 dark:border-white/10 shadow-lg text-xs font-medium text-slate-900 dark:text-slate-100">
-                <div className="flex items-center gap-3">
-                  <span className="text-slate-600 dark:text-slate-300 flex items-center gap-1.5 font-bold uppercase tracking-wider text-[11px]">
+              <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl border border-border/80 shadow-md text-xs font-medium text-foreground shrink-0">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <span className="text-muted-foreground flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px] sm:text-[11px]">
                     <Settings2 className="h-3.5 w-3.5 text-primary" /> Model:
                   </span>
                   <select
                     value={selectedModel}
                     onChange={(e) => setSelectedModel(e.target.value)}
-                    className="bg-slate-100 dark:bg-zinc-800 px-3 py-1.5 text-xs rounded-md text-slate-900 dark:text-slate-100 focus:outline-none font-medium border border-slate-300 dark:border-zinc-700"
+                    className="bg-muted/60 px-2.5 py-1 text-xs rounded-xl text-foreground focus:outline-none font-medium border border-border/60"
                   >
                     <option value="groq-llama3-70b">Groq Llama-3.1 70B (Fast Free)</option>
                     <option value="nvidia-nim-embed">NVIDIA NIM Grounded</option>
                   </select>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 bg-emerald-500/10">
-                    Qdrant RAG Active
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 font-mono">
+                    Qdrant Active
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleNewChat}
-                    className="h-7 text-[11px] gap-1 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-800"
+                    className="h-7 text-[11px] gap-1 rounded-xl text-foreground border-border/80 hover:bg-muted/80"
                   >
                     <RefreshCw className="h-3 w-3" />
                     <span>New Chat</span>
@@ -235,10 +235,10 @@ function ChatContent() {
                 </div>
               </div>
 
-              {/* Glassmorphism Chat Stream Container */}
+              {/* Glassmorphism Full-Screen Chat Stream Container */}
               <div
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto space-y-2 my-3 p-3 sm:p-5 rounded-2xl bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-2xl max-h-[64vh]"
+                className="flex-1 min-h-0 overflow-y-auto space-y-2.5 my-2.5 p-3 sm:p-5 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/80 shadow-xl"
               >
                 {messages.map((msg, idx) => (
                   <ChatMessage
@@ -253,11 +253,11 @@ function ChatContent() {
                 ))}
               </div>
 
-              {/* Bottom Input Box - Hugging the Base with High-Contrast Glassmorphism */}
-              <div className="w-full pb-2">
+              {/* Bottom Input Box - Base Pinned with Sleek Glassmorphism */}
+              <div className="w-full shrink-0 pb-1 sm:pb-2">
                 <form
                   onSubmit={submit}
-                  className="relative flex items-center gap-2 p-2 rounded-2xl bg-white/90 dark:bg-zinc-900/90 border border-slate-300 dark:border-white/15 shadow-2xl backdrop-blur-xl focus-within:ring-2 focus-within:ring-primary/50"
+                  className="relative flex items-center gap-2 p-2 rounded-2xl bg-card/90 border border-border/80 shadow-2xl backdrop-blur-2xl focus-within:ring-2 focus-within:ring-primary/40"
                 >
                   <textarea
                     value={input}
@@ -267,27 +267,27 @@ function ChatContent() {
                     disabled={streaming}
                     data-agent-target="chat-input"
                     rows={2}
-                    className="flex-1 bg-transparent border-none outline-none resize-none text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-xs sm:text-sm px-3 py-2"
+                    className="flex-1 bg-transparent border-none outline-none resize-none text-foreground placeholder:text-muted-foreground text-xs sm:text-sm px-3 py-1.5"
                   />
-                  <div className="flex items-center gap-2 pr-2">
+                  <div className="flex items-center gap-1.5 pr-2">
                     <button
                       type="button"
                       onClick={() => setMicActive(!micActive)}
                       className={`p-2 rounded-xl border transition-colors ${
                         micActive
                           ? "bg-rose-500/10 text-rose-500 border-rose-500/30"
-                          : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white border-transparent"
+                          : "text-muted-foreground hover:text-foreground border-transparent"
                       }`}
                     >
                       <Mic className="h-4 w-4" />
                     </button>
                     {streaming ? (
-                      <Button type="button" onClick={cancel} size="sm" variant="destructive" className="h-9 px-3 gap-1">
+                      <Button type="button" onClick={cancel} size="sm" variant="destructive" className="h-9 px-3 gap-1 rounded-xl">
                         <Square className="h-3.5 w-3.5" />
                         <span>Stop</span>
                       </Button>
                     ) : (
-                      <Button type="submit" disabled={!input.trim()} data-agent-target="chat-send-btn" size="sm" className="h-9 px-4 gap-1 font-bold">
+                      <Button type="submit" disabled={!input.trim()} data-agent-target="chat-send-btn" size="sm" className="h-9 px-4 gap-1.5 font-bold rounded-xl shadow-md">
                         <span>Send</span>
                         <Sparkles className="h-3.5 w-3.5" />
                       </Button>
@@ -315,4 +315,5 @@ export default function ChatPage() {
     </Suspense>
   );
 }
+
 
