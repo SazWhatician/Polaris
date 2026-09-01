@@ -20,25 +20,18 @@ import {
   Layers,
   ArrowRight,
   ShieldCheck,
-  ThumbsUp,
-  MessageCircle,
-  Plus,
   Copy,
   Check,
   Database,
   Cpu,
-  Zap,
   Eye,
-  Award,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { SiteHeader } from "@/components/site-header";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { CrystalGlow } from "@/components/ui/crystal-glow";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth-context";
 import {
   listDocuments,
@@ -79,7 +72,7 @@ function UserProfileContent() {
   const [onboardingModalOpen, setOnboardingModalOpen] = useState(false);
   const [friendsDrawerOpen, setFriendsDrawerOpen] = useState(false);
 
-  const { posts: communityPosts, profile: communityProfile, friends: communityFriends } = useCommunityStore();
+  const { posts: communityPosts } = useCommunityStore();
   const containerRef = useGsapEntrance(".gsap-user", 0.04);
 
   // Load documents

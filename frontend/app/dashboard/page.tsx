@@ -11,7 +11,6 @@ import {
   Sparkles,
   MessageSquare,
   Target,
-  Brain,
   ArrowUpRight,
   Database,
   Activity,
@@ -19,8 +18,6 @@ import {
   BookOpen,
   Calendar,
   UploadCloud,
-  Cpu,
-  Search,
 } from "lucide-react";
 import { toast } from "sonner";
 

@@ -2,11 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useMemo } from "react";
-import Link from "next/link";
 import {
   FileText,
   Clock,
-  CheckCircle2,
   Layers,
   RefreshCw,
   Sparkles,
@@ -14,9 +12,7 @@ import {
   Search,
   Eye,
   Trash2,
-  Loader2,
   Database,
-  ArrowUpRight,
 } from "lucide-react";
 import { toast } from "sonner";
 

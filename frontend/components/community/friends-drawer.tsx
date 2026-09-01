@@ -12,17 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   useCommunityStore,
-  type Friend,
 } from "@/lib/community-store";
 import {
   Users,
-  UserPlus,
   UserCheck,
   Clock,
   Search,
   School,
-  GraduationCap,
-  Sparkles,
   MessageSquare,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -36,7 +32,7 @@ interface Props {
 
 export function FriendsDrawer({ open, onOpenChange }: Props) {
   const router = useRouter();
-  const { friends, toggleFriendStatus, profile, sendFriendRequest } = useCommunityStore();
+  const { friends, toggleFriendStatus, profile } = useCommunityStore();
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"all" | "requests">("all");
 

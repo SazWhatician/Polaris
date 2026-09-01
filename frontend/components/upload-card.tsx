@@ -5,7 +5,6 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { uploadDocument, type DocumentResponse } from "@/lib/api/documents";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 const ACCEPTED = "application/pdf,image/jpeg,image/png,image/webp";

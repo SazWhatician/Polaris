@@ -2,7 +2,6 @@
 
 import React from "react";
 import { LucideIcon } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { useAnimeCounter } from "@/lib/use-animation-system";
 import { cn } from "@/lib/utils";
 

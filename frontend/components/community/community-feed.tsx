@@ -18,21 +18,11 @@ import {
   Send,
   FileText,
   CheckCircle2,
-  Bookmark,
-  Layers,
-  Brain,
-  Cpu,
-  ArrowRight,
   ShieldCheck,
-  Tag,
 } from "lucide-react";
 import {
   useCommunityStore,
   type CommunityPost,
-  type Community,
-  COLLEGES,
-  COURSES,
-  YEARS,
 } from "@/lib/community-store";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -53,7 +43,6 @@ export function CommunityFeed({}: Props) {
     selectedCollegeFilter,
     selectedCourseFilter,
     selectedYearFilter,
-    setFilters,
     toggleJoinCommunity,
     createPost,
     toggleLikePost,
