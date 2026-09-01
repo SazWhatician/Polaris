@@ -9,6 +9,7 @@ import { NotchNavbar } from "@/components/landing/notch-navbar";
 import { OpeningHeroScene } from "@/components/landing/opening-hero-scene";
 import { CascadeHandScrollSection } from "@/components/landing/cascade-hand-scroll-section";
 import { DreamyCloudsParallaxSection } from "@/components/landing/dreamy-clouds-parallax-section";
+import { CodexQuillScrollSection } from "@/components/landing/codex-quill-scroll-section";
 import { ReactorFooter } from "@/components/reactor-footer";
 import { AnimatedShaderCard } from "@/components/ui/animated-shader-card";
 import { CrystalGlow } from "@/components/ui/crystal-glow";
@@ -50,7 +51,10 @@ export default function Home() {
         {/* SCENE 3: Dreamy Clouds Parallax Section (2 Clouds + Liquid P Shader) */}
         <DreamyCloudsParallaxSection />
 
-        {/* SCENE 4: Tactical Feature Architecture & Intelligence Engine */}
+        {/* SCENE 4: Classical Codex Manuscript Scroll Section (book123.png + handbook123.png) */}
+        <CodexQuillScrollSection />
+
+        {/* SCENE 5: Tactical Feature Architecture & Intelligence Engine */}
         <section id="features-section" className="relative z-20 py-28 sm:py-36 px-6 max-w-7xl mx-auto space-y-16 border-t border-white/[0.08]">
           {/* Precision Intelligence Banner Card */}
           <AnimatedShaderCard className="max-w-4xl mx-auto">

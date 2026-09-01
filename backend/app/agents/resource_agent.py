@@ -33,23 +33,26 @@ class ResourceAgent:
         groq_client: GroqClient | None = None,
     ) -> None:
         self.youtube_service = youtube_service or YouTubeService()
-        self.cache_repo = cache_repo or ResourceCacheRepository()
-        self.groq_client = groq_client or GroqClient()
+        self.cache_repo = cache_repo
+        self.groq_client = groq_client
 
     async def check_cache(self, state: ResourceAgentState) -> dict[str, Any]:
         """Checks Firestore cache for previously ranked educational resources for this topic."""
         topic_hash = compute_topic_hash(state["topic_title"])
-        cached = await self.cache_repo.get_cached_resources(state["user_id"], topic_hash)
-
-        if cached and cached.resources:
-            logger.info(
-                "Cache HIT for topic_title='%s' (hash=%s)", state["topic_title"], topic_hash
-            )
-            return {
-                "topic_hash": topic_hash,
-                "from_cache": True,
-                "ranked_resources": cached.resources,
-            }
+        if self.cache_repo:
+            try:
+                cached = await self.cache_repo.get_cached_resources(state["user_id"], topic_hash)
+                if cached and cached.resources:
+                    logger.info(
+                        "Cache HIT for topic_title='%s' (hash=%s)", state["topic_title"], topic_hash
+                    )
+                    return {
+                        "topic_hash": topic_hash,
+                        "from_cache": True,
+                        "ranked_resources": cached.resources,
+                    }
+            except Exception as err:
+                logger.warning("Cache check non-fatal error: %s", err)
 
         logger.info("Cache MISS for topic_title='%s' (hash=%s)", state["topic_title"], topic_hash)
         return {
@@ -94,6 +97,16 @@ class ResourceAgent:
         candidates = state.get("raw_candidates") or []
         if not candidates:
             return {"ranked_resources": []}
+
+        if not self.groq_client:
+            logger.info("No Groq client provided. Using heuristic ranking for topic '%s'", state["topic_title"])
+            fallback_results: list[dict[str, Any]] = []
+            for idx, c in enumerate(candidates[:5]):
+                c_copy = dict(c)
+                c_copy["rank_score"] = round(0.95 - idx * 0.08, 2)
+                c_copy["why_recommended"] = f"Top-rated educational tutorial covering core principles of {state['topic_title']}."
+                fallback_results.append(c_copy)
+            return {"ranked_resources": fallback_results}
 
         try:
             prompt_tmpl = load_prompt("resource_ranker", "v1")
@@ -158,14 +171,17 @@ class ResourceAgent:
             return {}
 
         ranked = state.get("ranked_resources") or []
-        if ranked:
-            await self.cache_repo.save_cached_resources(
-                user_id=state["user_id"],
-                topic_hash=state["topic_hash"],
-                topic_id=state["topic_id"],
-                topic_title=state["topic_title"],
-                resources=ranked,
-            )
+        if ranked and self.cache_repo:
+            try:
+                await self.cache_repo.save_cached_resources(
+                    user_id=state["user_id"],
+                    topic_hash=state["topic_hash"],
+                    topic_id=state["topic_id"],
+                    topic_title=state["topic_title"],
+                    resources=ranked,
+                )
+            except Exception as err:
+                logger.warning("Cache save non-fatal error: %s", err)
         return {}
 
     def compile(self, checkpointer: Any = None) -> Any:

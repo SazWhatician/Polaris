@@ -363,8 +363,29 @@ export function LightBloom(props: LightBloomProps) {
       gl.uniform1f(u.vignette, v.vignette);
 
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      raf = requestAnimationFrame(render);
+      if (isVisible) {
+        raf = requestAnimationFrame(render);
+      }
     };
+
+    let isVisible = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const nextVisible = entry?.isIntersecting ?? true;
+        if (nextVisible !== isVisible) {
+          isVisible = nextVisible;
+          if (isVisible) {
+            cancelAnimationFrame(raf);
+            last = performance.now();
+            raf = requestAnimationFrame(render);
+          } else {
+            cancelAnimationFrame(raf);
+          }
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    if (canvas) observer.observe(canvas);
 
     const onMove = (e: MouseEvent | PointerEvent) => {
       const r = canvas.getBoundingClientRect();
@@ -393,6 +414,7 @@ export function LightBloom(props: LightBloomProps) {
     raf = requestAnimationFrame(render);
 
     return () => {
+      observer.disconnect();
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerenter", onEnter);

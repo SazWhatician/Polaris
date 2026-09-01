@@ -100,7 +100,23 @@ export function CascadeHandScrollSection() {
       );
     }, triggerRef);
 
+    // Pause background video when off-screen to conserve GPU memory
+    const videoEl = videoRef.current;
+    const videoObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (!videoEl) return;
+        if (entry?.isIntersecting) {
+          videoEl.play().catch(() => {});
+        } else {
+          videoEl.pause();
+        }
+      },
+      { rootMargin: "250px" }
+    );
+    if (triggerEl) videoObserver.observe(triggerEl);
+
     return () => {
+      videoObserver.disconnect();
       ctx.revert();
     };
   }, []);
@@ -125,6 +141,7 @@ export function CascadeHandScrollSection() {
             alt="Multi-Device Cascade Grid"
             fill
             priority
+            sizes="100vw"
             className="w-full h-full object-cover object-center opacity-90 scale-100"
           />
         </div>
@@ -184,6 +201,7 @@ export function CascadeHandScrollSection() {
               alt="3D Hand Scroll"
               fill
               priority
+              sizes="(max-width: 768px) 320px, (max-width: 1024px) 420px, 480px"
               className="object-contain relative z-10 pointer-events-none"
             />
           </div>

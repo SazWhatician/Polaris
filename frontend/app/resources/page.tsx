@@ -34,14 +34,39 @@ export default function ResourcesPage() {
       const run = await triggerResourceDiscovery(`topic-${Date.now()}`, topicTitle.trim());
       const threadId = run.thread_id;
 
+      let attempts = 0;
+      const maxAttempts = 30; // 60 seconds max
+
       // Poll until finished
       const interval = setInterval(async () => {
+        attempts++;
         try {
-          const res = await getResourceDiscoveryStatus(threadId);
-          setDiscoveryResult(res);
-          setLoading(false);
-          setStatusMsg("");
-          clearInterval(interval);
+          const res = await getResourceDiscoveryStatus(threadId) as (ResourceDiscoveryResponse & { detail?: string });
+          
+          if (res && res.detail === "Resource discovery is still in progress") {
+            if (attempts >= maxAttempts) {
+              clearInterval(interval);
+              setError("Resource discovery timed out. Please try again.");
+              setLoading(false);
+              setStatusMsg("");
+            }
+            return;
+          }
+
+          if (res && Array.isArray(res.resources)) {
+            setDiscoveryResult(res);
+            setLoading(false);
+            setStatusMsg("");
+            clearInterval(interval);
+            return;
+          }
+
+          if (attempts >= maxAttempts) {
+            clearInterval(interval);
+            setError("No resources found for this topic.");
+            setLoading(false);
+            setStatusMsg("");
+          }
         } catch (err: unknown) {
           const errObj = err as { status?: number; message?: string };
           if (errObj?.status !== 202) {

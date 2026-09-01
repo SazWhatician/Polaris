@@ -82,6 +82,7 @@ export function LandingLoader({
               alt="Polaris Emblem"
               fill
               priority
+              sizes="(max-width: 640px) 48px, 64px"
               className="object-contain drop-shadow-[0_0_24px_rgba(255,255,255,0.35)]"
             />
           </div>

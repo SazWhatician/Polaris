@@ -19,7 +19,8 @@ import { useEffect, useRef } from "react";
 
 /* ─────────────────────────────  GLSL  ───────────────────────────── */
 
-const VS = /* glsl */ `#version 300 es
+const VS = `#version 300 es
+precision highp float;
 in vec2 aPos;
 out vec2 vUv;
 void main() {
@@ -29,8 +30,14 @@ void main() {
 
 /* ---------- Simulation ---------- */
 
-const FS_SIM = /* glsl */ `#version 300 es
+const FS_SIM = `#version 300 es
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+precision highp int;
+#else
+precision mediump float;
+precision mediump int;
+#endif
 
 uniform float     iTime;
 uniform vec2      iResolution;
@@ -161,7 +168,13 @@ void main() {
 /* ---------- Display ---------- */
 
 const FS_DISPLAY = `#version 300 es
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+precision highp int;
+#else
+precision mediump float;
+precision mediump int;
+#endif
 
 uniform float     iTime;
 uniform vec2      iResolution;
@@ -468,7 +481,7 @@ export function PolarisLiquidP({
 
     /* ── state ── */
     const state = {
-      dpr: Math.min(window.devicePixelRatio || 1, 2),
+      dpr: Math.min(window.devicePixelRatio || 1, 1.5),
       imgW: 1, imgH: 1,
       time: 0,
       frame: 0,
@@ -693,11 +706,33 @@ export function PolarisLiquidP({
       drawDisplay(fboA.tex);
 
       state.frame++;
-      rafId = requestAnimationFrame(loop);
+      if (isVisible && !disposed) {
+        rafId = requestAnimationFrame(loop);
+      }
     };
+
+    let isVisible = true;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const nextVisible = entry?.isIntersecting ?? true;
+        if (nextVisible !== isVisible) {
+          isVisible = nextVisible;
+          if (isVisible && !disposed && !reducedMotion) {
+            cancelAnimationFrame(rafId);
+            state.lastTime = performance.now();
+            rafId = requestAnimationFrame(loop);
+          } else {
+            cancelAnimationFrame(rafId);
+          }
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    observer.observe(canvas);
 
     return () => {
       disposed = true;
+      observer.disconnect();
       cancelAnimationFrame(rafId);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerleave", onLeave);

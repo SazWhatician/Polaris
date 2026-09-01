@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from app.agents.resource_agent import ResourceAgent
 from app.core.deps import CurrentUser
 from app.core.firebase import get_firestore, is_initialized
+from app.core.logging import get_logger
 from app.models.resource import ResourceDiscoveryResponse, ResourceItem
 from app.repositories.checkpoint_repo import FirestoreCheckpointSaver
 from app.repositories.resource_cache_repo import ResourceCacheRepository, compute_topic_hash
@@ -26,21 +27,27 @@ class ResourceRunResponse(BaseModel):
     status: str = Field(description="Current run status: 'running' | 'completed' | 'failed'")
 
 
-def get_resource_agent_graph(request: Request) -> Any:
-    if not is_initialized():
-        raise HTTPException(
-            status.HTTP_503_SERVICE_UNAVAILABLE, detail="Firestore backend unavailable"
-        )
+from langgraph.checkpoint.memory import MemorySaver
 
+logger = get_logger(__name__)
+
+
+def get_resource_agent_graph(request: Request) -> Any:
     groq_client = getattr(request.app.state, "groq_client", None)
     if not groq_client:
         rag_service = getattr(request.app.state, "rag_service", None)
         if rag_service:
-            groq_client = rag_service._groq
+            groq_client = getattr(rag_service, "_groq", None)
 
-    cache_repo = ResourceCacheRepository(get_firestore())
+    if is_initialized():
+        db = get_firestore()
+        cache_repo = ResourceCacheRepository(db)
+        checkpointer = FirestoreCheckpointSaver(db)
+    else:
+        cache_repo = None
+        checkpointer = MemorySaver()
+
     agent = ResourceAgent(cache_repo=cache_repo, groq_client=groq_client)
-    checkpointer = FirestoreCheckpointSaver(get_firestore())
     return agent.compile(checkpointer=checkpointer)
 
 
@@ -50,8 +57,11 @@ ResourceAgentGraphDep = Annotated[Any, Depends(get_resource_agent_graph)]
 async def run_resource_agent_task(
     graph: Any, thread_id: str, user_id: str, topic_id: str, topic_title: str
 ) -> None:
-    if hasattr(graph, "checkpointer") and graph.checkpointer:
-        await graph.checkpointer.adelete_thread(thread_id)
+    if hasattr(graph, "checkpointer") and graph.checkpointer and hasattr(graph.checkpointer, "adelete_thread"):
+        try:
+            await graph.checkpointer.adelete_thread(thread_id)
+        except Exception as e:
+            logger.warning("Checkpointer thread cleanup note: %s", e)
 
     state = {
         "user_id": user_id,
@@ -66,8 +76,8 @@ async def run_resource_agent_task(
     config = {"configurable": {"thread_id": thread_id}}
     try:
         await graph.ainvoke(state, config)
-    except Exception:
-        pass
+    except Exception as err:
+        logger.error("Resource agent discovery graph invocation error: %s", err)
 
 
 @router.post("/run", response_model=ResourceRunResponse, status_code=status.HTTP_202_ACCEPTED)

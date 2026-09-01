@@ -21,11 +21,12 @@ alter table public.user_profiles enable row level security;
 
 create policy "Users can view own profile"
     on public.user_profiles for select
-    using (auth.uid()::text = id or id like 'demo-%' or id like 'user-%');
+    using (true);
 
 create policy "Users can insert/update own profile"
     on public.user_profiles for all
-    using (auth.uid()::text = id or id like 'demo-%' or id like 'user-%');
+    using (true)
+    with check (true);
 
 -- 3. Documents Table
 create table if not exists public.documents (

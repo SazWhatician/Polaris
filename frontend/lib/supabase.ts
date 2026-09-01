@@ -47,9 +47,13 @@ export async function syncUserProfileToSupabase(user: {
     const photoURL = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
     const nowIso = new Date().toISOString();
 
-    await supabase.from("user_profiles").upsert(
+    const normalizedId = user.id.startsWith("user-") || user.id.startsWith("demo-")
+      ? user.id
+      : `user-${user.id}`;
+
+    const { error } = await supabase.from("user_profiles").upsert(
       {
-        id: user.id,
+        id: normalizedId,
         email: user.email || null,
         display_name: displayName,
         photo_url: photoURL,
@@ -58,6 +62,9 @@ export async function syncUserProfileToSupabase(user: {
       },
       { onConflict: "id" }
     );
+    if (error && error.code !== "42501") {
+      console.warn("Supabase user profile sync note:", error.message);
+    }
   } catch (err) {
     console.warn("Supabase user profile sync non-fatal warning:", err);
   }

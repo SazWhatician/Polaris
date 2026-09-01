@@ -175,7 +175,7 @@ export function AnimatedShaderCard({
     const themeLoc = gl.getUniformLocation(program, "themeMode");
 
     const updateSize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const width = container.clientWidth || 600;
       const height = container.clientHeight || 300;
       canvas.width = width * dpr;
@@ -188,8 +188,11 @@ export function AnimatedShaderCard({
     resizeObserver.observe(container);
 
     let animationFrameId: number;
+    let isVisible = true;
+    let isDisposed = false;
+
     const render = () => {
-      animationFrameId = requestAnimationFrame(render);
+      if (isDisposed) return;
       const now = performance.now() * 1e-3;
 
       gl.useProgram(program);
@@ -198,12 +201,36 @@ export function AnimatedShaderCard({
       if (timeLoc) gl.uniform1f(timeLoc, now);
       if (themeLoc) gl.uniform1i(themeLoc, themeModeCode);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+      if (isVisible) {
+        animationFrameId = requestAnimationFrame(render);
+      }
     };
-    render();
+
+    const intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        const nextVisible = entry?.isIntersecting ?? true;
+        if (nextVisible !== isVisible) {
+          isVisible = nextVisible;
+          if (isVisible && !isDisposed) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(render);
+          } else {
+            cancelAnimationFrame(animationFrameId);
+          }
+        }
+      },
+      { rootMargin: "250px" }
+    );
+    intersectionObserver.observe(container);
+
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
+      isDisposed = true;
       cancelAnimationFrame(animationFrameId);
       resizeObserver.disconnect();
+      intersectionObserver.disconnect();
       gl.deleteBuffer(buffer);
       gl.deleteProgram(program);
       gl.deleteShader(vs);

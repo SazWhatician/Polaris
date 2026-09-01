@@ -465,7 +465,7 @@ export function ReactorFooter({
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     };
     window.addEventListener("resize", handleResize);
 
@@ -474,10 +474,13 @@ export function ReactorFooter({
     });
     resizeObserver.observe(footerEl);
 
-    // 7. 60fps Animation Loop
+    // 7. 60fps Animation Loop with Viewport Visibility Observer
     let animationFrameId: number;
+    let isVisible = false;
+    let isDisposed = false;
+
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
+      if (isDisposed) return;
       const time = performance.now() * 0.001;
 
       // Update Orbit Controls with damping
@@ -511,15 +514,37 @@ export function ReactorFooter({
       }
 
       renderer.render(scene, camera);
+
+      if (isVisible) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
-    animate();
+
+    const intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        const nextVisible = entry?.isIntersecting ?? false;
+        if (nextVisible !== isVisible) {
+          isVisible = nextVisible;
+          if (isVisible && !isDisposed) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(animate);
+          } else {
+            cancelAnimationFrame(animationFrameId);
+          }
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    intersectionObserver.observe(footerEl);
 
     // 8. Cleanup on Unmount
     return () => {
+      isDisposed = true;
       clearTimeout(refreshTimer);
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
       resizeObserver.disconnect();
+      intersectionObserver.disconnect();
       trigger.kill();
 
       controls.dispose();
@@ -651,6 +676,7 @@ export function ReactorFooter({
                   src="/polaris-monochrome.png"
                   alt="Polaris Logo"
                   fill
+                  sizes="(max-width: 640px) 112px, 144px"
                   className="object-contain invert"
                 />
               </div>
