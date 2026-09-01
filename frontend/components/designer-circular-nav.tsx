@@ -21,6 +21,8 @@ import {
   Check,
   ChevronDown,
   Lightbulb,
+  FileText,
+  Users,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
@@ -32,6 +34,22 @@ import { listDocuments } from "@/lib/api/documents";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const ALL_OTHER_FEATURES = [
+  {
+    id: "dock-tool-scholar-community",
+    title: "Scholar Communities",
+    description: "Universities, courses, friends & study circles",
+    href: "/community",
+    icon: Users,
+    badge: "Community",
+  },
+  {
+    id: "dock-tool-course-ingest",
+    title: "Course Ingestion",
+    description: "PDF docs, OCR & Vector indexing",
+    href: "/ingest",
+    icon: FileText,
+    badge: "Ingestion",
+  },
   {
     id: "dock-tool-knowledge-graph",
     title: "Knowledge Graph",

@@ -47,9 +47,9 @@ export function StatCard({
   };
 
   return (
-    <Card
+    <div
       className={cn(
-        "relative p-4 sm:p-5 rounded-2xl bg-card/85 border border-border/80 shadow-xs backdrop-blur-xl bento-card group select-none flex flex-col justify-between",
+        "relative p-5 rounded-3xl liquid-glass group select-none flex flex-col justify-between",
         className
       )}
     >
@@ -98,6 +98,6 @@ export function StatCard({
           <Icon className="h-4 w-4" />
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

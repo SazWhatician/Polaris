@@ -29,6 +29,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Scholar Profile Details (collected upon registration)
+  const [alias, setAlias] = useState("Quantum Scholar");
+  const [username, setUsername] = useState("quantum_scholar");
+  const [college, setCollege] = useState("Stanford University");
+  const [course, setCourse] = useState("B.S. Computer Science & AI");
+  const [year, setYear] = useState("3rd Year (Junior)");
+
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -73,9 +80,28 @@ export default function LoginPage() {
     tryPlay();
   }, []);
 
+  const saveScholarProfileToStore = (customAlias?: string, customUsername?: string) => {
+    try {
+      const cleanHandle = (customUsername || username).replace(/^@/, "").trim() || "scholar";
+      const cleanAlias = customAlias || alias || "Scholar";
+      const profile = {
+        alias: cleanAlias,
+        username: `@${cleanHandle}`,
+        college,
+        course,
+        year,
+        bio: `Scholar at ${college} specializing in ${course}.`,
+        isSetupComplete: true,
+      };
+      localStorage.setItem("polaris_comm_profile_v2", JSON.stringify(profile));
+      window.dispatchEvent(new Event("polaris:community-updated"));
+    } catch {}
+  };
+
   const handleGoogleSignIn = async () => {
     setIsSubmitting(true);
     try {
+      saveScholarProfileToStore();
       await signIn();
       window.location.href = "/dashboard";
     } catch (err) {
@@ -86,6 +112,7 @@ export default function LoginPage() {
   };
 
   const handleDemoSignIn = () => {
+    saveScholarProfileToStore("Alex Vance", "alex_vance");
     signInAsDemo();
     window.location.href = "/dashboard";
   };
@@ -99,6 +126,7 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
     try {
+      saveScholarProfileToStore();
       if (mode === "signup") {
         await signUpWithEmail(email, password);
       } else {
@@ -257,7 +285,101 @@ export default function LoginPage() {
           </div>
 
           {/* Email / Password Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            {mode === "signup" && (
+              <>
+                {/* Full Name & Username */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-foreground">Scholar Name</label>
+                    <input
+                      type="text"
+                      value={alias}
+                      onChange={(e) => setAlias(e.target.value)}
+                      placeholder="e.g. Alex Vance"
+                      required
+                      className="w-full h-10 px-3.5 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-foreground">Unique Username</label>
+                    <div className="relative flex items-center">
+                      <span className="absolute left-3 text-muted-foreground text-xs font-mono">@</span>
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="alex_vance"
+                        required
+                        className="w-full h-10 pl-7 pr-3 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs font-mono outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* University / College */}
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-foreground">University / College</label>
+                  <select
+                    value={college}
+                    onChange={(e) => setCollege(e.target.value)}
+                    className="w-full h-10 px-3 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50"
+                  >
+                    <option value="Stanford University">Stanford University</option>
+                    <option value="Massachusetts Institute of Technology (MIT)">Massachusetts Institute of Technology (MIT)</option>
+                    <option value="UC Berkeley">UC Berkeley</option>
+                    <option value="Carnegie Mellon University (CMU)">Carnegie Mellon University (CMU)</option>
+                    <option value="IIT Bombay">IIT Bombay</option>
+                    <option value="IIT Delhi">IIT Delhi</option>
+                    <option value="Oxford University">Oxford University</option>
+                    <option value="Harvard University">Harvard University</option>
+                    <option value="Georgia Tech">Georgia Tech</option>
+                    <option value="University of Washington">University of Washington</option>
+                    <option value="National University of Singapore (NUS)">National University of Singapore (NUS)</option>
+                    <option value="Other / Global Academy">Other / Global Academy</option>
+                  </select>
+                </div>
+
+                {/* Branch & Year */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-foreground">Branch / Major</label>
+                    <select
+                      value={course}
+                      onChange={(e) => setCourse(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50"
+                    >
+                      <option value="B.S. Computer Science & AI">B.S. Computer Science & AI</option>
+                      <option value="M.S. Artificial Intelligence & ML">M.S. Artificial Intelligence & ML</option>
+                      <option value="B.Tech Electrical & Computer Engineering">B.Tech Electrical & Computer Engineering</option>
+                      <option value="Data Science & Applied Statistics">Data Science & Applied Statistics</option>
+                      <option value="Software Engineering & Systems">Software Engineering & Systems</option>
+                      <option value="Mathematics & Quantum Computing">Mathematics & Quantum Computing</option>
+                      <option value="Mechanical & Robotics Engineering">Mechanical & Robotics Engineering</option>
+                      <option value="Biomedical Engineering">Biomedical Engineering</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-foreground">Year of Study</label>
+                    <select
+                      value={year}
+                      onChange={(e) => setYear(e.target.value)}
+                      className="w-full h-10 px-3 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50"
+                    >
+                      <option value="1st Year (Freshman)">1st Year (Freshman)</option>
+                      <option value="2nd Year (Sophomore)">2nd Year (Sophomore)</option>
+                      <option value="3rd Year (Junior)">3rd Year (Junior)</option>
+                      <option value="4th Year (Senior)">4th Year (Senior)</option>
+                      <option value="Master's Degree Candidate">Master's Degree Candidate</option>
+                      <option value="PhD & Doctoral Scholar">PhD & Doctoral Scholar</option>
+                    </select>
+                  </div>
+                </div>
+              </>
+            )}
+
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-foreground">Email Address</label>
               <div className="relative flex items-center">
@@ -268,7 +390,7 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="student@polaris.edu"
                   required
-                  className="w-full h-11 pl-10 pr-4 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs sm:text-sm outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
+                  className="w-full h-10 pl-10 pr-4 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
                 />
               </div>
             </div>
@@ -290,7 +412,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full h-11 pl-10 pr-10 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs sm:text-sm outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
+                  className="w-full h-10 pl-10 pr-10 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
                 />
                 <button
                   type="button"
@@ -306,9 +428,9 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-12 mt-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white font-black text-sm tracking-wide shadow-xl shadow-purple-500/25 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 border border-purple-400/30"
+              className="w-full h-11 mt-1 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white font-black text-xs sm:text-sm tracking-wide shadow-xl shadow-purple-500/25 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 border border-purple-400/30"
             >
-              <span>{mode === "login" ? "Sign In to Polaris Workspace" : "Create Polaris Account"}</span>
+              <span>{mode === "login" ? "Sign In to Polaris Workspace" : "Register Scholar Account"}</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>

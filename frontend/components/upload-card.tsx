@@ -12,10 +12,11 @@ const ACCEPTED = "application/pdf,image/jpeg,image/png,image/webp";
 const MAX_BYTES = 500 * 1024 * 1024; // 500 MiB limit
 
 interface Props {
-  onUploaded: (doc: DocumentResponse) => void;
+  onUploaded?: (doc: DocumentResponse) => void;
+  onUploadComplete?: () => void;
 }
 
-export function UploadCard({ onUploaded }: Props) {
+export function UploadCard({ onUploaded, onUploadComplete }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
@@ -33,7 +34,8 @@ export function UploadCard({ onUploaded }: Props) {
     try {
       const doc = await uploadDocument(file, (pct) => setProgress(Math.round(pct)));
       toast.success("Document uploaded & queued for OCR indexing", { description: file.name });
-      onUploaded(doc);
+      if (onUploaded) onUploaded(doc);
+      if (onUploadComplete) onUploadComplete();
     } catch (e) {
       toast.error("Upload failed", { description: e instanceof Error ? e.message : String(e) });
     } finally {
@@ -51,34 +53,31 @@ export function UploadCard({ onUploaded }: Props) {
   };
 
   return (
-    <Card
+    <div
       onDragOver={(e) => {
         e.preventDefault();
         setDragOver(true);
       }}
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
-      className={`relative p-5 sm:p-6 rounded-2xl sm:rounded-3xl bg-card/85 border backdrop-blur-xl transition-all duration-300 shadow-md overflow-hidden ${
-        dragOver ? "border-primary ring-2 ring-primary/30 scale-[1.01]" : "border-border/80 hover:border-primary/40"
+      className={`relative p-6 sm:p-7 rounded-3xl liquid-glass transition-all duration-300 overflow-hidden ${
+        dragOver ? "border-primary/80 ring-2 ring-primary/40 scale-[1.015] bg-white/10" : ""
       }`}
     >
-      {/* Top subtle highlight line */}
-      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
-        <div className="flex items-center gap-3.5 text-left">
-          <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shadow-xs shrink-0">
+        <div className="flex items-center gap-4 text-left">
+          <div className="p-3.5 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shadow-xs shrink-0 bento-icon-bounce">
             <Upload className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+            <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
               Upload Course Materials
               <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                PDF & Images
+                PDF & Slides
               </span>
             </h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Drag & drop files or browse. Supports PDF, JPEG, PNG up to 500 MiB.
+            <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+              Drag & drop lecture notes, syllabus or click to browse. Supports PDF, JPEG, PNG up to 500 MiB.
             </p>
           </div>
         </div>
@@ -98,7 +97,7 @@ export function UploadCard({ onUploaded }: Props) {
           <Button
             onClick={onPick}
             disabled={busy}
-            className="w-full sm:w-auto text-xs font-bold px-6 py-2.5 rounded-xl shadow-md gap-2"
+            className="w-full sm:w-auto text-xs font-bold px-6 py-2.5 rounded-2xl shadow-md gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-all hover:scale-102"
           >
             <Upload className="h-4 w-4" />
             <span>{busy ? `Uploading… ${progress ?? 0}%` : "Select Document"}</span>
@@ -120,6 +119,6 @@ export function UploadCard({ onUploaded }: Props) {
           </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 }

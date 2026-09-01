@@ -5,20 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
+  LayoutGrid,
   FileText,
   MessageSquare,
   CheckSquare,
   Target,
   Layers,
   Menu,
-  Sun,
-  Moon,
-  User as UserIcon,
+  Users,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/lib/auth-context";
 import { openSideDrawer, openTodoDrawer, getStoredTodos } from "@/lib/todo-store";
 import { DesignerCircularNav } from "@/components/designer-circular-nav";
 import { DesignerCornerFeatures } from "@/components/designer-corner-features";
@@ -29,14 +26,7 @@ import {
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const { user } = useAuth();
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [activeTodoCount, setActiveTodoCount] = useState(0);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     const updateTodos = () => {
@@ -49,15 +39,20 @@ export function SiteHeader() {
     return () => window.removeEventListener("polaris:todos-updated", updateTodos);
   }, []);
 
-  const currentTheme = mounted ? (resolvedTheme || theme) : "dark";
-
   const navItems = [
+    {
+      id: "nav-btn-dashboard",
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: LayoutGrid,
+      isActive: pathname === "/dashboard",
+    },
     {
       id: "nav-btn-ingest",
       label: "Ingest",
-      href: "/dashboard",
+      href: "/ingest",
       icon: FileText,
-      isActive: pathname === "/dashboard",
+      isActive: pathname === "/ingest",
     },
     {
       id: "nav-btn-rag-chat",
@@ -88,17 +83,24 @@ export function SiteHeader() {
       icon: Layers,
       isActive: pathname === "/graph",
     },
+    {
+      id: "nav-btn-community",
+      label: "Community",
+      href: "/community",
+      icon: Users,
+      isActive: pathname === "/community",
+    },
   ];
 
   return (
     <>
-      {/* ── Left Circular Navigation Rail & Bottom-Left Card (Untouched) ─ */}
+      {/* ── Left Circular Navigation Rail & Bottom-Left Card ─────────── */}
       <DesignerCircularNav />
 
       {/* ── Bottom-Right Frosted Glass Context Card ────────────────── */}
       <DesignerCornerFeatures />
 
-      {/* ── Top Notch Navigation Bar (Identical to Landing Page Notch) ── */}
+      {/* ── Top Notch Navigation Bar (Always Solid Pure White) ──────── */}
       <header
         id="site-notch-navbar"
         data-testid="site-notch-navbar"
@@ -108,21 +110,21 @@ export function SiteHeader() {
       >
         <div className="relative pointer-events-auto flex items-start">
           
-          {/* Left Inverted Wing */}
+          {/* Left Inverted Wing (Always Pure White) */}
           <NotchLeftWing
             position="top"
-            className="text-white dark:text-zinc-900 fill-current drop-shadow-sm hidden md:block"
+            className="text-white fill-white drop-shadow-sm hidden md:block"
           />
 
-          {/* Main Notch Body */}
-          <div className="flex items-center gap-1.5 sm:gap-3.5 px-3 sm:px-5 py-2 sm:py-2.5 bg-white text-slate-900 dark:bg-zinc-900 dark:text-slate-100 rounded-b-[24px] sm:rounded-b-[30px] shadow-[0_16px_50px_rgba(0,0,0,0.18)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.5)] border-b border-x border-slate-200/90 dark:border-white/10 backdrop-blur-xl">
+          {/* Main Notch Body (Always Solid Pure White with Slate/Black Text) */}
+          <div className="flex items-center gap-1 sm:gap-2.5 px-3 sm:px-5 py-2 sm:py-2.5 bg-white text-slate-900 rounded-b-[24px] sm:rounded-b-[30px] shadow-[0_16px_50px_rgba(0,0,0,0.12)] border-b border-x border-slate-200/90 backdrop-blur-xl">
             
             {/* Left Brand Slot: POLARIS LOGO */}
             <Link
               href="/dashboard"
               id="notch-nav-logo"
               data-testid="notch-nav-logo"
-              className="flex items-center pr-2 sm:pr-3 border-r border-slate-200 dark:border-zinc-800 group"
+              className="flex items-center pr-2 sm:pr-3 border-r border-slate-200 group"
             >
               <Image
                 src="/polaris-monochrome.png"
@@ -130,7 +132,7 @@ export function SiteHeader() {
                 width={105}
                 height={28}
                 priority
-                className="h-5 sm:h-6 w-auto object-contain dark:invert group-hover:scale-105 transition-transform"
+                className="h-5 sm:h-6 w-auto object-contain group-hover:scale-105 transition-transform"
               />
             </Link>
 
@@ -147,18 +149,18 @@ export function SiteHeader() {
                     aria-label={item.label}
                     aria-current={item.isActive ? "page" : undefined}
                     className={cn(
-                      "relative flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full text-xs font-bold transition-all duration-200 transform active:scale-95",
+                      "relative flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-200 transform active:scale-95",
                       item.isActive
-                        ? "bg-slate-900 text-white dark:bg-zinc-100 dark:text-zinc-950 shadow-xs scale-102"
-                        : "text-slate-600 hover:text-slate-950 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800/70"
+                        ? "bg-slate-950 text-white shadow-xs scale-102"
+                        : "text-slate-600 hover:text-slate-950 hover:bg-slate-100"
                     )}
                   >
                     <Icon
                       className={cn(
                         "h-3.5 w-3.5",
                         item.isActive
-                          ? "text-white dark:text-zinc-950 stroke-[2.4]"
-                          : "text-slate-500 dark:text-zinc-400"
+                          ? "text-white stroke-[2.4]"
+                          : "text-slate-500"
                       )}
                     />
                     <span className="hidden sm:inline">{item.label}</span>
@@ -177,91 +179,36 @@ export function SiteHeader() {
 
                 if (item.href) {
                   return (
-                    <Link key={item.label} href={item.href as Parameters<typeof Link>[0]["href"]}>
+                    <Link key={item.id} href={item.href as Parameters<typeof Link>[0]["href"]}>
                       {buttonElement}
                     </Link>
                   );
                 }
 
-                return <div key={item.label}>{buttonElement}</div>;
+                return <div key={item.id}>{buttonElement}</div>;
               })}
             </div>
 
-            {/* Right Slot: Theme Switcher + Profile / Avatar */}
-            <div className="pl-1.5 sm:pl-2 border-l border-slate-200 dark:border-zinc-800 flex items-center gap-1.5 sm:gap-2">
-              
-              {/* THEME TOGGLE BUTTON */}
-              <button
-                id="site-theme-toggle"
-                data-testid="site-theme-toggle"
-                type="button"
-                onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
-                className="w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-950 hover:bg-slate-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 active:scale-95 transition-all"
-                title={`Switch to ${currentTheme === "dark" ? "Light" : "Dark"} Mode`}
-                aria-label="Toggle Theme"
-              >
-                {currentTheme === "dark" ? (
-                  <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 stroke-[2.2] animate-in spin-in-90 duration-300" />
-                ) : (
-                  <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700 stroke-[2.2] animate-in spin-in-90 duration-300" />
-                )}
-              </button>
-
-              {/* User Profile Avatar Link */}
-              <Link
-                href="/profile"
-                id="site-nav-profile"
-                data-testid="site-nav-profile"
-                className={cn(
-                  "flex items-center gap-1.5 p-1 sm:px-2.5 sm:py-1 rounded-full text-xs font-bold transition-all hover:scale-105 active:scale-95 group",
-                  pathname === "/profile" || pathname === "/user"
-                    ? "bg-primary text-primary-foreground shadow-xs"
-                    : "bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700"
-                )}
-                title="Scholar Profile & Knowledge Hub"
-              >
-                {user?.photoURL ? (
-                  <Image
-                    src={user.photoURL}
-                    alt="User Avatar"
-                    width={20}
-                    height={20}
-                    unoptimized
-                    className="w-5 h-5 rounded-full object-cover border border-primary/40"
-                    onError={(e) => {
-                      (e.target as HTMLElement).style.display = "none";
-                    }}
-                  />
-                ) : (
-                  <UserIcon className="w-3.5 h-3.5 text-primary" />
-                )}
-                <span className="hidden md:inline font-semibold text-[11px]">
-                  {user?.displayName ? user.displayName.split(" ")[0] : "Profile"}
-                </span>
-              </Link>
-
-              {/* Mobile menu trigger */}
-              <button
-                id="nav-btn-mobile-menu"
-                data-testid="nav-btn-mobile-menu"
-                type="button"
-                onClick={openSideDrawer}
-                className="p-1.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-800 dark:text-zinc-200 md:hidden"
-                aria-label="Open Navigation Menu"
-              >
-                <Menu className="h-3.5 w-3.5" />
-              </button>
-            </div>
+            {/* Mobile menu trigger */}
+            <button
+              id="nav-btn-mobile-menu"
+              data-testid="nav-btn-mobile-menu"
+              type="button"
+              onClick={openSideDrawer}
+              className="p-1.5 rounded-full bg-slate-100 text-slate-800 hover:bg-slate-200 md:hidden ml-1 transition-colors"
+              aria-label="Open Navigation Menu"
+            >
+              <Menu className="h-3.5 w-3.5" />
+            </button>
           </div>
 
-          {/* Right Inverted Wing */}
+          {/* Right Inverted Wing (Always Pure White) */}
           <NotchRightWing
             position="top"
-            className="text-white dark:text-zinc-900 fill-current drop-shadow-sm hidden md:block"
+            className="text-white fill-white drop-shadow-sm hidden md:block"
           />
         </div>
       </header>
     </>
   );
 }
-

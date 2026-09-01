@@ -18,6 +18,8 @@ import {
   ListTodo,
   Bot,
   ChevronRight,
+  LayoutGrid,
+  Users,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -42,23 +44,37 @@ const NAV_GROUPS: NavGroup[] = [
     title: "Core Workspace",
     items: [
       {
-        href: "/user",
-        label: "User Profile & Hub",
-        description: "Uploads, chat history & community",
-        icon: Sparkles,
-        badge: "User",
+        href: "/dashboard",
+        label: "Intelligence Dashboard",
+        description: "Central command nexus & telemetry",
+        icon: LayoutGrid,
       },
       {
-        href: "/dashboard",
+        href: "/ingest",
         label: "Course Ingestion",
         description: "PDF docs, OCR & Vector indexing",
         icon: FileText,
+        badge: "Studio",
       },
       {
         href: "/syllabus",
         label: "Syllabus Intelligence",
         description: "Structured topic tree & coverage",
         icon: BookOpen,
+      },
+      {
+        href: "/community",
+        label: "Scholar Communities",
+        description: "Colleges, courses, friends & study circles",
+        icon: Users,
+        badge: "Network",
+      },
+      {
+        href: "/user",
+        label: "User Profile & Hub",
+        description: "Uploads, chat history & identity",
+        icon: Sparkles,
+        badge: "User",
       },
     ],
   },

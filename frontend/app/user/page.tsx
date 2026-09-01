@@ -56,65 +56,10 @@ import { UploadCard } from "@/components/upload-card";
 import { PagesViewer } from "@/components/pages-viewer";
 import { useGsapEntrance } from "@/lib/use-animation-system";
 import { cn } from "@/lib/utils";
-
-interface CommunityPost {
-  id: string;
-  author: string;
-  title: string;
-  description: string;
-  category: string;
-  tags: string[];
-  likes: number;
-  comments: number;
-  downloads: number;
-  date: string;
-  verified: boolean;
-}
-
-const INITIAL_COMMUNITY_POSTS: CommunityPost[] = [
-  {
-    id: "post-1",
-    author: "Elena Rostova",
-    title: "CS189 Introduction to Machine Learning — Master Syllabus & Concept Graph",
-    description:
-      "Fully annotated syllabus covering Convex Optimization, Support Vector Machines, Backpropagation, and Deep Transformers with 142 citation chunks.",
-    category: "Computer Science",
-    tags: ["Machine Learning", "Optimization", "Neural Networks"],
-    likes: 128,
-    comments: 24,
-    downloads: 412,
-    date: "2 hours ago",
-    verified: true,
-  },
-  {
-    id: "post-2",
-    author: "Marcus Thorne",
-    title: "Organic Chemistry II (CHEM 220) — Complete Reaction Mechanisms & Flash Graph",
-    description:
-      "Synthesized knowledge topology with complete arrow-pushing mechanisms, prerequisite reactions, and lecture notes citations.",
-    category: "Biochemistry",
-    tags: ["Organic Chemistry", "Synthesis", "Reaction Topologies"],
-    likes: 94,
-    comments: 18,
-    downloads: 305,
-    date: "Yesterday",
-    verified: true,
-  },
-  {
-    id: "post-3",
-    author: "Sophia Lin",
-    title: "Linear Algebra & Spectral Graph Theory — Full Textbooks Index",
-    description:
-      "Grounded Qdrant-indexed collection covering Eigendecomposition, Singular Value Decomposition, and PageRank with high-res diagram OCR.",
-    category: "Mathematics",
-    tags: ["Linear Algebra", "Spectral Theory", "SVD"],
-    likes: 156,
-    comments: 31,
-    downloads: 520,
-    date: "3 days ago",
-    verified: true,
-  },
-];
+import { CommunityFeed } from "@/components/community/community-feed";
+import { CommunityOnboardingModal } from "@/components/community/community-onboarding-modal";
+import { FriendsDrawer } from "@/components/community/friends-drawer";
+import { useCommunityStore } from "@/lib/community-store";
 
 function UserProfileContent() {
   const { user, signOut, signInAsDemo } = useAuth();
@@ -131,16 +76,10 @@ function UserProfileContent() {
   const [historySearch, setHistorySearch] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>(INITIAL_COMMUNITY_POSTS);
-  const [communitySearch, setCommunitySearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [newPostTitle, setNewPostTitle] = useState("");
-  const [newPostDesc, setNewPostDesc] = useState("");
-  const [newPostCategory, setNewPostCategory] = useState("Computer Science");
-  const [newPostTags, setNewPostTags] = useState("");
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+  const [onboardingModalOpen, setOnboardingModalOpen] = useState(false);
+  const [friendsDrawerOpen, setFriendsDrawerOpen] = useState(false);
 
+  const { posts: communityPosts, profile: communityProfile, friends: communityFriends } = useCommunityStore();
   const containerRef = useGsapEntrance(".gsap-user", 0.04);
 
   // Load documents
@@ -223,53 +162,6 @@ function UserProfileContent() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const handleLikePost = (id: string) => {
-    setLikedPosts((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-        setCommunityPosts((posts) =>
-          posts.map((p) => (p.id === id ? { ...p, likes: p.likes - 1 } : p))
-        );
-      } else {
-        next.add(id);
-        setCommunityPosts((posts) =>
-          posts.map((p) => (p.id === id ? { ...p, likes: p.likes + 1 } : p))
-        );
-      }
-      return next;
-    });
-  };
-
-  const handleCreatePost = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPostTitle.trim() || !newPostDesc.trim()) {
-      toast.error("Please provide both title and description for community post");
-      return;
-    }
-
-    const post: CommunityPost = {
-      id: `post-${Date.now()}`,
-      author: user?.displayName || user?.email?.split("@")[0] || "Scholar Researcher",
-      title: newPostTitle,
-      description: newPostDesc,
-      category: newPostCategory,
-      tags: newPostTags.split(",").map((t) => t.trim()).filter(Boolean),
-      likes: 1,
-      comments: 0,
-      downloads: 0,
-      date: "Just now",
-      verified: true,
-    };
-
-    setCommunityPosts((prev) => [post, ...prev]);
-    setShowShareModal(false);
-    setNewPostTitle("");
-    setNewPostDesc("");
-    setNewPostTags("");
-    toast.success("Published to the Polaris Community Hub!");
-  };
-
   // Filtered docs
   const filteredDocs = useMemo(() => {
     return docs.filter((d) => {
@@ -290,18 +182,6 @@ function UserProfileContent() {
     });
   }, [sessions, historySearch]);
 
-  // Filtered community
-  const filteredCommunity = useMemo(() => {
-    return communityPosts.filter((p) => {
-      const matchCat = selectedCategory === "All" || p.category === selectedCategory;
-      const matchSearch =
-        p.title.toLowerCase().includes(communitySearch.toLowerCase()) ||
-        p.description.toLowerCase().includes(communitySearch.toLowerCase()) ||
-        p.tags.some((t) => t.toLowerCase().includes(communitySearch.toLowerCase()));
-      return matchCat && matchSearch;
-    });
-  }, [communityPosts, selectedCategory, communitySearch]);
-
   const totalBytes = docs.reduce((acc, d) => acc + (d.size_bytes || 0), 0);
   const totalMB = (totalBytes / (1024 * 1024)).toFixed(1);
   const totalPages = docs.reduce((acc, d) => acc + (d.page_count || 0), 0);
@@ -309,16 +189,18 @@ function UserProfileContent() {
   const userInitial = username.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 relative selection:bg-primary/30 selection:text-foreground">
+    <div className="relative min-h-screen text-foreground pb-32 pt-14 sm:pt-16 overflow-x-hidden selection:bg-primary/30 selection:text-foreground">
+      {/* ── Ambient Fluid Liquid Caustic Spheres (iOS/visionOS Glass Glow) ── */}
+      <div className="ambient-liquid-glow -top-24 -left-24 w-[500px] h-[500px] bg-indigo-500/20" />
+      <div className="ambient-liquid-glow top-[38%] -right-32 w-[550px] h-[550px] bg-purple-500/15" />
+      <div className="ambient-liquid-glow bottom-12 left-[20%] w-[600px] h-[600px] bg-emerald-500/12" />
+
       <SiteHeader />
 
-      <main ref={containerRef} className="max-w-7xl mx-auto space-y-5 py-4 px-3 sm:px-6 lg:px-8">
+      <main ref={containerRef} className="relative z-10 max-w-7xl mx-auto space-y-5 py-4 px-3 sm:px-6 lg:px-8">
         
         {/* ── BENTO HERO: Compact Scholar Hologram ID Banner ────────────── */}
-        <div className="gsap-user relative overflow-hidden rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-card/85 backdrop-blur-xl border border-border/80 shadow-lg bento-card">
-          {/* Top highlight line */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
-
+        <div className="gsap-user relative overflow-hidden rounded-3xl p-6 sm:p-7 liquid-glass">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
             
             {/* Left: Avatar & Identity details */}
@@ -382,7 +264,7 @@ function UserProfileContent() {
                   <Button
                     size="sm"
                     onClick={() => router.push("/chat")}
-                    className="h-8.5 px-3.5 rounded-xl gap-1.5 font-bold text-xs bg-primary text-primary-foreground shadow-sm hover:scale-105 active:scale-95 transition-all"
+                    className="h-9 px-4 rounded-2xl gap-1.5 font-bold text-xs bg-primary text-primary-foreground shadow-sm hover:scale-102 active:scale-95 transition-all"
                   >
                     <MessageSquare className="h-3.5 w-3.5" />
                     <span>Launch RAG</span>
@@ -391,7 +273,7 @@ function UserProfileContent() {
                     variant="outline"
                     size="sm"
                     onClick={() => signOut()}
-                    className="h-8.5 px-3 rounded-xl gap-1.5 font-bold text-xs text-destructive hover:bg-destructive/10 border-border/80"
+                    className="h-9 px-3.5 rounded-2xl gap-1.5 font-bold text-xs text-destructive hover:bg-destructive/10 border-white/20 bg-white/5"
                   >
                     <LogOut className="h-3.5 w-3.5" />
                     <span>Sign Out</span>
@@ -402,7 +284,7 @@ function UserProfileContent() {
                   <Button
                     size="sm"
                     onClick={signInAsDemo}
-                    className="h-8.5 px-3.5 rounded-xl gap-1.5 font-bold text-xs bg-primary text-primary-foreground shadow-sm"
+                    className="h-9 px-4 rounded-2xl gap-1.5 font-bold text-xs bg-primary text-primary-foreground shadow-sm"
                   >
                     <Sparkles className="h-3.5 w-3.5" />
                     <span>Demo Mode</span>
@@ -411,7 +293,7 @@ function UserProfileContent() {
                     variant="outline"
                     size="sm"
                     onClick={() => router.push("/login")}
-                    className="h-8.5 px-3 rounded-xl gap-1.5 font-bold text-xs"
+                    className="h-9 px-3.5 rounded-2xl gap-1.5 font-bold text-xs"
                   >
                     <LogIn className="h-3.5 w-3.5" />
                     <span>Log In</span>
@@ -422,17 +304,17 @@ function UserProfileContent() {
           </div>
         </div>
 
-        {/* ── BENTO TELEMETRY STRIP (4 Compact Metric Bento Cells) ────────── */}
-        <div className="gsap-user grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* ── BENTO TELEMETRY STRIP (4 Liquid Glass Cells) ────────── */}
+        <div className="gsap-user grid grid-cols-2 lg:grid-cols-4 gap-3.5">
           
           {/* Bento Stat 1 */}
-          <div className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
+          <div className="p-4 sm:p-5 rounded-3xl liquid-glass flex flex-col justify-between group">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
                 Ingested Files
               </span>
-              <div className="p-1.5 rounded-xl bg-primary/10 text-primary border border-primary/20 bento-icon-bounce">
-                <FileText className="w-3.5 h-3.5" />
+              <div className="p-2 rounded-2xl bg-primary/10 text-primary border border-primary/20 bento-icon-bounce">
+                <FileText className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-2.5">
@@ -446,13 +328,13 @@ function UserProfileContent() {
           </div>
 
           {/* Bento Stat 2 */}
-          <div className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
+          <div className="p-4 sm:p-5 rounded-3xl liquid-glass flex flex-col justify-between group">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
-                Extracted Pages
+                Pages Indexed
               </span>
-              <div className="p-1.5 rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 bento-icon-bounce">
-                <Layers className="w-3.5 h-3.5" />
+              <div className="p-2 rounded-2xl bg-purple-500/10 text-purple-500 border border-purple-500/20 bento-icon-bounce">
+                <Layers className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-2.5">
@@ -460,19 +342,19 @@ function UserProfileContent() {
                 {totalPages}
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5">
-                OCR & Vector ready
+                OCRv2 Vector Chunks
               </p>
             </div>
           </div>
 
           {/* Bento Stat 3 */}
-          <div className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
+          <div className="p-4 sm:p-5 rounded-3xl liquid-glass flex flex-col justify-between group">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
-                Saved Chat Turns
+                Chat Turns
               </span>
-              <div className="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 bento-icon-bounce">
-                <MessageSquare className="w-3.5 h-3.5" />
+              <div className="p-2 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 bento-icon-bounce">
+                <MessageSquare className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-2.5">
@@ -480,19 +362,19 @@ function UserProfileContent() {
                 {sessions.length}
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5">
-                Multi-Turn Citations
+                Grounded Sessions
               </p>
             </div>
           </div>
 
           {/* Bento Stat 4 */}
-          <div className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
+          <div className="p-4 sm:p-5 rounded-3xl liquid-glass flex flex-col justify-between group">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
                 Community Hub
               </span>
-              <div className="p-1.5 rounded-xl bg-purple-500/10 text-purple-500 border border-purple-500/20 bento-icon-bounce">
-                <Users className="w-3.5 h-3.5" />
+              <div className="p-2 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 bento-icon-bounce">
+                <Sparkles className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-2.5">
@@ -500,7 +382,7 @@ function UserProfileContent() {
                 {communityPosts.length}
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5">
-                Peer Knowledge Packs
+                Knowledge Packs Shared
               </p>
             </div>
           </div>
@@ -839,131 +721,10 @@ function UserProfileContent() {
         {/* ── TAB 3: COMMUNITY HUB ──────────────────────────────────────── */}
         {activeTab === "community" && (
           <div className="space-y-4 animate-in fade-in duration-200">
-            
-            {/* Banner & Post Share Button */}
-            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-gradient-to-r from-primary/15 via-indigo-500/10 to-transparent border border-primary/30 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="space-y-1.5 max-w-lg">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-primary/20 border border-primary/30 text-primary text-[10px] font-mono tracking-wider uppercase font-bold">
-                  <Sparkles className="h-3 w-3" />
-                  <span>Polaris Knowledge Exchange</span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-black text-foreground">
-                  Community Knowledge Hub
-                </h2>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Discover peer-reviewed syllabus topologies, vetted lecture notes, and share your own academic indexes.
-                </p>
-              </div>
-
-              <Button
-                onClick={() => setShowShareModal(true)}
-                className="h-10 px-5 rounded-xl font-bold text-xs bg-primary text-primary-foreground shadow-md hover:scale-105 active:scale-95 transition-transform flex items-center gap-1.5 shrink-0"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Share Knowledge Pack</span>
-              </Button>
-            </div>
-
-            {/* Filter Bar */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl">
-              <div className="relative w-full sm:w-72">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={communitySearch}
-                  onChange={(e) => setCommunitySearch(e.target.value)}
-                  placeholder="Search community notes, topics..."
-                  className="w-full h-8.5 pl-9 pr-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary shadow-xs"
-                />
-              </div>
-
-              <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto p-0.5">
-                {["All", "Computer Science", "Biochemistry", "Mathematics", "Physics"].map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={cn(
-                      "px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap transition-all",
-                      selectedCategory === cat
-                        ? "bg-primary text-primary-foreground shadow-xs"
-                        : "bg-muted/40 text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Community Feed Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-              {filteredCommunity.map((post) => {
-                const isLiked = likedPosts.has(post.id);
-
-                return (
-                  <div
-                    key={post.id}
-                    className="p-5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between space-y-3 group"
-                  >
-                    <div className="space-y-2.5">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
-                          {post.category}
-                        </span>
-                        <span className="text-[10px] font-mono text-muted-foreground">{post.date}</span>
-                      </div>
-
-                      <h3 className="text-sm font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
-                        {post.title}
-                      </h3>
-
-                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
-                        {post.description}
-                      </p>
-
-                      <div className="flex flex-wrap gap-1 pt-1">
-                        {post.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2 py-0.5 rounded-md text-[9px] font-mono bg-muted/60 text-muted-foreground"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="pt-3 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-5 h-5 rounded-full bg-primary/20 text-primary font-bold text-[9px] flex items-center justify-center">
-                          {post.author.charAt(0)}
-                        </div>
-                        <span className="font-medium text-foreground text-xs truncate max-w-[100px]">
-                          {post.author}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2.5">
-                        <button
-                          onClick={() => handleLikePost(post.id)}
-                          className={cn(
-                            "flex items-center gap-1 text-xs font-mono transition-colors",
-                            isLiked ? "text-rose-500 font-bold" : "hover:text-foreground"
-                          )}
-                        >
-                          <ThumbsUp className="h-3 w-3" />
-                          <span>{post.likes}</span>
-                        </button>
-                        <span className="flex items-center gap-1 text-xs font-mono">
-                          <MessageCircle className="h-3 w-3" />
-                          <span>{post.comments}</span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <CommunityFeed
+              onOpenIdentityModal={() => setOnboardingModalOpen(true)}
+              onOpenFriendsDrawer={() => setFriendsDrawerOpen(true)}
+            />
           </div>
         )}
 
@@ -1023,88 +784,16 @@ function UserProfileContent() {
 
       </main>
 
-      {/* Share to Community Modal */}
-      {showShareModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="max-w-md w-full rounded-3xl bg-card border border-border/80 p-6 space-y-4 shadow-2xl relative">
-            <div className="space-y-1">
-              <h2 className="text-lg font-black text-foreground">Share Knowledge Pack</h2>
-              <p className="text-xs text-muted-foreground">
-                Publish a study syllabus, course notes collection, or topic topology to the community.
-              </p>
-            </div>
+      {/* Community Modals */}
+      <CommunityOnboardingModal
+        open={onboardingModalOpen}
+        onOpenChange={setOnboardingModalOpen}
+      />
 
-            <form onSubmit={handleCreatePost} className="space-y-3">
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-foreground">Pack Title</label>
-                <input
-                  type="text"
-                  value={newPostTitle}
-                  onChange={(e) => setNewPostTitle(e.target.value)}
-                  placeholder="e.g. CS189 Machine Learning Complete Guide"
-                  required
-                  className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-foreground">Category / Subject</label>
-                <select
-                  value={newPostCategory}
-                  onChange={(e) => setNewPostCategory(e.target.value)}
-                  className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="Computer Science">Computer Science</option>
-                  <option value="Biochemistry">Biochemistry</option>
-                  <option value="Mathematics">Mathematics</option>
-                  <option value="Physics">Physics</option>
-                  <option value="Engineering">Engineering</option>
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-foreground">Description & Overview</label>
-                <textarea
-                  value={newPostDesc}
-                  onChange={(e) => setNewPostDesc(e.target.value)}
-                  placeholder="Describe the topics covered, textbook citations, and key prerequisites..."
-                  rows={2}
-                  required
-                  className="w-full p-2.5 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary resize-none"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-foreground">Tags (comma separated)</label>
-                <input
-                  type="text"
-                  value={newPostTags}
-                  onChange={(e) => setNewPostTags(e.target.value)}
-                  placeholder="e.g. AI, Algorithms, ExamPrep"
-                  className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
-                />
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setShowShareModal(false)}
-                  className="rounded-xl text-xs h-8.5"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="rounded-xl font-bold text-xs h-8.5 bg-primary text-primary-foreground shadow-sm"
-                >
-                  Publish to Community
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <FriendsDrawer
+        open={friendsDrawerOpen}
+        onOpenChange={setFriendsDrawerOpen}
+      />
 
       {/* Pages OCR Viewer Modal */}
       <PagesViewer doc={viewingDoc} onClose={() => setViewingDoc(null)} />

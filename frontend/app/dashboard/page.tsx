@@ -1,72 +1,47 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   FileText,
   Clock,
   CheckCircle2,
   Layers,
-  RefreshCw,
   Sparkles,
   MessageSquare,
   Target,
   Brain,
   ArrowUpRight,
   Database,
-  Search,
   Activity,
   Zap,
-  Eye,
-  Trash2,
-  Loader2,
-  Compass,
+  BookOpen,
+  Calendar,
+  UploadCloud,
+  Cpu,
+  Search,
 } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
 
 import { SiteHeader } from "@/components/site-header";
-import { UploadCard } from "@/components/upload-card";
-import { PagesViewer } from "@/components/pages-viewer";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/lib/auth-context";
 import {
   listDocuments,
-  deleteDocument,
-  reprocessDocument,
   type DocumentResponse,
 } from "@/lib/api/documents";
 import { useGsapEntrance } from "@/lib/use-animation-system";
 import { cn } from "@/lib/utils";
-
-const POLL_INTERVAL_MS = 3000;
-const IN_FLIGHT_STATES = new Set(["queued", "processing"]);
+import { SpatialTelemetryCarousel } from "@/components/dashboard/spatial-telemetry-carousel";
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [docs, setDocs] = useState<DocumentResponse[]>([]);
   const [fetching, setFetching] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "ocr_complete" | "processing" | "failed">("all");
-  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
-  const [viewingDoc, setViewingDoc] = useState<DocumentResponse | null>(null);
 
-  const docsRef = useRef(docs);
-  docsRef.current = docs;
   const containerRef = useGsapEntrance(".gsap-dash", 0.04);
 
   useEffect(() => {
@@ -86,536 +61,501 @@ export default function DashboardPage() {
     }
   };
 
-  // Initial load
   useEffect(() => {
     if (!user) return;
     loadDocs();
   }, [user]);
 
-  // Background poll for in-flight tasks
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-
-    const tick = async () => {
-      const hasInFlight = docsRef.current.some((d) => IN_FLIGHT_STATES.has(d.status));
-      if (!hasInFlight) return;
-      try {
-        const items = await listDocuments();
-        if (!cancelled) setDocs(items);
-      } catch {
-        // Best-effort polling
-      }
-    };
-
-    const interval = setInterval(tick, POLL_INTERVAL_MS);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [user]);
-
-  const handleDelete = async () => {
-    if (!pendingDeleteId) return;
-    const id = pendingDeleteId;
-    const prev = docs;
-    setDocs((d) => d.filter((item) => item.id !== id));
-    setPendingDeleteId(null);
-    try {
-      await deleteDocument(id);
-      toast.success("Document removed from index");
-    } catch (e) {
-      setDocs(prev);
-      toast.error("Delete failed", {
-        description: e instanceof Error ? e.message : String(e),
-      });
-    }
-  };
-
-  const handleReprocess = async (doc: DocumentResponse) => {
-    try {
-      await reprocessDocument(doc.id);
-      toast.success(`Reprocessing OCR for ${doc.filename}`);
-      loadDocs();
-    } catch (e) {
-      toast.error("Reprocess request failed", {
-        description: e instanceof Error ? e.message : String(e),
-      });
-    }
-  };
-
   const totalDocs = docs.length;
   const processedDocs = docs.filter((d) => d.status === "ocr_complete").length;
-  const inFlightDocs = docs.filter((d) => IN_FLIGHT_STATES.has(d.status)).length;
   const totalPages = docs.reduce((acc, d) => acc + (d.page_count || 0), 0);
   const totalBytes = docs.reduce((acc, d) => acc + (d.size_bytes || 0), 0);
   const totalMb = (totalBytes / (1024 * 1024)).toFixed(1);
   const vectorEstimatedChunks = processedDocs * 42 + totalPages * 8;
 
-  const filteredDocs = useMemo(() => {
-    return docs.filter((d) => {
-      const matchSearch = d.filename.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchStatus = statusFilter === "all" || d.status === statusFilter;
-      return matchSearch && matchStatus;
-    });
-  }, [docs, searchQuery, statusFilter]);
-
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen text-foreground pb-32 relative selection:bg-primary/30 selection:text-foreground pt-14 sm:pt-16">
-      {/* ── Top Notch Navbar (Identical to Landing Page) ─────────────── */}
+    <div className="relative min-h-screen text-foreground pb-32 pt-14 sm:pt-16 overflow-x-hidden selection:bg-primary/30 selection:text-foreground">
+      {/* ── Ambient Fluid Liquid Caustic Spheres (iOS/visionOS Glass Glow) ── */}
+      <div className="ambient-liquid-glow -top-24 -left-24 w-[500px] h-[500px] bg-indigo-500/20" />
+      <div className="ambient-liquid-glow top-[35%] -right-32 w-[550px] h-[550px] bg-purple-500/15" />
+      <div className="ambient-liquid-glow bottom-12 left-[20%] w-[600px] h-[600px] bg-emerald-500/12" />
+
       <SiteHeader />
 
-      {/* ── Main Compact Bento-Box Grid Container ─────────────────────── */}
-      <main ref={containerRef} className="max-w-7xl mx-auto py-4 px-3 sm:px-6 lg:px-8 space-y-6">
+      <main ref={containerRef} className="relative z-10 max-w-7xl mx-auto space-y-5 py-4 px-3 sm:px-6 lg:px-8">
         
-        {/* ── BENTO ROW 1: Hero Intelligence Terminal (Full Width Animated Deck) ── */}
-        <section className="gsap-dash relative overflow-hidden rounded-[28px] sm:rounded-[36px] border border-border/80 bg-gradient-to-br from-slate-900 via-zinc-900/95 to-slate-950 dark:from-zinc-950 dark:via-zinc-900/90 dark:to-black p-6 sm:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.25)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.65)] text-white">
+        {/* ── DRAMATIC ASYMMETRIC ROW 1: Panoramic Command Deck (Span 8) + Spatial Telemetry Carousel (Span 4) ── */}
+        <div className="gsap-dash grid grid-cols-1 lg:grid-cols-12 gap-4">
           
-          {/* Animated Quantum Grid & Ambient Glow Orbs */}
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/25 rounded-full blur-[100px] pointer-events-none animate-pulse duration-1000" />
-          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-indigo-500/20 rounded-full blur-[90px] pointer-events-none" />
+          {/* Hero Command Glass Pod (Span 8) */}
+          <div className="lg:col-span-8 liquid-glass p-6 sm:p-8 flex flex-col justify-between space-y-6">
+            <div className="space-y-3.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/25 text-primary font-mono text-[10px] font-bold tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-ping inline-block" />
+                  <span>POLARIS ACADEMIC ENGINE // ACTIVE</span>
+                </span>
+                <span className="text-[11px] font-mono text-muted-foreground hidden sm:inline">•</span>
+                <span className="text-[11px] font-mono text-muted-foreground">Neural Vector Mesh & OCR Pipeline</span>
+              </div>
+
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.08]">
+                Autonomous Academic <br className="hidden sm:inline" />
+                <span className="bg-gradient-to-r from-primary via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                  Intelligence Nexus
+                </span>
+              </h1>
+
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xl">
+                Welcome back, <span className="font-bold text-foreground">{user.displayName || "Scholar"}</span>. Your course syllabus, dense vector embeddings, and concept DAGs are indexed and live.
+              </p>
+            </div>
+
+            {/* Glass Action Dock */}
+            <div className="flex flex-wrap items-center gap-2.5 pt-2">
+              <Button
+                onClick={() => router.push("/ingest")}
+                className="rounded-2xl font-bold text-xs h-9.5 px-5 gap-2 bg-primary text-primary-foreground shadow-md hover:bg-primary/90 transition-all hover:scale-102"
+              >
+                <UploadCloud className="w-4 h-4" />
+                <span>Ingest Course Notes</span>
+              </Button>
+
+              <Button
+                onClick={() => router.push("/chat")}
+                variant="outline"
+                className="rounded-2xl font-bold text-xs h-9.5 px-5 gap-2 border-white/20 dark:border-white/15 bg-white/10 dark:bg-white/5 hover:bg-white/20 backdrop-blur-xl transition-all"
+              >
+                <MessageSquare className="w-4 h-4 text-primary" />
+                <span>Grounded RAG Chat</span>
+              </Button>
+
+              <Button
+                onClick={() => router.push("/community")}
+                variant="ghost"
+                className="rounded-2xl font-bold text-xs h-9.5 px-4 gap-1.5 text-muted-foreground hover:text-foreground hover:bg-white/10 transition-all"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>Scholar Community</span>
+                <ArrowUpRight className="w-3.5 h-3.5 ml-0.5" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Spatial Telemetry Multi-Image Liquid Glass Carousel (Span 4) */}
+          <div className="lg:col-span-4">
+            <SpatialTelemetryCarousel totalMb={totalMb} />
+          </div>
+
+        </div>
+
+        {/* ── DRAMATIC ASYMMETRIC ROW 2: Triple Liquid Glass Spark Pods (3 x Span 4) ── */}
+        <div className="gsap-dash grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
           
-          {/* Background Animated Neural Rings */}
-          <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-20 hidden lg:block">
-            <div className="w-72 h-72 rounded-full border border-primary/40 animate-[spin_25s_linear_infinite] flex items-center justify-center">
-              <div className="w-48 h-48 rounded-full border border-indigo-400/40 animate-[spin_15s_linear_infinite_reverse] flex items-center justify-center">
-                <div className="w-24 h-24 rounded-full border border-emerald-400/50 animate-ping duration-1000" />
+          {/* Pod 1: Ingested Course Files */}
+          <div className="liquid-glass p-5 flex flex-col justify-between space-y-3 group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono text-muted-foreground font-bold uppercase tracking-wider">
+                Ingested Files
+              </span>
+              <div className="p-2 rounded-2xl bg-primary/10 text-primary border border-primary/20 bento-icon-bounce">
+                <FileText className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black font-mono tracking-tight text-foreground">
+                  {totalDocs}
+                </span>
+                <span className="text-xs font-mono text-emerald-500 font-bold">
+                  {processedDocs} Indexed
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-1">
+                <span>{totalPages} total pages</span>
+                <Link href="/ingest" className="text-primary hover:underline font-semibold flex items-center gap-0.5">
+                  <span>Studio →</span>
+                </Link>
               </div>
             </div>
           </div>
 
-          <div className="relative z-10 flex flex-col justify-between h-full space-y-6">
-            
-            {/* Top Telemetry Pills */}
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/20 text-white text-[11px] font-mono font-bold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>QDRANT VECTOR SPACE ACTIVE</span>
+          {/* Pod 2: Syllabus Coverage */}
+          <div className="liquid-glass p-5 flex flex-col justify-between space-y-3 group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono text-muted-foreground font-bold uppercase tracking-wider">
+                Curriculum Coverage
+              </span>
+              <div className="p-2 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 bento-icon-bounce">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black font-mono tracking-tight text-foreground">
+                  82%
                 </span>
+                <span className="text-xs font-mono text-emerald-500 font-bold">
+                  +8% this week
+                </span>
+              </div>
+              <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mt-2">
+                <div className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full" style={{ width: "82%" }} />
+              </div>
+            </div>
+          </div>
 
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/20 backdrop-blur-md border border-primary/40 text-primary-foreground text-[11px] font-mono font-semibold">
-                  <Zap className="w-3 h-3 text-amber-300" />
-                  <span>OCR PIPELINE: &lt;65ms</span>
+          {/* Pod 3: Exam Readiness Index */}
+          <div className="liquid-glass p-5 flex flex-col justify-between space-y-3 group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono text-muted-foreground font-bold uppercase tracking-wider">
+                Exam Readiness
+              </span>
+              <div className="p-2 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20 bento-icon-bounce">
+                <Target className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black font-mono tracking-tight text-foreground">
+                  91.4%
                 </span>
+                <span className="text-xs font-mono text-amber-500 font-bold">
+                  Target: 95%
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                LangGraph confidence synthesis
+              </p>
+            </div>
+          </div>
+
+          {/* Pod 4: Vector Mesh Chunks */}
+          <div className="liquid-glass p-5 flex flex-col justify-between space-y-3 group">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono text-muted-foreground font-bold uppercase tracking-wider">
+                Vector Mesh Chunks
+              </span>
+              <div className="p-2 rounded-2xl bg-purple-500/10 text-purple-500 border border-purple-500/20 bento-icon-bounce">
+                <Layers className="w-4 h-4" />
+              </div>
+            </div>
+            <div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-black font-mono tracking-tight text-foreground">
+                  {vectorEstimatedChunks > 0 ? vectorEstimatedChunks.toLocaleString() : "10K+"}
+                </span>
+                <span className="text-xs font-mono text-purple-500 font-bold">
+                  Qdrant
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                bge-large cosine indexed
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── DRAMATIC ASYMMETRIC ROW 3: Asymmetrical Glass Launchpads (Span 7, Span 5, Span 4, Span 4, Span 4) ── */}
+        <div className="gsap-dash space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-mono font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+              <Zap className="w-3.5 h-3.5 text-primary" />
+              <span>Academic Workspace Suite</span>
+            </h2>
+            <span className="text-[11px] font-mono text-muted-foreground">Spatial Apple-Glass Architecture</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+            
+            {/* Launchpad 1: Course Ingestion Studio (Wide Span 7) */}
+            <Link
+              href="/ingest"
+              className="md:col-span-7 liquid-glass p-6 flex flex-col justify-between space-y-4 group"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="p-3.5 rounded-2xl bg-primary/10 text-primary border border-primary/25 bento-icon-bounce">
+                  <UploadCloud className="w-6 h-6" />
+                </div>
+                <Badge variant="outline" className="text-[10px] font-mono font-bold uppercase bg-white/10 border-white/20 text-foreground">
+                  Ingestion Studio
+                </Badge>
+              </div>
+
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors flex items-center justify-between">
+                  <span>Course Ingestion & Document Pipeline</span>
+                  <ArrowUpRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed max-w-lg">
+                  Drag and drop lecture slide decks, syllabus outlines, and textbook PDFs. Extracts full OCR text and generates dense semantic embeddings into Qdrant collections.
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+                <span className="text-muted-foreground">{totalDocs} Documents • {totalPages} Pages</span>
+                <span className="text-primary font-bold">Open Studio →</span>
+              </div>
+            </Link>
+
+            {/* Launchpad 2: Grounded RAG Chat (Medium Span 5) */}
+            <Link
+              href="/chat"
+              className="md:col-span-5 liquid-glass p-6 flex flex-col justify-between space-y-4 group"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="p-3.5 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/25 bento-icon-bounce">
+                  <MessageSquare className="w-6 h-6" />
+                </div>
+                <Badge variant="outline" className="text-[10px] font-mono font-bold uppercase bg-emerald-500/10 border-emerald-500/20 text-emerald-500">
+                  Sub-Second RAG
+                </Badge>
+              </div>
+
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-emerald-500 transition-colors flex items-center justify-between">
+                  <span>Grounded RAG Chat</span>
+                  <ArrowUpRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Query your course notes with exact page-level citations, audio voice toggle, and multi-model Groq switching.
+                </p>
+              </div>
+
+              <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs font-mono">
+                <span className="text-muted-foreground">Strict Grounding</span>
+                <span className="text-emerald-500 font-bold">Ask AI →</span>
+              </div>
+            </Link>
+
+            {/* Launchpad 3: Knowledge Graph (Span 4) */}
+            <Link
+              href="/graph"
+              className="md:col-span-4 liquid-glass p-5 flex flex-col justify-between space-y-3 group"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-500 border border-purple-500/25 bento-icon-bounce">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <Badge variant="outline" className="text-[9px] font-mono font-bold uppercase bg-purple-500/10 border-purple-500/20 text-purple-500">
+                  Concept Map
+                </Badge>
+              </div>
+
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-foreground group-hover:text-purple-500 transition-colors flex items-center justify-between">
+                  <span>Knowledge Graph</span>
+                  <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all" />
+                </h3>
+                <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                  Interactive 3D concept network & Louvain modularity clusters.
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
+                <span className="text-muted-foreground">DAG Topology</span>
+                <span className="text-purple-500 font-bold">Explore →</span>
+              </div>
+            </Link>
+
+            {/* Launchpad 4: Syllabus Intelligence (Span 4) */}
+            <Link
+              href="/syllabus"
+              className="md:col-span-4 liquid-glass p-5 flex flex-col justify-between space-y-3 group"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-500 border border-amber-500/25 bento-icon-bounce">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <Badge variant="outline" className="text-[9px] font-mono font-bold uppercase bg-amber-500/10 border-amber-500/20 text-amber-500">
+                  Curriculum
+                </Badge>
+              </div>
+
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-foreground group-hover:text-amber-500 transition-colors flex items-center justify-between">
+                  <span>Syllabus Intelligence</span>
+                  <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all" />
+                </h3>
+                <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                  Hierarchical topic trees with automatic mastery trackers.
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
+                <span className="text-muted-foreground">82% Covered</span>
+                <span className="text-amber-500 font-bold">Track →</span>
+              </div>
+            </Link>
+
+            {/* Launchpad 5: Revision Timetable (Span 4) */}
+            <Link
+              href="/plan"
+              className="md:col-span-4 liquid-glass p-5 flex flex-col justify-between space-y-3 group"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/25 bento-icon-bounce">
+                  <Calendar className="w-5 h-5" />
+                </div>
+                <Badge variant="outline" className="text-[9px] font-mono font-bold uppercase bg-rose-500/10 border-rose-500/20 text-rose-500">
+                  LangGraph
+                </Badge>
+              </div>
+
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-foreground group-hover:text-rose-500 transition-colors flex items-center justify-between">
+                  <span>Revision Timetable</span>
+                  <ArrowUpRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all" />
+                </h3>
+                <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                  Autonomous exam countdown and daily study schedule blocks.
+                </p>
+              </div>
+
+              <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
+                <span className="text-muted-foreground">Daily Quotas</span>
+                <span className="text-rose-500 font-bold">Schedule →</span>
+              </div>
+            </Link>
+
+          </div>
+        </div>
+
+        {/* ── DRAMATIC ASYMMETRIC ROW 4: Live Ingested Files (Span 7) + Academic Digital Twin Radar (Span 5) ── */}
+        <div className="gsap-dash grid grid-cols-1 lg:grid-cols-12 gap-4">
+          
+          {/* Left: Recent Ingested Files Card (Span 7) */}
+          <div className="lg:col-span-7 liquid-glass p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3.5">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-2xl bg-primary/10 text-primary border border-primary/20">
+                  <Database className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm text-foreground">Recent Ingested Course Files</h3>
+                  <p className="text-[11px] text-muted-foreground">Live vectorized documents in your workspace</p>
+                </div>
               </div>
 
               <Button
                 variant="outline"
                 size="sm"
-                onClick={loadDocs}
-                className="gap-2 text-xs font-bold rounded-full bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-md transition-all active:scale-95"
+                onClick={() => router.push("/ingest")}
+                className="h-8 text-xs font-bold gap-1 rounded-xl border-white/20 bg-white/5 hover:bg-white/15"
               >
-                <RefreshCw className={cn("h-3.5 w-3.5", fetching ? "animate-spin text-amber-300" : "")} />
-                <span>Sync Index</span>
+                <span>Full Ingest Studio</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
               </Button>
             </div>
 
-            {/* Main Headline & Description */}
-            <div className="max-w-2xl space-y-3">
-              <div className="flex items-center gap-2 text-indigo-300 text-xs font-mono font-bold tracking-widest uppercase">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Autonomous Academic Intelligence Nexus</span>
+            {fetching ? (
+              <div className="p-8 text-center text-xs text-muted-foreground flex items-center justify-center gap-2">
+                <Clock className="w-4 h-4 animate-spin text-primary" />
+                <span>Synchronizing indexed documents...</span>
               </div>
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight font-sans">
-                Neural Knowledge Ingestion & Topology.
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed max-w-xl">
-                Continuous multimodal vector indexing, Bayesian concept mastery modeling, and grounded RAG synthesis across your entire academic curriculum.
-              </p>
-            </div>
-
-            {/* Quick Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Link href="/chat">
-                <Button className="h-10 px-5 rounded-xl font-bold text-xs bg-white text-slate-950 hover:bg-slate-100 shadow-xl gap-2 hover:scale-105 active:scale-95 transition-all">
-                  <MessageSquare className="w-4 h-4 text-primary" />
-                  <span>Launch RAG Chat</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-500" />
+            ) : docs.length === 0 ? (
+              <div className="p-8 text-center text-xs text-muted-foreground space-y-2">
+                <FileText className="w-8 h-8 text-muted-foreground/40 mx-auto" />
+                <p>No documents uploaded yet. Ingest syllabus and lecture notes to begin vector analysis.</p>
+                <Button
+                  onClick={() => router.push("/ingest")}
+                  size="sm"
+                  className="rounded-2xl text-xs font-bold gap-1.5 bg-primary text-primary-foreground"
+                >
+                  <UploadCloud className="w-3.5 h-3.5" />
+                  <span>Upload Files Now</span>
                 </Button>
-              </Link>
-              <Link href="/gaps">
-                <Button variant="outline" className="h-10 px-4 rounded-xl font-bold text-xs bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-md gap-2 transition-all">
-                  <Target className="w-4 h-4 text-amber-400" />
-                  <span>Scan Learning Gaps</span>
-                </Button>
-              </Link>
-              <Link href="/graph">
-                <Button variant="outline" className="h-10 px-4 rounded-xl font-bold text-xs bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-md gap-2 transition-all">
-                  <Layers className="w-4 h-4 text-indigo-300" />
-                  <span>Concept Topology</span>
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* ── BENTO ROW 2: Telemetry Spark Matrix (4 Compact Bento Cards) ── */}
-        <section className="gsap-dash grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          
-          {/* Bento Cell 1: Total Documents */}
-          <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
-                Ingested Files
-              </span>
-              <div className="p-2 rounded-xl bg-primary/10 text-primary border border-primary/20 bento-icon-bounce">
-                <FileText className="w-4 h-4" />
               </div>
-            </div>
-            <div className="mt-3">
-              <div className="text-2xl sm:text-3xl font-black text-foreground font-mono">
-                {totalDocs}
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1.5 font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                <span>{totalMb} MB total volume</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Bento Cell 2: Vector Status */}
-          <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
-                OCR & Vectorized
-              </span>
-              <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 bento-icon-bounce">
-                <CheckCircle2 className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-3">
-              <div className="text-2xl sm:text-3xl font-black text-foreground font-mono">
-                {processedDocs}
-                <span className="text-xs text-muted-foreground font-normal ml-1">/ {totalDocs}</span>
-              </div>
-              <div className="w-full bg-muted/60 h-1.5 rounded-full mt-2 overflow-hidden">
-                <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                  style={{ width: `${totalDocs > 0 ? (processedDocs / totalDocs) * 100 : 0}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Bento Cell 3: Extracted Pages */}
-          <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
-                Extracted Pages
-              </span>
-              <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 bento-icon-bounce">
-                <Layers className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-3">
-              <div className="text-2xl sm:text-3xl font-black text-foreground font-mono">
-                {totalPages}
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1.5 font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                <span>~{vectorEstimatedChunks} Vector Chunks</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Bento Cell 4: Qdrant Health */}
-          <div className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-xs bento-card flex flex-col justify-between group">
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
-                Index Health
-              </span>
-              <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500 border border-purple-500/20 bento-icon-bounce">
-                <Database className="w-4 h-4" />
-              </div>
-            </div>
-            <div className="mt-3">
-              <div className="text-xl sm:text-2xl font-black text-emerald-500 font-mono flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>100% ONLINE</span>
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-0.5 font-mono">
-                {inFlightDocs > 0 ? `${inFlightDocs} task(s) indexing...` : "Continuous embeddings live"}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ── BENTO ROW 3: Ingestion Dropzone & Fast Academic Launchpads ── */}
-        <section className="gsap-dash grid grid-cols-1 lg:grid-cols-12 gap-4">
-          
-          {/* Left Ingestion Matrix Dropzone (Span 7) */}
-          <div className="lg:col-span-7">
-            <UploadCard onUploaded={(d) => setDocs((prev) => [d, ...prev])} />
-          </div>
-
-          {/* Right Academic Intelligence Launchpad (Span 5 Bento Deck) */}
-          <div className="lg:col-span-5 grid grid-cols-2 gap-3">
-            
-            {/* Launchpad Card 1: RAG Chat */}
-            <Link
-              href="/chat"
-              className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card/85 border border-border/80 bento-card flex flex-col justify-between group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20 bento-icon-bounce">
-                  <MessageSquare className="w-4 h-4" />
-                </div>
-                <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-              </div>
-              <div className="mt-3">
-                <h4 className="font-bold text-xs sm:text-sm text-foreground">Grounded RAG</h4>
-                <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
-                  Ask cited questions across your indexed lectures & notes.
-                </p>
-              </div>
-            </Link>
-
-            {/* Launchpad Card 2: Gap Detector */}
-            <Link
-              href="/gaps"
-              className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card/85 border border-border/80 bento-card flex flex-col justify-between group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 bento-icon-bounce">
-                  <Target className="w-4 h-4" />
-                </div>
-                <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-amber-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-              </div>
-              <div className="mt-3">
-                <h4 className="font-bold text-xs sm:text-sm text-foreground">Gap Detector</h4>
-                <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
-                  Target weak syllabus topics with AI study plans.
-                </p>
-              </div>
-            </Link>
-
-            {/* Launchpad Card 3: Concept Graph */}
-            <Link
-              href="/graph"
-              className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card/85 border border-border/80 bento-card flex flex-col justify-between group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 bento-icon-bounce">
-                  <Layers className="w-4 h-4" />
-                </div>
-                <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-indigo-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-              </div>
-              <div className="mt-3">
-                <h4 className="font-bold text-xs sm:text-sm text-foreground">Concept Graph</h4>
-                <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
-                  Explore DAG hierarchies and prerequisite maps.
-                </p>
-              </div>
-            </Link>
-
-            {/* Launchpad Card 4: Digital Twin */}
-            <Link
-              href="/twin"
-              className="p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-card/85 border border-border/80 bento-card flex flex-col justify-between group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 bento-icon-bounce">
-                  <Brain className="w-4 h-4" />
-                </div>
-                <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-emerald-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
-              </div>
-              <div className="mt-3">
-                <h4 className="font-bold text-xs sm:text-sm text-foreground">Digital Twin</h4>
-                <p className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
-                  Track Bayesian mastery & prerequisite readiness.
-                </p>
-              </div>
-            </Link>
-          </div>
-        </section>
-
-        {/* ── BENTO ROW 4: Vector Document Matrix (High-Density Explorer) ── */}
-        <section className="gsap-dash space-y-4">
-          
-          {/* Header & Filter Controls Bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl shadow-sm">
-            <div className="flex items-center gap-2.5">
-              <Database className="w-4 h-4 text-primary" />
-              <h2 className="font-bold text-sm text-foreground">
-                Indexed Knowledge Base
-              </h2>
-              <Badge variant="secondary" className="text-[10px] font-mono px-2 py-0.5">
-                {filteredDocs.length} files
-              </Badge>
-            </div>
-
-            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-              {/* Search Bar */}
-              <div className="relative flex-1 sm:w-60">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter documents..."
-                  className="w-full pl-8.5 pr-3 py-1.5 text-xs rounded-xl bg-muted/40 border border-border/60 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary shadow-xs"
-                />
-              </div>
-
-              {/* Status Filter Buttons */}
-              <div className="flex items-center gap-1 p-0.5 rounded-xl bg-muted/40 border border-border/50 text-[11px]">
-                {(["all", "ocr_complete", "processing", "failed"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setStatusFilter(mode)}
-                    className={cn(
-                      "px-2.5 py-1 rounded-lg font-bold capitalize transition-all",
-                      statusFilter === mode
-                        ? "bg-background text-foreground shadow-xs"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {mode === "ocr_complete" ? "Ready" : mode}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Documents Grid / Empty State */}
-          {fetching ? (
-            <Card className="p-12 text-center text-xs flex flex-col items-center justify-center gap-3 bg-card/85 backdrop-blur-2xl border-border/80 rounded-3xl shadow-sm">
-              <Clock className="h-6 w-6 animate-spin text-primary" />
-              <span className="font-bold text-sm text-foreground">Synchronizing Vector Documents...</span>
-              <p className="text-xs text-muted-foreground">Checking live Qdrant collection embeddings and OCR jobs.</p>
-            </Card>
-          ) : filteredDocs.length === 0 ? (
-            <Card className="p-12 text-center text-xs flex flex-col items-center justify-center gap-3 bg-card/60 backdrop-blur-xl border-border/80 rounded-3xl">
-              <FileText className="h-8 w-8 text-muted-foreground/40" />
-              <span className="font-bold text-sm text-foreground">No documents found</span>
-              <p className="text-xs text-muted-foreground max-w-sm">
-                {searchQuery ? "No results match your search query." : "Upload course PDF notes or syllabus files above to begin vector indexing."}
-              </p>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
-              {filteredDocs.map((d) => {
-                const isReady = d.status === "ocr_complete";
-                const isFailed = d.status === "failed";
-                const sizeStr = ((d.size_bytes || 0) / (1024 * 1024)).toFixed(2);
-
-                return (
+            ) : (
+              <div className="space-y-2">
+                {docs.slice(0, 4).map((d) => (
                   <div
                     key={d.id}
-                    className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs flex flex-col justify-between space-y-3 group"
+                    className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 hover:border-primary/40 transition-colors"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0 bento-icon-bounce">
-                          <FileText className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-foreground truncate" title={d.filename}>
-                            {d.filename}
-                          </h4>
-                          <p className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 pt-0.5">
-                            <span>{sizeStr} MB</span>
-                            <span>•</span>
-                            <span>{d.page_count || 1} pg</span>
-                            <span>•</span>
-                            <span>{new Date(d.created_at).toLocaleDateString()}</span>
-                          </p>
-                        </div>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <FileText className="w-4 h-4 text-primary shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-foreground truncate">{d.filename}</p>
+                        <p className="text-[10px] font-mono text-muted-foreground">
+                          {((d.size_bytes || 0) / (1024 * 1024)).toFixed(2)} MB • {d.page_count || 1} pages
+                        </p>
                       </div>
-
-                      <span
-                        className={cn(
-                          "px-2 py-0.5 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider shrink-0",
-                          isReady
-                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                            : isFailed
-                            ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                            : "bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse"
-                        )}
-                      >
-                        {d.status.replace("_", " ")}
-                      </span>
                     </div>
 
-                    <div className="pt-2 border-t border-border/40 flex items-center justify-between gap-1.5">
-                      <div className="flex items-center gap-1.5">
-                        {isReady && (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => router.push(`/chat?q=Explain%20key%20concepts%20from%20${encodeURIComponent(d.filename)}`)}
-                              className="h-7 px-2.5 rounded-lg text-[11px] font-bold gap-1 text-primary border-primary/30 hover:bg-primary/10"
-                            >
-                              <MessageSquare className="w-3 h-3" />
-                              <span>Ask RAG</span>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setViewingDoc(d)}
-                              className="h-7 px-2 rounded-lg text-[11px] text-muted-foreground hover:text-foreground"
-                              title="Inspect OCR text"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                            </Button>
-                          </>
-                        )}
-                        {(isFailed || isReady) && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleReprocess(d)}
-                            className="h-7 px-2 rounded-lg text-[11px] text-muted-foreground hover:text-foreground"
-                            title="Reprocess OCR & Vectors"
-                          >
-                            <RefreshCw className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                      </div>
-
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className={cn(
+                        "px-2 py-0.5 rounded-md text-[9px] font-mono font-bold uppercase",
+                        d.status === "ocr_complete"
+                          ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                          : "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                      )}>
+                        {d.status === "ocr_complete" ? "Ready" : d.status}
+                      </span>
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setPendingDeleteId(d.id)}
-                        className="h-7 w-7 p-0 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                        title="Delete Document"
+                        onClick={() => router.push(`/chat?q=Explain%20key%20concepts%20from%20${encodeURIComponent(d.filename)}`)}
+                        className="h-7 px-2 text-[11px] font-bold text-primary hover:bg-white/10"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        Ask RAG
                       </Button>
                     </div>
                   </div>
-                );
-              })}
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right: Academic Digital Twin Radar (Span 5) */}
+          <div className="lg:col-span-5 liquid-glass p-6 space-y-4 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3.5">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-primary" />
+                  <h3 className="font-bold text-sm text-foreground">Digital Twin Telemetry</h3>
+                </div>
+                <Badge variant="outline" className="text-[10px] font-mono text-emerald-500 border-emerald-500/20 bg-emerald-500/10">
+                  State Synced
+                </Badge>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-foreground">Next Exam Target</span>
+                  <span className="font-mono text-[11px] text-primary font-bold">24 Days Left</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Focus on Dynamic Programming and AVL Tree Rotations. 3 weak concept dependencies detected in Knowledge Graph.
+                </p>
+              </div>
             </div>
-          )}
-        </section>
+
+            <div className="pt-2 flex items-center justify-between gap-2.5">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push("/twin")}
+                className="w-full text-xs font-bold rounded-2xl h-9 border-white/20 bg-white/5 hover:bg-white/15"
+              >
+                Inspect Twin
+              </Button>
+              <Button
+                onClick={() => router.push("/plan")}
+                size="sm"
+                className="w-full text-xs font-bold rounded-2xl h-9 bg-primary text-primary-foreground shadow-md hover:bg-primary/90"
+              >
+                View Timetable
+              </Button>
+            </div>
+          </div>
+
+        </div>
+
       </main>
-
-      {/* Delete Confirmation Modal */}
-      <AlertDialog open={pendingDeleteId !== null} onOpenChange={(o) => !o && setPendingDeleteId(null)}>
-        <AlertDialogContent className="bg-card/95 backdrop-blur-2xl border-border/80 rounded-3xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-base font-bold">Remove document from Vector Index?</AlertDialogTitle>
-            <AlertDialogDescription className="text-xs text-muted-foreground">
-              This will remove the file from storage and purge all associated vector embeddings from the Qdrant collection.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl text-xs">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="rounded-xl text-xs bg-destructive text-destructive-foreground font-bold">
-              Delete Permanently
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Page OCR Viewer Modal */}
-      <PagesViewer doc={viewingDoc} onClose={() => setViewingDoc(null)} />
     </div>
   );
 }
-

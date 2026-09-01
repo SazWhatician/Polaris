@@ -437,9 +437,14 @@ export default function GapsPage() {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 selection:bg-primary/30 selection:text-foreground">
+    <div className="relative min-h-screen text-foreground pb-32 pt-14 sm:pt-16 overflow-x-hidden selection:bg-primary/30 selection:text-foreground">
+      {/* ── Ambient Fluid Liquid Caustic Spheres (iOS/visionOS Glass Glow) ── */}
+      <div className="ambient-liquid-glow -top-24 -left-24 w-[500px] h-[500px] bg-indigo-500/20" />
+      <div className="ambient-liquid-glow top-[38%] -right-32 w-[550px] h-[550px] bg-purple-500/15" />
+      <div className="ambient-liquid-glow bottom-12 left-[20%] w-[600px] h-[600px] bg-emerald-500/12" />
+
       <SiteHeader />
-      <main className="max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
+      <main className="relative z-10 max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
         {/* Standardized Page Header */}
         <PageHeader
           category="ACADEMIC INTELLIGENCE // GAP DETECTOR"
@@ -449,23 +454,14 @@ export default function GapsPage() {
           badgeText="Syllabus Evaluator"
           badgeVariant="purple"
           actions={
-            <div className="flex items-center flex-wrap gap-2">
-              {syllabi.length > 0 && (
-                <select
-                  value={selectedSyllabusId}
-                  onChange={(e) => setSelectedSyllabusId(e.target.value)}
-                  className="h-9 rounded-xl border border-border/80 bg-background px-3 py-1.5 text-xs text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary shadow-xs"
-                >
-                  {syllabi.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              )}
-
-              <Button size="sm" onClick={() => setShowCreateModal(true)} className="gap-1.5 text-xs font-bold rounded-xl shadow-xs">
-                <Plus className="h-4 w-4" />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCreateModal(true)}
+                className="gap-1.5 text-xs font-bold rounded-2xl border-white/20 bg-white/10 dark:bg-white/5 hover:bg-white/15 backdrop-blur-xl"
+              >
+                <Plus className="h-3.5 w-3.5" />
                 <span>New Syllabus</span>
               </Button>
 
@@ -476,44 +472,44 @@ export default function GapsPage() {
                   disabled={deletingSyllabusId === selectedSyllabusId}
                   onClick={() => void handleDeleteSyllabus(selectedSyllabusId)}
                   title="Delete current syllabus"
-                  className="h-9 w-9 rounded-xl text-destructive hover:bg-destructive/10 border-border/80"
+                  className="h-9 w-9 rounded-2xl text-destructive hover:bg-destructive/10 border-white/20 bg-white/5"
                 >
-                {deletingSyllabusId === selectedSyllabusId ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-              </Button>
-            )}
-          </div>
-        }
-      />
+                  {deletingSyllabusId === selectedSyllabusId ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
+            </div>
+          }
+        />
 
         {/* Empty State */}
         {syllabi.length === 0 && !loadingSyllabi && (
-          <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed bg-card/40 backdrop-blur-sm">
+          <div className="flex flex-col items-center justify-center p-12 text-center border-dashed rounded-3xl liquid-glass">
             <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
             <CardTitle>No syllabi added yet</CardTitle>
             <CardDescription className="max-w-md mt-2">
               Create a syllabus first by pasting your syllabus outline or linking an uploaded PDF notes document to map coverage.
             </CardDescription>
-            <Button onClick={() => setShowCreateModal(true)} className="mt-6 gap-2">
+            <Button onClick={() => setShowCreateModal(true)} className="mt-6 gap-2 rounded-2xl bg-primary text-primary-foreground">
               <Plus className="h-4 w-4" />
               Create First Syllabus
             </Button>
-          </Card>
+          </div>
         )}
 
         {selectedSyllabus && (
-          <div className="space-y-8">
+          <div className="space-y-6">
             
             {/* Overview & Action Bar */}
-            <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
-              <Card className="bento-card p-4 sm:p-5 rounded-2xl shadow-xs border-border/80 flex flex-col justify-between">
+            <div className="grid gap-3.5 md:grid-cols-3">
+              <div className="liquid-glass p-5 flex flex-col justify-between">
                 <div>
-                  <CardTitle className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                  <div className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
                     Syllabus Coverage Score
-                  </CardTitle>
+                  </div>
                   <div className="space-y-2 mt-2">
                     {coverage ? (
                       <div className="flex items-baseline gap-2">
@@ -529,9 +525,9 @@ export default function GapsPage() {
                     )}
                     
                     {coverage && (
-                      <div className="w-full bg-muted/60 rounded-full h-1.5 overflow-hidden">
+                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
                         <div
-                          className="bg-primary h-full rounded-full transition-all duration-500"
+                          className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
                           style={{ width: `${coverage.overall_score}%` }}
                         />
                       </div>
@@ -559,13 +555,13 @@ export default function GapsPage() {
                     )}
                   </Button>
                 </div>
-              </Card>
+              </div>
 
-              <Card className="bento-card p-4 sm:p-5 rounded-2xl shadow-xs border-border/80 flex flex-col justify-between">
+              <div className="liquid-glass p-5 flex flex-col justify-between">
                 <div>
-                  <CardTitle className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                  <div className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
                     Study Recommendations
-                  </CardTitle>
+                  </div>
                   <div className="mt-2">
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-black font-mono tracking-tight text-primary">
@@ -586,7 +582,7 @@ export default function GapsPage() {
                     disabled={agentStatus === "running" || !coverage}
                     data-agent-target="run-gap-agent-btn"
                     size="sm"
-                    className="w-full gap-1.5 h-8 text-xs font-bold rounded-xl bg-primary text-primary-foreground shadow-xs"
+                    className="w-full gap-1.5 h-8.5 text-xs font-bold rounded-2xl bg-primary text-primary-foreground shadow-xs"
                   >
                     {agentStatus === "running" ? (
                       <>
@@ -601,13 +597,13 @@ export default function GapsPage() {
                     )}
                   </Button>
                 </div>
-              </Card>
+              </div>
 
-              <Card className="bento-card p-4 sm:p-5 rounded-2xl shadow-xs border-border/80 flex flex-col justify-between">
+              <div className="liquid-glass p-5 flex flex-col justify-between">
                 <div>
-                  <CardTitle className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                  <div className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
                     Total Estimated Study Time
-                  </CardTitle>
+                  </div>
                   <div className="mt-2">
                     <div className="flex items-baseline gap-2">
                       <span className="text-3xl font-black font-mono tracking-tight text-primary">
@@ -623,12 +619,12 @@ export default function GapsPage() {
                   </div>
                 </div>
                 <div className="pt-3">
-                  <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 h-8">
+                  <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 h-8.5">
                     <Info className="h-3 w-3 text-primary shrink-0" />
                     <span>Drag cards below to customize order.</span>
                   </div>
                 </div>
-              </Card>
+              </div>
             </div>
 
             {/* Main Dashboard Layout */}
