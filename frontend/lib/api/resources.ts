@@ -14,6 +14,22 @@ export interface ResourceItem {
   why_recommended: string;
 }
 
+export interface PlaylistItem {
+  playlist_id: string;
+  title: string;
+  channel_title: string;
+  video_count: string;
+  url: string;
+  thumbnail_url: string;
+}
+
+export interface BlockResourcesResponse {
+  topic_title: string;
+  playlists: PlaylistItem[];
+  videos: ResourceItem[];
+  subtopics_resources: Record<string, ResourceItem[]>;
+}
+
 export interface ResourceDiscoveryResponse {
   topic_id: string;
   topic_title: string;
@@ -36,6 +52,32 @@ export async function triggerResourceDiscovery(
     body: JSON.stringify({
       topic_id: topicId,
       topic_title: topicTitle,
+    }),
+  });
+}
+
+export async function quickDiscoverResources(
+  topicTitle: string,
+  topicId?: string,
+): Promise<ResourceDiscoveryResponse> {
+  return api<ResourceDiscoveryResponse>("/api/agents/resource/quick", {
+    method: "POST",
+    body: JSON.stringify({
+      topic_id: topicId || `topic-${Date.now()}`,
+      topic_title: topicTitle,
+    }),
+  });
+}
+
+export async function getBlockResources(
+  topicTitle: string,
+  subtopics: string[] = [],
+): Promise<BlockResourcesResponse> {
+  return api<BlockResourcesResponse>("/api/agents/resource/block", {
+    method: "POST",
+    body: JSON.stringify({
+      topic_title: topicTitle,
+      subtopics: subtopics,
     }),
   });
 }

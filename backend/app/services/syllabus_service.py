@@ -292,8 +292,10 @@ class SyllabusService:
             try:
                 raw_out = await self._groq.complete(prompt, json_mode=True, temperature=0.0)
                 parsed = LLMTopicTree.model_validate_json(raw_out)
-                return self._map_llm_topics(parsed.topics)
-            except (json.JSONDecodeError, ValidationError) as exc:
+                mapped = self._map_llm_topics(parsed.topics)
+                if mapped:
+                    return mapped
+            except Exception as exc:
                 log.warning("syllabus.extract_tree.validation_failed", error=str(exc))
                 # Trigger corrective retry
                 corrected_prompt = (
@@ -309,20 +311,31 @@ class SyllabusService:
                         corrected_prompt, json_mode=True, temperature=0.0
                     )
                     parsed_retry = LLMTopicTree.model_validate_json(raw_out_retry)
-                    return self._map_llm_topics(parsed_retry.topics)
+                    mapped_retry = self._map_llm_topics(parsed_retry.topics)
+                    if mapped_retry:
+                        return mapped_retry
                 except Exception as final_exc:
                     log.error("syllabus.extract_tree.retry_failed", error=str(final_exc))
-                    # If LLM retry fails, return a simple fallback single-topic tree
-                    # rather than failing entirely
-                    fallback_id = str(uuid.uuid4())[:8]
-                    return [
-                        Topic(
-                            id=fallback_id,
-                            title="Syllabus Content",
-                            description="Extracted curriculum elements (fallback)",
-                            subtopics=[],
-                        )
-                    ]
+
+            # Guaranteed non-empty fallback: derive topics directly from text lines
+            lines = [line.strip("- *#\t") for line in text.splitlines() if len(line.strip("- *#\t")) > 3]
+            subtopics = [
+                Topic(
+                    id=f"topic-{i+1}",
+                    title=line[:80],
+                    description="Extracted curriculum topic",
+                    subtopics=[],
+                )
+                for i, line in enumerate(lines[:12])
+            ]
+            return [
+                Topic(
+                    id="module-1",
+                    title="Course Curriculum & Overview",
+                    description="Curriculum topics extracted from uploaded syllabus document.",
+                    subtopics=subtopics,
+                )
+            ]
 
     async def _grade_topic_coverage_with_llm(
         self, topic: Topic, chunks: list[Any]

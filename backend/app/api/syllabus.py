@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile, status
 
 from app.core.deps import CurrentUser
 from app.core.firebase import get_firestore, is_initialized
@@ -57,6 +57,64 @@ async def create_syllabus(
             name=body.name,
             syllabus_text=body.syllabus_text,
             document_id=body.document_id,
+        )
+        return SyllabusResponse.model_validate(syllabus, from_attributes=True)
+    except SyllabusValidationError as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+
+
+@router.post("/upload", response_model=SyllabusResponse, status_code=status.HTTP_201_CREATED)
+async def upload_syllabus(
+    user: CurrentUser,
+    service: SyllabusServiceDep,
+    name: str = Form(...),
+    file: UploadFile = File(...),
+) -> SyllabusResponse:
+    """Uploads a syllabus file (PDF, TXT, MD) and extracts structured module blocks."""
+    contents = await file.read()
+    if not contents:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Uploaded file is empty")
+
+    extracted_text = ""
+    filename = (file.filename or "").lower()
+    content_type = (file.content_type or "").lower()
+
+    IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff", ".gif")
+    is_image = filename.endswith(IMAGE_EXTENSIONS) or content_type.startswith("image/")
+
+    if is_image:
+        from app.services.image_transcriber import transcribe_image_bytes
+
+        mime = content_type if content_type.startswith("image/") else "image/jpeg"
+        extracted_text = await transcribe_image_bytes(contents, mime_type=mime)
+    elif filename.endswith(".pdf"):
+        from app.services.page_extractor import extract_pdf_page_texts
+
+        page_texts = extract_pdf_page_texts(contents)
+        extracted_text = "\n\n".join(t for t in page_texts if t).strip()
+
+        # Scanned PDF fallback: If extracted digital text is empty, transcribe rendered pages
+        if len(extracted_text) < 40:
+            from app.services.image_transcriber import transcribe_scanned_pdf_bytes
+
+            extracted_text = await transcribe_scanned_pdf_bytes(contents)
+    else:
+        extracted_text = contents.decode("utf-8", errors="replace").strip()
+
+    if not extracted_text or len(extracted_text.strip()) < 10:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "Could not extract readable text from the uploaded photo or document. "
+                "Please make sure the syllabus image is clear and legible, or paste the syllabus text directly."
+            ),
+        )
+
+    try:
+        syllabus = await service.create_syllabus(
+            user_id=user.uid,
+            name=name.strip() or (file.filename or "Uploaded Syllabus"),
+            syllabus_text=extracted_text,
         )
         return SyllabusResponse.model_validate(syllabus, from_attributes=True)
     except SyllabusValidationError as exc:

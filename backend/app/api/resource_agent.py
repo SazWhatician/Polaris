@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC
+from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
@@ -13,8 +13,15 @@ from app.core.logging import get_logger
 from app.models.resource import ResourceDiscoveryResponse, ResourceItem
 from app.repositories.checkpoint_repo import FirestoreCheckpointSaver
 from app.repositories.resource_cache_repo import ResourceCacheRepository, compute_topic_hash
+from app.services.youtube_service import YouTubeService
+from langgraph.checkpoint.memory import MemorySaver
 
 router = APIRouter(prefix="/api/agents/resource", tags=["resource_agent"])
+
+logger = get_logger(__name__)
+
+# Shared memory checkpointer to ensure state persistence across async request-response cycles
+_shared_memory_saver = MemorySaver()
 
 
 class ResourceRunRequest(BaseModel):
@@ -27,9 +34,27 @@ class ResourceRunResponse(BaseModel):
     status: str = Field(description="Current run status: 'running' | 'completed' | 'failed'")
 
 
-from langgraph.checkpoint.memory import MemorySaver
+class PlaylistItem(BaseModel):
+    playlist_id: str
+    title: str
+    channel_title: str
+    video_count: str
+    url: str
+    thumbnail_url: str
 
-logger = get_logger(__name__)
+
+class BlockResourcesRequest(BaseModel):
+    topic_title: str = Field(description="The topic or module block title")
+    subtopics: list[str] = Field(
+        default_factory=list, description="List of subtopic names in this block"
+    )
+
+
+class BlockResourcesResponse(BaseModel):
+    topic_title: str
+    playlists: list[PlaylistItem]
+    videos: list[ResourceItem]
+    subtopics_resources: dict[str, list[ResourceItem]]
 
 
 def get_resource_agent_graph(request: Request) -> Any:
@@ -45,7 +70,7 @@ def get_resource_agent_graph(request: Request) -> Any:
         checkpointer = FirestoreCheckpointSaver(db)
     else:
         cache_repo = None
-        checkpointer = MemorySaver()
+        checkpointer = _shared_memory_saver
 
     agent = ResourceAgent(cache_repo=cache_repo, groq_client=groq_client)
     return agent.compile(checkpointer=checkpointer)
@@ -57,7 +82,11 @@ ResourceAgentGraphDep = Annotated[Any, Depends(get_resource_agent_graph)]
 async def run_resource_agent_task(
     graph: Any, thread_id: str, user_id: str, topic_id: str, topic_title: str
 ) -> None:
-    if hasattr(graph, "checkpointer") and graph.checkpointer and hasattr(graph.checkpointer, "adelete_thread"):
+    if (
+        hasattr(graph, "checkpointer")
+        and graph.checkpointer
+        and hasattr(graph.checkpointer, "adelete_thread")
+    ):
         try:
             await graph.checkpointer.adelete_thread(thread_id)
         except Exception as e:
@@ -96,6 +125,65 @@ async def trigger_resource_discovery(
     return ResourceRunResponse(thread_id=thread_id, status="running")
 
 
+@router.post("/quick", response_model=ResourceDiscoveryResponse)
+async def quick_discover_resources(
+    body: ResourceRunRequest,
+    user: CurrentUser,
+    graph: ResourceAgentGraphDep,
+) -> ResourceDiscoveryResponse:
+    """Synchronously discovers and ranks resources, bypassing polling latency."""
+    safe_topic_slug = compute_topic_hash(body.topic_title)[:16]
+    thread_id = f"{user.uid}:quick:{safe_topic_slug}:{int(datetime.now(UTC).timestamp())}"
+
+    state = {
+        "user_id": user.uid,
+        "topic_id": body.topic_id,
+        "topic_title": body.topic_title,
+        "topic_hash": compute_topic_hash(body.topic_title),
+        "from_cache": False,
+        "raw_candidates": [],
+        "ranked_resources": [],
+        "error": None,
+    }
+    config = {"configurable": {"thread_id": thread_id}}
+    result_state = await graph.ainvoke(state, config)
+
+    ranked_data = result_state.get("ranked_resources") or []
+    resources = [ResourceItem(**item) for item in ranked_data if isinstance(item, dict)]
+
+    return ResourceDiscoveryResponse(
+        topic_id=body.topic_id,
+        topic_title=body.topic_title,
+        resources=resources,
+        from_cache=result_state.get("from_cache", False),
+        updated_at=datetime.now(UTC).isoformat(),
+    )
+
+
+@router.post("/block", response_model=BlockResourcesResponse)
+async def discover_block_resources(
+    body: BlockResourcesRequest,
+    user: CurrentUser,
+) -> BlockResourcesResponse:
+    """Discovers full-course playlists, main topic videos, and subtopic-categorized tutorials for a syllabus block."""
+    yt_service = YouTubeService()
+    data = await yt_service.get_block_resources(body.topic_title, body.subtopics)
+
+    playlists = [PlaylistItem(**p) for p in data["playlists"]]
+    main_videos = [ResourceItem(**v) for v in data["videos"]]
+
+    subtopic_map: dict[str, list[ResourceItem]] = {}
+    for sub, vids in data["subtopics_resources"].items():
+        subtopic_map[sub] = [ResourceItem(**v) for v in vids]
+
+    return BlockResourcesResponse(
+        topic_title=data["topic_title"],
+        playlists=playlists,
+        videos=main_videos,
+        subtopics_resources=subtopic_map,
+    )
+
+
 @router.get("/runs/{thread_id}", response_model=ResourceDiscoveryResponse)
 async def get_resource_discovery_status(
     thread_id: str,
@@ -124,8 +212,6 @@ async def get_resource_discovery_status(
 
     ranked_data = values.get("ranked_resources") or []
     resources = [ResourceItem(**item) for item in ranked_data if isinstance(item, dict)]
-
-    from datetime import datetime
 
     return ResourceDiscoveryResponse(
         topic_id=values.get("topic_id", ""),

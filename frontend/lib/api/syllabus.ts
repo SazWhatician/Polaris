@@ -49,6 +49,19 @@ export async function createSyllabus(
   });
 }
 
+export async function uploadSyllabusFile(
+  name: string,
+  file: File,
+): Promise<SyllabusResponse> {
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("file", file);
+  return api<SyllabusResponse>("/api/syllabus/upload", {
+    method: "POST",
+    body: formData,
+  });
+}
+
 export async function listSyllabi(): Promise<SyllabusListResponse> {
   return api<SyllabusListResponse>("/api/syllabus", {
     method: "GET",
