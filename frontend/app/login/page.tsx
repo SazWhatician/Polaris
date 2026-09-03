@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Mail,
   Lock,
@@ -19,11 +19,19 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-export default function LoginPage() {
+function LoginContent() {
   const { user, loading, signIn, signInWithEmail, signUpWithEmail, signInAsDemo } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const queryMode = searchParams.get("mode");
 
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup">(queryMode === "signup" ? "signup" : "login");
+
+  useEffect(() => {
+    if (queryMode === "signup" || queryMode === "login") {
+      setMode(queryMode);
+    }
+  }, [queryMode]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -454,5 +462,19 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground text-xs font-mono">
+          INITIALIZING SECURE PORTAL...
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }

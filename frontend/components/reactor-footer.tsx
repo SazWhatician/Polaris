@@ -3,139 +3,29 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import * as THREE from "three";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Move3d, Loader2 } from "lucide-react";
+import {
+  MODEL_COLORWAYS,
+  ModelColorway,
+  ColorwayConfig,
+} from "./reactor-canvas";
 
-export type ModelColorway =
-  | "emerald"
-  | "amethyst"
-  | "cyan"
-  | "gold"
-  | "crimson"
-  | "chrome"
-  | "aurora";
+export { MODEL_COLORWAYS };
+export type { ModelColorway, ColorwayConfig };
 
-export interface ColorwayConfig {
-  id: ModelColorway;
-  label: string;
-  dotColor: string;
-  modelColor: string;
-  emissiveColor: string;
-  emissiveIntensity: number;
-  roughness: number;
-  metalness: number;
-  rimColor: number;
-  bottomColor: number;
-  coreLightColor: number;
-  particleColor: number;
-}
+// Dynamic import with SSR disabled for Next.js 15 App Router WebGL canvas
+const ReactorCanvas = dynamic(
+  () => import("./reactor-canvas").then((mod) => mod.ReactorCanvas),
+  {
+    ssr: false,
+    loading: () => null,
+  }
+);
 
-export const MODEL_COLORWAYS: Record<ModelColorway, ColorwayConfig> = {
-  emerald: {
-    id: "emerald",
-    label: "Cyber Emerald",
-    dotColor: "#10b981",
-    modelColor: "#94a3b8",
-    emissiveColor: "#064e3b",
-    emissiveIntensity: 0.28,
-    roughness: 0.22,
-    metalness: 0.85,
-    rimColor: 0x10b981,
-    bottomColor: 0x06b6d4,
-    coreLightColor: 0x10b981,
-    particleColor: 0x6ee7b7,
-  },
-  amethyst: {
-    id: "amethyst",
-    label: "Cosmic Amethyst",
-    dotColor: "#a855f7",
-    modelColor: "#475569",
-    emissiveColor: "#581c87",
-    emissiveIntensity: 0.35,
-    roughness: 0.20,
-    metalness: 0.90,
-    rimColor: 0xc084fc,
-    bottomColor: 0xe879f9,
-    coreLightColor: 0x9333ea,
-    particleColor: 0xd8b4fe,
-  },
-  cyan: {
-    id: "cyan",
-    label: "Arctic Neon",
-    dotColor: "#06b6d4",
-    modelColor: "#64748b",
-    emissiveColor: "#083344",
-    emissiveIntensity: 0.32,
-    roughness: 0.18,
-    metalness: 0.88,
-    rimColor: 0x22d3ee,
-    bottomColor: 0x38bdf8,
-    coreLightColor: 0x06b6d4,
-    particleColor: 0xa5f3fc,
-  },
-  gold: {
-    id: "gold",
-    label: "Solar Gold",
-    dotColor: "#f59e0b",
-    modelColor: "#ca8a04",
-    emissiveColor: "#78350f",
-    emissiveIntensity: 0.30,
-    roughness: 0.24,
-    metalness: 0.92,
-    rimColor: 0xfbbf24,
-    bottomColor: 0xf97316,
-    coreLightColor: 0xf59e0b,
-    particleColor: 0xfde68a,
-  },
-  crimson: {
-    id: "crimson",
-    label: "Reactor Ruby",
-    dotColor: "#f43f5e",
-    modelColor: "#334155",
-    emissiveColor: "#881337",
-    emissiveIntensity: 0.38,
-    roughness: 0.20,
-    metalness: 0.88,
-    rimColor: 0xf43f5e,
-    bottomColor: 0xfb7185,
-    coreLightColor: 0xe11d48,
-    particleColor: 0xfecdd3,
-  },
-  chrome: {
-    id: "chrome",
-    label: "Liquid Chrome",
-    dotColor: "#f8fafc",
-    modelColor: "#e2e8f0",
-    emissiveColor: "#0f172a",
-    emissiveIntensity: 0.10,
-    roughness: 0.08,
-    metalness: 0.98,
-    rimColor: 0xffffff,
-    bottomColor: 0x94a3b8,
-    coreLightColor: 0xffffff,
-    particleColor: 0xffffff,
-  },
-  aurora: {
-    id: "aurora",
-    label: "Prism Shift",
-    dotColor: "#ec4899",
-    modelColor: "#cbd5e1",
-    emissiveColor: "#4338ca",
-    emissiveIntensity: 0.35,
-    roughness: 0.15,
-    metalness: 0.90,
-    rimColor: 0x818cf8,
-    bottomColor: 0x34d399,
-    coreLightColor: 0xf472b6,
-    particleColor: 0xfbcfe8,
-  },
-};
-
-interface ReactorFooterProps {
+export interface ReactorFooterProps {
   /** Custom 3D model URL (e.g. "/models/bouche_a_levres.glb") */
   customModelUrl?: string;
   /** Scale factor for custom 3D model (default: 1.0) */
@@ -150,293 +40,35 @@ export function ReactorFooter({
   initialColorway = "emerald",
 }: ReactorFooterProps) {
   const footerRef = useRef<HTMLElement>(null);
-  const canvasContainerRef = useRef<HTMLDivElement>(null);
   const contentContainerRef = useRef<HTMLDivElement>(null);
 
-  const controlsRef = useRef<OrbitControls | null>(null);
-  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const modelGroupRef = useRef<THREE.Group | null>(null);
-
-  const materialsRef = useRef<THREE.MeshStandardMaterial[]>([]);
-  const rimLightRef = useRef<THREE.DirectionalLight | null>(null);
-  const bottomLightRef = useRef<THREE.DirectionalLight | null>(null);
-  const corePointLightRef = useRef<THREE.PointLight | null>(null);
-  const particlesMatRef = useRef<THREE.PointsMaterial | null>(null);
-
   const [isLoading, setIsLoading] = useState(true);
-  const [loadProgress, setLoadProgress] = useState(0);
   const [selectedColorway, setSelectedColorway] = useState<ModelColorway>(initialColorway);
-  const selectedColorwayRef = useRef<ModelColorway>(initialColorway);
-  selectedColorwayRef.current = selectedColorway;
+  const [isInView, setIsInView] = useState(false);
 
-  // Apply colorway transitions to 3D materials and lights
-  const _handleColorwayChange = (cwKey: ModelColorway) => {
-    setSelectedColorway(cwKey);
-    const cfg = MODEL_COLORWAYS[cwKey];
-    if (!cfg) return;
+  // Lazy-mount the 3D model and WebGL canvas only when scrolling near the footer
+  useEffect(() => {
+    const footerEl = footerRef.current;
+    if (!footerEl) return;
 
-    materialsRef.current.forEach((mat) => {
-      const targetColor = new THREE.Color(cfg.modelColor);
-      const targetEmissive = new THREE.Color(cfg.emissiveColor);
-
-      gsap.to(mat.color, {
-        r: targetColor.r,
-        g: targetColor.g,
-        b: targetColor.b,
-        duration: 0.8,
-        ease: "power2.out",
-      });
-      gsap.to(mat.emissive, {
-        r: targetEmissive.r,
-        g: targetEmissive.g,
-        b: targetEmissive.b,
-        duration: 0.8,
-        ease: "power2.out",
-      });
-      mat.emissiveIntensity = cfg.emissiveIntensity;
-      mat.roughness = cfg.roughness;
-      mat.metalness = cfg.metalness;
-      mat.needsUpdate = true;
-    });
-
-    if (rimLightRef.current) {
-      const targetRim = new THREE.Color(cfg.rimColor);
-      gsap.to(rimLightRef.current.color, {
-        r: targetRim.r,
-        g: targetRim.g,
-        b: targetRim.b,
-        duration: 0.8,
-      });
-    }
-
-    if (bottomLightRef.current) {
-      const targetBottom = new THREE.Color(cfg.bottomColor);
-      gsap.to(bottomLightRef.current.color, {
-        r: targetBottom.r,
-        g: targetBottom.g,
-        b: targetBottom.b,
-        duration: 0.8,
-      });
-    }
-
-    if (corePointLightRef.current) {
-      const targetCore = new THREE.Color(cfg.coreLightColor);
-      gsap.to(corePointLightRef.current.color, {
-        r: targetCore.r,
-        g: targetCore.g,
-        b: targetCore.b,
-        duration: 0.8,
-      });
-    }
-
-    if (particlesMatRef.current) {
-      const targetPart = new THREE.Color(cfg.particleColor);
-      gsap.to(particlesMatRef.current.color, {
-        r: targetPart.r,
-        g: targetPart.g,
-        b: targetPart.b,
-        duration: 0.8,
-      });
-    }
-  };
-  void _handleColorwayChange;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsInView(Boolean(entry?.isIntersecting));
+      },
+      { rootMargin: "350px" }
+    );
+    observer.observe(footerEl);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    const canvasEl = canvasContainerRef.current;
     const footerEl = footerRef.current;
     const contentEl = contentContainerRef.current;
+    if (!footerEl || !contentEl) return;
 
-    if (!canvasEl || !footerEl || !contentEl) return;
-
-    const getWidth = () => footerEl.clientWidth || window.innerWidth;
-    const getHeight = () => footerEl.clientHeight || window.innerHeight || 800;
-
-    let width = getWidth();
-    let height = getHeight();
-
-    // 1. Scene & WebGL Renderer
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x000000, 0.025);
-
-    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
-    camera.position.set(0, 0.2, 4.2);
-    cameraRef.current = camera;
-
-    const renderer = new THREE.WebGLRenderer({
-      alpha: true,
-      antialias: true,
-      powerPreference: "high-performance",
-    });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
-    renderer.domElement.style.position = "absolute";
-    renderer.domElement.style.top = "0";
-    renderer.domElement.style.left = "0";
-    renderer.domElement.style.width = "100%";
-    renderer.domElement.style.height = "100%";
-    renderer.domElement.style.touchAction = "none";
-
-    canvasEl.innerHTML = "";
-    canvasEl.appendChild(renderer.domElement);
-
-    // 2. Passive OrbitControls
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.06;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 1.1;
-    controls.enableRotate = false;
-    controls.enableZoom = false;
-    controls.enablePan = false;
-    controls.target.set(0, 0, 0);
-    controlsRef.current = controls;
-
-    // 3. Studio PBR Lighting Setup
-    const initialCfg = MODEL_COLORWAYS[selectedColorwayRef.current];
-
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
-    scene.add(ambientLight);
-
-    const keyLight = new THREE.DirectionalLight(0xf8fafc, 2.6);
-    keyLight.position.set(3, 5, 4);
-    scene.add(keyLight);
-
-    const fillLight = new THREE.DirectionalLight(0x94a3b8, 1.5);
-    fillLight.position.set(-4, 2, 3);
-    scene.add(fillLight);
-
-    const rimLight = new THREE.DirectionalLight(initialCfg.rimColor, 3.4);
-    rimLight.position.set(0, 4, -4);
-    scene.add(rimLight);
-    rimLightRef.current = rimLight;
-
-    const bottomLight = new THREE.DirectionalLight(initialCfg.bottomColor, 1.6);
-    bottomLight.position.set(0, -3, 2);
-    scene.add(bottomLight);
-    bottomLightRef.current = bottomLight;
-
-    // 4. 3D Model Root Group
-    const modelGroup = new THREE.Group();
-    modelGroup.position.set(0, 0, 0);
-    scene.add(modelGroup);
-    modelGroupRef.current = modelGroup;
-
-    const corePointLight = new THREE.PointLight(initialCfg.coreLightColor, 2.0, 15);
-    corePointLight.position.set(0, 0, 0);
-    modelGroup.add(corePointLight);
-    corePointLightRef.current = corePointLight;
-
-    let innerMesh: THREE.Object3D | null = null;
-    let outerCage: THREE.Mesh | null = null;
-    materialsRef.current = [];
-
-    if (customModelUrl) {
-      const loader = new GLTFLoader();
-      loader.load(
-        customModelUrl,
-        (gltf) => {
-          const model = gltf.scene;
-
-          model.traverse((child) => {
-            if ((child as THREE.Mesh).isMesh) {
-              const mesh = child as THREE.Mesh;
-              mesh.castShadow = true;
-              mesh.receiveShadow = true;
-
-              const mat = new THREE.MeshStandardMaterial({
-                color: new THREE.Color(initialCfg.modelColor),
-                roughness: initialCfg.roughness,
-                metalness: initialCfg.metalness,
-                emissive: new THREE.Color(initialCfg.emissiveColor),
-                emissiveIntensity: initialCfg.emissiveIntensity,
-                side: THREE.DoubleSide,
-              });
-              mesh.material = mat;
-              materialsRef.current.push(mat);
-            }
-          });
-
-          // Auto-Fit Bounding Box & Center
-          const box = new THREE.Box3().setFromObject(model);
-          const center = box.getCenter(new THREE.Vector3());
-          const size = box.getSize(new THREE.Vector3());
-          const maxDim = Math.max(size.x, size.y, size.z) || 1;
-          const scaleFactor = (3.6 / maxDim) * modelScale;
-
-          model.position.sub(center.multiplyScalar(scaleFactor));
-          model.scale.setScalar(scaleFactor);
-
-          innerMesh = model;
-          modelGroup.add(model);
-          setIsLoading(false);
-        },
-        (xhr) => {
-          if (xhr.total > 0) {
-            setLoadProgress(Math.round((xhr.loaded / xhr.total) * 100));
-          }
-        },
-        (error) => {
-          console.warn("Failed to load custom 3D model, falling back to crystal:", error);
-          createDefaultCrystal();
-          setIsLoading(false);
-        }
-      );
-    } else {
-      createDefaultCrystal();
-      setIsLoading(false);
-    }
-
-    function createDefaultCrystal() {
-      const innerGeo = new THREE.OctahedronGeometry(1.2, 0);
-      const innerMat = new THREE.MeshStandardMaterial({
-        color: new THREE.Color(initialCfg.modelColor),
-        emissive: new THREE.Color(initialCfg.emissiveColor),
-        emissiveIntensity: initialCfg.emissiveIntensity,
-        roughness: initialCfg.roughness,
-        metalness: initialCfg.metalness,
-      });
-      materialsRef.current.push(innerMat);
-
-      const crystal = new THREE.Mesh(innerGeo, innerMat);
-      innerMesh = crystal;
-      modelGroup.add(crystal);
-
-      const outerGeo = new THREE.IcosahedronGeometry(1.6, 0);
-      const outerMat = new THREE.MeshBasicMaterial({
-        color: initialCfg.rimColor,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.35,
-      });
-      outerCage = new THREE.Mesh(outerGeo, outerMat);
-      modelGroup.add(outerCage);
-    }
-
-    // Floating Stardust Particles (600 Points)
-    const particleCount = 600;
-    const particlesGeo = new THREE.BufferGeometry();
-    const posArray = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount * 3; i++) {
-      posArray[i] = (Math.random() - 0.5) * 14;
-    }
-    particlesGeo.setAttribute("position", new THREE.BufferAttribute(posArray, 3));
-    const particlesMat = new THREE.PointsMaterial({
-      size: 0.022,
-      color: initialCfg.particleColor,
-      transparent: true,
-      opacity: 0.65,
-    });
-    particlesMatRef.current = particlesMat;
-
-    const particles = new THREE.Points(particlesGeo, particlesMat);
-    modelGroup.add(particles);
-
-    // 5. GSAP Parallax ScrollTrigger
-    let scrollProgress = 0;
     gsap.set(contentEl, { yPercent: 0, opacity: 1 });
 
     const trigger = ScrollTrigger.create({
@@ -445,7 +77,7 @@ export function ReactorFooter({
       end: "bottom bottom",
       scrub: true,
       onUpdate: (self) => {
-        scrollProgress = self.progress;
+        const scrollProgress = self.progress;
         gsap.set(contentEl, {
           yPercent: -6 * (1 - scrollProgress),
           opacity: 0.6 + 0.4 * scrollProgress,
@@ -457,106 +89,11 @@ export function ReactorFooter({
       ScrollTrigger.refresh();
     }, 250);
 
-    // 6. Resize Handler
-    const handleResize = () => {
-      if (!canvasEl || !footerEl) return;
-      width = getWidth();
-      height = getHeight();
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-    };
-    window.addEventListener("resize", handleResize);
-
-    const resizeObserver = new ResizeObserver(() => {
-      handleResize();
-    });
-    resizeObserver.observe(footerEl);
-
-    // 7. 60fps Animation Loop with Viewport Visibility Observer
-    let animationFrameId: number;
-    let isVisible = false;
-    let isDisposed = false;
-
-    const animate = () => {
-      if (isDisposed) return;
-      const time = performance.now() * 0.001;
-
-      // Update Orbit Controls with damping
-      controls.update();
-
-      // Dynamic Aurora / Prism Rainbow Shift
-      if (selectedColorwayRef.current === "aurora") {
-        const hue = (time * 0.15) % 1.0;
-        const color = new THREE.Color().setHSL(hue, 0.85, 0.55);
-        const emissive = new THREE.Color().setHSL((hue + 0.5) % 1.0, 0.9, 0.25);
-
-        materialsRef.current.forEach((mat) => {
-          mat.emissive.copy(emissive);
-          mat.color.copy(color);
-        });
-        if (rimLightRef.current) rimLightRef.current.color.copy(color);
-        if (bottomLightRef.current) bottomLightRef.current.color.copy(emissive);
-        if (corePointLightRef.current) corePointLightRef.current.color.copy(color);
-      }
-
-      if (outerCage) {
-        outerCage.rotation.y -= 0.004;
-        outerCage.rotation.z += 0.002;
-      }
-
-      particles.rotation.y += 0.0008;
-      particles.rotation.x = Math.sin(time * 0.4) * 0.04;
-
-      if (innerMesh) {
-        innerMesh.position.y = Math.sin(time * 1.5) * 0.05;
-      }
-
-      renderer.render(scene, camera);
-
-      if (isVisible) {
-        animationFrameId = requestAnimationFrame(animate);
-      }
-    };
-
-    const intersectionObserver = new IntersectionObserver(
-      ([entry]) => {
-        const nextVisible = entry?.isIntersecting ?? false;
-        if (nextVisible !== isVisible) {
-          isVisible = nextVisible;
-          if (isVisible && !isDisposed) {
-            cancelAnimationFrame(animationFrameId);
-            animationFrameId = requestAnimationFrame(animate);
-          } else {
-            cancelAnimationFrame(animationFrameId);
-          }
-        }
-      },
-      { rootMargin: "300px" }
-    );
-    intersectionObserver.observe(footerEl);
-
-    // 8. Cleanup on Unmount
     return () => {
-      isDisposed = true;
       clearTimeout(refreshTimer);
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("resize", handleResize);
-      resizeObserver.disconnect();
-      intersectionObserver.disconnect();
       trigger.kill();
-
-      controls.dispose();
-      renderer.dispose();
-      particlesGeo.dispose();
-      particlesMat.dispose();
-
-      if (canvasEl.contains(renderer.domElement)) {
-        canvasEl.removeChild(renderer.domElement);
-      }
     };
-  }, [customModelUrl, modelScale]);
+  }, []);
 
   return (
     <div className="relative z-20 w-full min-h-screen bg-black overflow-hidden select-none flex flex-col justify-between">
@@ -564,13 +101,21 @@ export function ReactorFooter({
         ref={footerRef}
         className="reactor-zone relative z-20 w-full min-h-screen overflow-hidden bg-black flex flex-col justify-between"
       >
-        {/* 3D Canvas Layer */}
+        {/* 3D React Three Fiber Canvas Layer — Lazy mounted on scroll */}
         <div
           id="footer-canvas"
-          ref={canvasContainerRef}
           className="absolute inset-0 w-full h-full pointer-events-none"
           aria-hidden="true"
-        />
+        >
+          {isInView ? (
+            <ReactorCanvas
+              customModelUrl={customModelUrl}
+              modelScale={modelScale}
+              colorway={selectedColorway}
+              onLoaded={() => setIsLoading(false)}
+            />
+          ) : null}
+        </div>
 
         {/* Loading Overlay */}
         {isLoading && (
@@ -578,7 +123,7 @@ export function ReactorFooter({
             <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/[0.05] border border-white/10 shadow-2xl">
               <Loader2 className="w-5 h-5 text-[#2BA648] animate-spin" />
               <span className="text-xs font-mono text-white/80 tracking-wider">
-                Loading 3D Chamber {loadProgress > 0 ? `(${loadProgress}%)` : "..."}
+                Loading 3D Chamber...
               </span>
             </div>
           </div>
@@ -660,13 +205,37 @@ export function ReactorFooter({
 
           {/* Bottom HUD Bar */}
           <div className="w-full pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-white/50 border-t border-white/10 pointer-events-auto">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <div className="px-3 py-1 rounded-full bg-white/[0.05] border border-white/10 flex items-center gap-2">
                 <Move3d className="w-3.5 h-3.5 text-[#2BA648]" />
                 <span className="text-[10px] tracking-widest uppercase">3D CHAMBER CORE</span>
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
-                />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              </div>
+
+              {/* Interactive Colorway Pills */}
+              <div className="flex items-center gap-1.5 bg-white/[0.03] p-1 rounded-full border border-white/5">
+                {(Object.keys(MODEL_COLORWAYS) as ModelColorway[]).map((cw) => {
+                  const cfg = MODEL_COLORWAYS[cw];
+                  const isSelected = selectedColorway === cw;
+                  return (
+                    <button
+                      key={cw}
+                      onClick={() => setSelectedColorway(cw)}
+                      className={`px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider transition-all flex items-center gap-1 ${
+                        isSelected
+                          ? "bg-white/15 text-white font-semibold shadow-sm"
+                          : "text-white/40 hover:text-white/80"
+                      }`}
+                      title={cfg.label}
+                    >
+                      <span
+                        className="w-2 h-2 rounded-full inline-block"
+                        style={{ backgroundColor: cfg.dotColor }}
+                      />
+                      <span className="hidden md:inline">{cfg.label.split(" ")[1] || cfg.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

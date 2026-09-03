@@ -599,7 +599,7 @@ export function PolarisLiquidP({
 
       if (reducedMotion) {
         drawOnce();
-      } else {
+      } else if (isVisible) {
         rafId = requestAnimationFrame(loop);
       }
     };
@@ -711,7 +711,7 @@ export function PolarisLiquidP({
       }
     };
 
-    let isVisible = true;
+    let isVisible = false;
     const observer = new IntersectionObserver(
       ([entry]) => {
         const nextVisible = entry?.isIntersecting ?? true;

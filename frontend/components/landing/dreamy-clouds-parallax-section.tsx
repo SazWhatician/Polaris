@@ -54,7 +54,7 @@ export function DreamyCloudsParallaxSection() {
         <img
           src="/clouddd.png"
           alt="Celestial Cloud Drift Left"
-          className="w-full h-auto object-contain filter drop-shadow-[0_0_80px_rgba(255,255,255,0.25)] mix-blend-screen select-none"
+          className="w-full h-auto object-contain mix-blend-screen opacity-90 select-none"
         />
       </motion.div>
 
@@ -70,7 +70,7 @@ export function DreamyCloudsParallaxSection() {
         <img
           src="/clouddd.png"
           alt="Celestial Cloud Drift Right"
-          className="w-full h-auto object-contain filter drop-shadow-[0_0_80px_rgba(168,85,247,0.3)] mix-blend-screen select-none rotate-180 scale-x-[-1]"
+          className="w-full h-auto object-contain mix-blend-screen opacity-90 select-none rotate-180 scale-x-[-1]"
         />
       </motion.div>
 

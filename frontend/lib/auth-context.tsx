@@ -67,10 +67,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         syncUserProfileToSupabase(parsed).catch(() => {});
       } catch {
         localStorage.removeItem("polaris_demo_user");
-        setUser(DEMO_USER);
+        setUser(null);
       }
     } else {
-      setUser(DEMO_USER);
+      setUser(null);
     }
     setLoading(false);
 

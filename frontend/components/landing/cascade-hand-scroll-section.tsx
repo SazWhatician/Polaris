@@ -126,6 +126,12 @@ export function CascadeHandScrollSection() {
       ref={triggerRef}
       className="relative w-full h-screen min-h-screen bg-black text-white select-none overflow-hidden flex flex-col justify-between items-center z-10"
     >
+      {/* Top Dissolve Gradient blending with Hero 3D scene above */}
+      <div
+        className="absolute inset-x-0 top-0 h-32 sm:h-48 pointer-events-none z-20 bg-gradient-to-b from-black via-black/80 to-transparent"
+        aria-hidden="true"
+      />
+
       {/* 1. Fullscreen Cascade Phone Background (Spanning Entire Screen Width) */}
       <div
         ref={cascadeRef}

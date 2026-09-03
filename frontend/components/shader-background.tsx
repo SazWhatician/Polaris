@@ -258,6 +258,10 @@ export function ShaderBackground() {
   const { theme } = useTheme();
   const displayMatRef = useRef<THREE.ShaderMaterial | null>(null);
 
+  // The landing page has its own dedicated 3D scene architecture and solid background.
+  // Rendering an invisible full-screen fluid simulation under it wastes ~250MB VRAM.
+  if (pathname === "/") return null;
+
   // Dynamic Theme Uniform Update
   useEffect(() => {
     if (!displayMatRef.current || !displayMatRef.current.uniforms.uColor1) return;

@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { Zap, Layers, ShieldCheck, ChevronRight, ArrowRight } from "lucide-react";
 
-import { LandingLoader } from "@/components/landing/landing-loader";
 import { NotchNavbar } from "@/components/landing/notch-navbar";
-import { OpeningHeroScene } from "@/components/landing/opening-hero-scene";
+import { Scene } from "@/components/Scene";
 import { CascadeHandScrollSection } from "@/components/landing/cascade-hand-scroll-section";
 import { DreamyCloudsParallaxSection } from "@/components/landing/dreamy-clouds-parallax-section";
 import { CodexQuillScrollSection } from "@/components/landing/codex-quill-scroll-section";
@@ -18,7 +17,6 @@ import { useAuth } from "@/lib/auth-context";
 export default function Home() {
   const { user } = useAuth();
   const router = useRouter();
-  const [isLoaded, setIsLoaded] = useState(false);
 
   const handlePrimaryCta = () => {
     if (user) {
@@ -30,20 +28,14 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-black text-foreground selection:bg-primary/30 selection:text-foreground">
-      {/* 1. INITIAL CURTAIN SPLIT LOADER */}
-      <LandingLoader
-        onComplete={() => setIsLoaded(true)}
-        minDisplayTime={900}
-      />
-
-      {/* 2. ORGANIC NOTCH NAVBAR */}
+      {/* 1. ORGANIC NOTCH NAVBAR */}
       <NotchNavbar />
 
       {/* 3. MAIN SCROLLABLE CONTENT (Curtain Layer over Drawer Footer) */}
       <div className="relative z-10 bg-black shadow-[0_50px_100px_rgba(0,0,0,0.95)] border-b border-white/[0.08] rounded-b-[36px] sm:rounded-b-[56px] overflow-hidden">
         
-        {/* SCENE 1: WebGL Shader + Tactical Blueprint Grid + Fancy Quote + Full-Width POLARIS */}
-        <OpeningHeroScene isLoaded={isLoaded} />
+        {/* SCENE 1: SylvaHero 3D Living Green World Scene */}
+        <Scene />
 
         {/* SCENE 2: Cascade of Phones + Silent Video + Scrolling Hand Met-A-Wall Effect */}
         <CascadeHandScrollSection />

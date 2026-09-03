@@ -200,22 +200,33 @@ export function NotchNavbar() {
                   <ArrowUpRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </Link>
               ) : (
-                <Link
-                  href="/login"
-                  id="landing-nav-login"
-                  data-testid="landing-nav-login"
-                  className="relative group overflow-hidden flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full bg-slate-950 text-white text-xs font-extrabold transition-all hover:scale-105 active:scale-95 shadow-md border border-slate-800"
-                >
-                  {/* Shimmer ambient sweep beam */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                <div className="flex items-center gap-1 sm:gap-1.5">
+                  <Link
+                    href="/login"
+                    id="landing-nav-login"
+                    data-testid="landing-nav-login"
+                    className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-all active:scale-95"
+                  >
+                    <span>Login</span>
+                  </Link>
 
-                  {/* Shimmering Text */}
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                  <span className="bg-gradient-to-r from-amber-300 via-rose-300 to-indigo-300 bg-[length:200%_auto] animate-[shimmer_2.5s_linear_infinite] bg-clip-text text-transparent font-black tracking-wider uppercase drop-shadow-xs">
-                    Login
-                  </span>
-                  <ArrowUpRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                </Link>
+                  <Link
+                    href="/login?mode=signup"
+                    id="landing-nav-signup"
+                    data-testid="landing-nav-signup"
+                    className="relative group overflow-hidden flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-slate-950 text-white text-xs font-extrabold transition-all hover:scale-105 active:scale-95 shadow-md border border-slate-800"
+                  >
+                    {/* Shimmer ambient sweep beam */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+
+                    {/* Shimmering Text */}
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                    <span className="bg-gradient-to-r from-amber-300 via-rose-300 to-indigo-300 bg-[length:200%_auto] animate-[shimmer_2.5s_linear_infinite] bg-clip-text text-transparent font-black tracking-wider uppercase drop-shadow-xs">
+                      Sign Up
+                    </span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  </Link>
+                </div>
               )}
             </div>
           </div>

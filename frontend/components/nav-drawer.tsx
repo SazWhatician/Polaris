@@ -34,7 +34,7 @@ interface NavGroup {
     href: string;
     label: string;
     description: string;
-    icon: React.ElementType;
+    icon: React.ComponentType<{ className?: string }>;
     badge?: string;
   }[];
 }
