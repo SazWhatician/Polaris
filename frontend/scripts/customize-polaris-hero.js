@@ -26,11 +26,11 @@ html = html.replace(
   ''
 );
 
-// 4. Headline: "Polaris" in modern font
+// 4. Headline: PolarisState.png wordmark logo
 html = html.replace(
   /<h1\s+class="headline"[\s\S]*?<\/h1>/i,
   `<h1 class="headline" style="--pd:18; --pr:1.2">
-      <span><i style="--d:260ms">Polaris</i></span>
+      <span><i style="--d:260ms"><img src="/PolarisState.png" alt="Polaris" class="headline-logo-img" /></i></span>
     </h1>`
 );
 
@@ -83,8 +83,17 @@ html = html.replace(
 const polarisThemeCss = `<style data-polaris-theme>
 html, body {
   background: #020616 !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  height: 100% !important;
+  height: 100svh !important;
+  touch-action: pan-y !important;
 }
 .hero {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
   background:
     radial-gradient(64% 52% at 27% 84%, rgba(124, 58, 237, 0.16) 0%, rgba(124, 58, 237, 0) 72%),
     radial-gradient(70% 60% at 92% 8%,  rgba(59, 130, 246, 0.14) 0%, rgba(59, 130, 246, 0) 68%),
@@ -126,23 +135,40 @@ html, body {
   display: none !important;
 }
 
-/* ── Modern Polaris Typography ────────────────────────────────────────── */
+/* ── Modern Polaris Brand Wordmark (PolarisState.png) ── */
 .headline {
   left: calc(56 * var(--u)) !important;
-  top: calc(180 * var(--u)) !important;
-  font-family: 'Syncopate', var(--font-syncopate), -apple-system, sans-serif !important;
-  font-size: calc(76 * var(--u)) !important;
-  line-height: calc(80 * var(--u)) !important;
-  letter-spacing: calc(0.06em) !important;
-  text-transform: uppercase !important;
-  color: #ffffff !important;
+  top: calc(150 * var(--u)) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+.headline span {
+  display: block !important;
+  padding: 0 !important;
 }
 .headline span i {
-  background: linear-gradient(135deg, #ffffff 35%, #c7d2fe 75%, #818cf8 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  filter: drop-shadow(0 6px 30px rgba(124, 58, 237, 0.40)) !important;
-  display: inline-block;
+  display: inline-block !important;
+}
+.headline-logo-img {
+  display: block !important;
+  width: calc(340 * var(--u)) !important;
+  max-width: 82vw !important;
+  height: auto !important;
+  object-fit: contain !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  filter: drop-shadow(0 calc(10 * var(--u)) calc(32 * var(--u)) rgba(0, 0, 0, 0.8)) !important;
+}
+
+@media (max-width: 900px) {
+  .headline {
+    left: calc(34 * var(--u)) !important;
+    top: calc(120 * var(--u)) !important;
+  }
+  .headline-logo-img {
+    width: min(calc(280 * var(--u)), 75vw) !important;
+  }
 }
 
 /* ── Left-Stacked Clean Copy & Action Stack ────────────────────────────── */
@@ -215,8 +241,50 @@ html, body {
 </style>`;
 
 if (!html.includes('data-polaris-theme')) {
-  html = html.replace(/<\/head>/i, polarisThemeCss + '\n</head>');
-}
+// 8. Celestial Violet & Indigo 3D Tree Shader Customization
+html = html.replace(
+  /'\s*vec3 silver = mix\(vec3\(0\.020, 0\.019, 0\.018\), vec3\(0\.290, 0\.283, 0\.264\), grain\);'/,
+  `'  vec3 silver = mix(vec3(0.012, 0.010, 0.025), vec3(0.125, 0.115, 0.220), grain);'`
+);
+html = html.replace(
+  /'\s*vec3 umber\s*=\s*mix\(vec3\(0\.024, 0\.019, 0\.016\), vec3\(0\.175, 0\.140, 0\.110\), grain\);'/,
+  `'  vec3 umber  = mix(vec3(0.016, 0.010, 0.030), vec3(0.088, 0.065, 0.155), grain);'`
+);
+html = html.replace(
+  /'\s*vec3 moss = mix\(vec3\(0\.0204, 0\.0311, 0\.0050\), vec3\(0\.0914, 0\.1392, 0\.0227\), mo\);'/,
+  `'  vec3 moss = mix(vec3(0.024, 0.012, 0.056), vec3(0.120, 0.045, 0.235), mo);'`
+);
+html = html.replace(
+  /'\s*vec3 deep = vec3\(0\.0126, 0\.0192, 0\.0031\);[\s\S]*?'\s*vec3 tipHi = vec3\(0\.2600, 0\.3900, 0\.0640\);'/,
+  `'  vec3 deep = vec3(0.018, 0.009, 0.052);',
+        '  vec3 mid  = vec3(0.075, 0.028, 0.175);',
+        '  vec3 tip  = vec3(0.180, 0.075, 0.335);',
+        '  vec3 tipHi = vec3(0.390, 0.220, 0.600);'`
+);
+html = html.replace(
+  /'\s*vec3 base = mix\(vec3\(0\.0270, 0\.0450, 0\.0099\), vec3\(0\.0690, 0\.1150, 0\.0253\), vTint\);'/,
+  `'  vec3 base = mix(vec3(0.035, 0.018, 0.088), vec3(0.115, 0.055, 0.235), vTint);'`
+);
+html = html.replace(
+  /'\s*vec3 col = mix\(vec3\(0\.30, 0\.72, 0\.46\), vec3\(0\.86, 1\.00, 0\.90\), rim\);'/,
+  `'  vec3 col = mix(vec3(0.55, 0.32, 0.95), vec3(0.92, 0.88, 1.00), rim);'`
+);
+html = html.replace(
+  /new THREE\.Color\(1\.14, 1\.06, 0\.88\)/g,
+  `new THREE.Color(1.12, 1.04, 1.28)`
+);
+html = html.replace(
+  /new THREE\.Color\(0\.78, 0\.78, 0\.62\)/g,
+  `new THREE.Color(0.65, 0.45, 0.95)`
+);
+html = html.replace(
+  /new THREE\.Color\(0\.086, 0\.090, 0\.080\)/g,
+  `new THREE.Color(0.075, 0.050, 0.120)`
+);
+html = html.replace(
+  /new THREE\.Color\(0\.176, 0\.195, 0\.145\)/g,
+  `new THREE.Color(0.145, 0.095, 0.240)`
+);
 
 fs.writeFileSync(targetPath, html, 'utf8');
-console.log('Successfully updated inner-green-3d.html: dock removed, Polaris modern headline, glitching eliminated!');
+console.log('Successfully updated inner-green-3d.html: dock removed, Polaris modern headline, celestial violet tree!');

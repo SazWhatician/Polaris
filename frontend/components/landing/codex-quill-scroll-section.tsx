@@ -39,16 +39,16 @@ export function CodexQuillScrollSection() {
           end: "+=240%",
           pin: true,
           pinSpacing: true,
-          scrub: 0.9,
+          scrub: 0.3,
           anticipatePin: 1,
           onUpdate: (self) => {
             // Pulse & lock when the hand lands exactly onto the open book manuscript
             if (self.progress > 0.8) {
-              if (inkGlowEl) gsap.to(inkGlowEl, { opacity: 1, scale: 1.2, duration: 0.4 });
-              if (lockBadgeEl) gsap.to(lockBadgeEl, { opacity: 1, scale: 1, duration: 0.35 });
+              if (inkGlowEl) gsap.to(inkGlowEl, { opacity: 1, scale: 1.2, duration: 0.3, overwrite: "auto" });
+              if (lockBadgeEl) gsap.to(lockBadgeEl, { opacity: 1, scale: 1, duration: 0.3, overwrite: "auto" });
             } else {
-              if (inkGlowEl) gsap.to(inkGlowEl, { opacity: 0, scale: 0.5, duration: 0.3 });
-              if (lockBadgeEl) gsap.to(lockBadgeEl, { opacity: 0, scale: 0.9, duration: 0.3 });
+              if (inkGlowEl) gsap.to(inkGlowEl, { opacity: 0, scale: 0.5, duration: 0.25, overwrite: "auto" });
+              if (lockBadgeEl) gsap.to(lockBadgeEl, { opacity: 0, scale: 0.9, duration: 0.25, overwrite: "auto" });
             }
           },
         },

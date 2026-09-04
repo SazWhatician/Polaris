@@ -78,7 +78,7 @@ export function LandingLoader({
           {/* Stencil Image */}
           <div className="relative w-12 h-12 sm:w-16 sm:h-16 animate-pulse [animation-duration:1.6s]">
             <Image
-              src="/polaris-p-stencil.png"
+              src="/polaris-standalone.png"
               alt="Polaris Emblem"
               fill
               priority

@@ -32,7 +32,7 @@ export default function Home() {
       <NotchNavbar />
 
       {/* 3. MAIN SCROLLABLE CONTENT (Curtain Layer over Drawer Footer) */}
-      <div className="relative z-10 bg-black shadow-[0_50px_100px_rgba(0,0,0,0.95)] border-b border-white/[0.08] rounded-b-[36px] sm:rounded-b-[56px] overflow-hidden">
+      <div className="relative z-10 bg-black shadow-[0_50px_100px_rgba(0,0,0,0.95)] border-b border-white/[0.08] rounded-b-[36px] sm:rounded-b-[56px]">
         
         {/* SCENE 1: SylvaHero 3D Living Green World Scene */}
         <Scene />
@@ -43,7 +43,7 @@ export default function Home() {
         {/* SCENE 3: Dreamy Clouds Parallax Section (2 Clouds + Liquid P Shader) */}
         <DreamyCloudsParallaxSection />
 
-        {/* SCENE 4: Classical Codex Manuscript Scroll Section (book123.png + handbook123.png) */}
+        {/* SCENE 4: Classical Codex Manuscript Scroll Section (bookoriginal.png + handbook123.png) */}
         <CodexQuillScrollSection />
 
         {/* SCENE 5: Tactical Feature Architecture & Intelligence Engine */}

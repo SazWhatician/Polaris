@@ -7,6 +7,12 @@
 @tailwind utilities;
 
 @layer base {
+  body {
+    max-width: 100vw;
+    width: 100%;
+    position: relative;
+  }
+
   * {
     font-family: var(--font-jakarta), var(--font-inter), system-ui, -apple-system, sans-serif;
   }
@@ -665,7 +671,8 @@ footer.reactor-zone {
   position: relative;
   width: 100%;
   height: 100vh;
-  min-height: 680px;
+  height: 100svh;
+  min-height: 520px;
   max-height: 1080px;
   overflow: hidden;
   background: #020616;

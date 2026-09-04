@@ -43,23 +43,23 @@ export function CascadeHandScrollSection() {
           end: "+=220%",
           pin: true,
           pinSpacing: true,
-          scrub: 0.8,
+          scrub: 0.3,
           anticipatePin: 1,
           onUpdate: (self) => {
             // Trigger wall impact pulse when reaching bottom
             if (self.progress > 0.88) {
               if (wallGlowEl) {
-                gsap.to(wallGlowEl, { opacity: 1, duration: 0.3 });
+                gsap.to(wallGlowEl, { opacity: 1, duration: 0.25, overwrite: "auto" });
               }
               if (badgeEl) {
-                gsap.to(badgeEl, { opacity: 1, scale: 1, duration: 0.3 });
+                gsap.to(badgeEl, { opacity: 1, scale: 1, duration: 0.25, overwrite: "auto" });
               }
             } else {
               if (wallGlowEl) {
-                gsap.to(wallGlowEl, { opacity: 0, duration: 0.3 });
+                gsap.to(wallGlowEl, { opacity: 0, duration: 0.25, overwrite: "auto" });
               }
               if (badgeEl) {
-                gsap.to(badgeEl, { opacity: 0, scale: 0.9, duration: 0.3 });
+                gsap.to(badgeEl, { opacity: 0, scale: 0.9, duration: 0.25, overwrite: "auto" });
               }
             }
           },
@@ -124,11 +124,13 @@ export function CascadeHandScrollSection() {
   return (
     <section
       ref={triggerRef}
+      id="cascade-section"
+      data-testid="cascade-hand-scroll-section"
       className="relative w-full h-screen min-h-screen bg-black text-white select-none overflow-hidden flex flex-col justify-between items-center z-10"
     >
-      {/* Top Dissolve Gradient blending with Hero 3D scene above */}
+      {/* Top Dissolve Gradient seamlessly blending with Hero 3D scene above */}
       <div
-        className="absolute inset-x-0 top-0 h-32 sm:h-48 pointer-events-none z-20 bg-gradient-to-b from-black via-black/80 to-transparent"
+        className="absolute inset-x-0 top-0 h-16 sm:h-24 pointer-events-none z-20 bg-gradient-to-b from-black via-black/70 to-transparent"
         aria-hidden="true"
       />
 

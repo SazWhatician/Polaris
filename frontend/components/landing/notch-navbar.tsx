@@ -13,6 +13,9 @@ import {
   CheckCircle2,
   Moon,
   Sun,
+  Menu,
+  X,
+  Compass,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
@@ -37,6 +40,7 @@ export function NotchNavbar() {
   const [mounted, setMounted] = useState(false);
   const [activeId, setActiveId] = useState<string>("home");
   const [showContact, setShowContact] = useState<boolean>(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [contactSent, setContactSent] = useState<boolean>(false);
   const [contactEmail, setContactEmail] = useState<string>("");
   const [contactMessage, setContactMessage] = useState<string>("");
@@ -84,21 +88,21 @@ export function NotchNavbar() {
       <header
         id="landing-notch-navbar"
         data-testid="landing-notch-navbar"
-        className="fixed top-0 inset-x-0 z-[90] flex justify-center pointer-events-none px-2 sm:px-4 select-none"
+        className="fixed top-0 inset-x-0 z-[90] flex flex-col items-center pointer-events-none px-2 sm:px-4 select-none max-w-[calc(100vw-1rem)] mx-auto"
       >
         <div className="relative pointer-events-auto flex items-start">
-          
-          {/* Left Inverted Wing */}
+          {/* Left Inverted Wing (desktop only) */}
           <NotchLeftWing position="top" className="text-white fill-current drop-shadow-sm hidden md:block" />
 
           {/* Main White Notch Body */}
-          <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-2 sm:py-2.5 bg-white text-slate-900 rounded-b-[24px] sm:rounded-b-[32px] shadow-[0_16px_50px_rgba(0,0,0,0.35)] border-b border-x border-slate-100">
+          <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-2 sm:py-2.5 bg-white text-slate-900 rounded-b-[20px] sm:rounded-b-[32px] shadow-[0_16px_50px_rgba(0,0,0,0.35)] border-b border-x border-slate-100 max-w-full">
             
             {/* Left Brand Slot: POLARIS MONOCHROME LOGO */}
             <Link
               href="/"
               id="landing-nav-logo"
               data-testid="landing-nav-logo"
+              onClick={() => setMobileMenuOpen(false)}
               className="flex items-center pr-2 sm:pr-3 border-r border-slate-200 group"
             >
               <Image
@@ -107,13 +111,12 @@ export function NotchNavbar() {
                 width={120}
                 height={32}
                 priority
-                className="h-6 sm:h-7.5 w-auto object-contain group-hover:scale-105 transition-transform"
+                className="h-5.5 sm:h-7.5 w-auto object-contain group-hover:scale-105 transition-transform"
               />
             </Link>
 
-            {/* Center Navigation Links: Home, About, Contact Us */}
-            <div className="flex items-center gap-1 sm:gap-2">
-              {/* 1. Home */}
+            {/* Desktop Center Navigation Links (hidden on mobile) */}
+            <div className="hidden md:flex items-center gap-1 sm:gap-2">
               <button
                 id="landing-nav-home"
                 data-testid="landing-nav-home"
@@ -130,7 +133,6 @@ export function NotchNavbar() {
                 <span>Home</span>
               </button>
 
-              {/* 2. About */}
               <button
                 id="landing-nav-about"
                 data-testid="landing-nav-about"
@@ -147,7 +149,6 @@ export function NotchNavbar() {
                 <span>About</span>
               </button>
 
-              {/* 3. Contact us */}
               <button
                 id="landing-nav-contact"
                 data-testid="landing-nav-contact"
@@ -165,10 +166,8 @@ export function NotchNavbar() {
               </button>
             </div>
 
-            {/* Right Group: Theme Switcher + Login / Dashboard CTA */}
-            <div className="pl-2 border-l border-slate-200 flex items-center gap-2">
-              
-              {/* THEME TOGGLE BUTTON */}
+            {/* Desktop Right Group: Theme Switcher + Auth CTA */}
+            <div className="hidden md:flex pl-2 border-l border-slate-200 items-center gap-2">
               <button
                 id="landing-theme-toggle"
                 data-testid="landing-theme-toggle"
@@ -185,7 +184,6 @@ export function NotchNavbar() {
                 )}
               </button>
 
-              {/* Login / Dashboard Action */}
               {user ? (
                 <Link
                   href="/dashboard"
@@ -216,10 +214,7 @@ export function NotchNavbar() {
                     data-testid="landing-nav-signup"
                     className="relative group overflow-hidden flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 rounded-full bg-slate-950 text-white text-xs font-extrabold transition-all hover:scale-105 active:scale-95 shadow-md border border-slate-800"
                   >
-                    {/* Shimmer ambient sweep beam */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-
-                    {/* Shimmering Text */}
                     <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
                     <span className="bg-gradient-to-r from-amber-300 via-rose-300 to-indigo-300 bg-[length:200%_auto] animate-[shimmer_2.5s_linear_infinite] bg-clip-text text-transparent font-black tracking-wider uppercase drop-shadow-xs">
                       Sign Up
@@ -229,11 +224,157 @@ export function NotchNavbar() {
                 </div>
               )}
             </div>
+
+            {/* Mobile Actions: Theme Switcher + Hamburger Button */}
+            <div className="flex md:hidden items-center gap-1 pl-1">
+              <button
+                id="mobile-theme-toggle"
+                data-testid="mobile-theme-toggle"
+                type="button"
+                onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-600 hover:text-slate-950 hover:bg-slate-100 active:scale-95 transition-all"
+                title={`Switch to ${currentTheme === "dark" ? "Light" : "Dark"} Mode`}
+                aria-label="Toggle Theme"
+              >
+                {currentTheme === "dark" ? (
+                  <Sun className="w-4 h-4 text-amber-500 stroke-[2.2]" />
+                ) : (
+                  <Moon className="w-4 h-4 text-slate-700 stroke-[2.2]" />
+                )}
+              </button>
+
+              <button
+                id="mobile-menu-toggle"
+                data-testid="mobile-menu-toggle"
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="w-8 h-8 rounded-full flex items-center justify-center bg-slate-900 text-white hover:bg-slate-800 active:scale-95 transition-all shadow-xs"
+                aria-label="Toggle Navigation Menu"
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-4 h-4" />
+                ) : (
+                  <Menu className="w-4 h-4" />
+                )}
+              </button>
+            </div>
           </div>
 
-          {/* Right Inverted Wing */}
+          {/* Right Inverted Wing (desktop only) */}
           <NotchRightWing position="top" className="text-white fill-current drop-shadow-sm hidden md:block" />
         </div>
+
+        {/* MOBILE FLOATING GLASS MENU SHEET */}
+        {mobileMenuOpen && (
+          <div
+            id="mobile-nav-dropdown"
+            data-testid="mobile-nav-dropdown"
+            className="pointer-events-auto mt-2 w-full max-w-xs sm:max-w-sm bg-card/95 backdrop-blur-2xl border border-white/15 text-foreground rounded-3xl p-4 shadow-[0_25px_60px_rgba(0,0,0,0.8)] animate-in fade-in slide-in-from-top-4 duration-300 flex flex-col gap-3"
+          >
+            {/* Quick Links List */}
+            <div className="flex flex-col gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  handleNavSelect("home");
+                  setMobileMenuOpen(false);
+                }}
+                className={cn(
+                  "flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-colors",
+                  activeId === "home"
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted/60 text-foreground"
+                )}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Home className="w-4 h-4" />
+                  <span>Home</span>
+                </div>
+                <span className="text-[10px] font-mono opacity-60">01</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  handleNavSelect("about");
+                  setMobileMenuOpen(false);
+                }}
+                className={cn(
+                  "flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-colors",
+                  activeId === "about"
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted/60 text-foreground"
+                )}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Info className="w-4 h-4" />
+                  <span>About & Architecture</span>
+                </div>
+                <span className="text-[10px] font-mono opacity-60">02</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  handleNavSelect("contact");
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold hover:bg-muted/60 text-foreground transition-colors"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Mail className="w-4 h-4" />
+                  <span>Contact Team</span>
+                </div>
+                <span className="text-[10px] font-mono opacity-60">03</span>
+              </button>
+
+              <Link
+                href="/demo"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold hover:bg-muted/60 text-foreground transition-colors"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Compass className="w-4 h-4 text-primary" />
+                  <span>Interactive Demo</span>
+                </div>
+                <ArrowUpRight className="w-3.5 h-3.5 opacity-60" />
+              </Link>
+            </div>
+
+            {/* Mobile Auth Divider & CTAs */}
+            <div className="pt-2 border-t border-border/60 flex flex-col gap-2">
+              {user ? (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-white text-black font-bold text-xs hover:bg-slate-200 transition-colors shadow-lg"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Open Workspace Dashboard</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </Link>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center py-2.5 rounded-2xl border border-border/80 bg-muted/40 text-foreground text-xs font-bold hover:bg-muted transition-colors"
+                  >
+                    <span>Login</span>
+                  </Link>
+                  <Link
+                    href="/login?mode=signup"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-2xl bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 transition-opacity shadow-md"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <span>Sign Up</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* CONTACT US DIALOG MODAL */}

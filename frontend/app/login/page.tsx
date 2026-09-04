@@ -160,7 +160,6 @@ function LoginContent() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
         >
-          <source src="/New_Direction_EVERYONE_IS_GO.mp4" type="video/mp4" />
           <source src="/login-video.mp4" type="video/mp4" />
         </video>
 

@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useRef } from "react";
+import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Sparkles, Compass, Layers, Zap } from "lucide-react";
 
-import { PolarisLiquidP } from "@/components/ui/polaris-liquid-p";
 import { getTheme } from "@/lib/polaris-themes";
 import { CrystalGlow } from "@/components/ui/crystal-glow";
 
@@ -34,7 +34,7 @@ export function DreamyCloudsParallaxSection() {
       ref={containerRef}
       id="dreamy-clouds-section"
       data-testid="dreamy-clouds-section"
-      className="relative w-full min-h-[140vh] bg-black text-white overflow-hidden select-none flex flex-col items-center justify-center py-24 sm:py-36 border-t border-white/[0.08]"
+      className="relative w-full min-h-[140vh] bg-black text-white overflow-hidden overflow-x-clip select-none flex flex-col items-center justify-center py-24 sm:py-36 border-t border-white/[0.08]"
     >
       {/* 1. Deep Celestial Atmospheric Radial Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.15)_0%,rgba(168,85,247,0.08)_40%,transparent_75%)] pointer-events-none" />
@@ -97,11 +97,11 @@ export function DreamyCloudsParallaxSection() {
             Dreaming in Vectors
           </CrystalGlow>
           <p className="text-sm sm:text-base text-slate-300 max-w-xl mx-auto font-medium leading-relaxed drop-shadow-sm">
-            Drag and interact with the fluid core. Watch autonomous citation pathways and neural embeddings refract inside the live Navier-Stokes shader.
+            Autonomous citation verification, prerequisite topological graphs, and neural vector embeddings unified in the Polaris academic core.
           </p>
         </motion.div>
 
-        {/* Central Liquid P Emblem with Orbital Rings */}
+        {/* Central Polaris Celestial Star Core with Orbital Rings */}
         <motion.div
           style={{
             scale: pScale,
@@ -116,9 +116,16 @@ export function DreamyCloudsParallaxSection() {
             <div className="w-[60%] h-[60%] rounded-full border border-primary/30 animate-pulse" />
           </div>
 
-          {/* Interactive WebGL Liquid Shader P */}
-          <div className="relative w-52 sm:w-64 md:w-80 lg:w-96 aspect-square pointer-events-auto cursor-grab active:cursor-grabbing hover:scale-106 transition-transform duration-500 shadow-[0_0_90px_rgba(147,51,234,0.35)] rounded-full">
-            <PolarisLiquidP {...palette.liquid} />
+          {/* 100% Backgroundless Floating Polaris Star Emblem */}
+          <div className="relative w-52 sm:w-64 md:w-80 lg:w-96 aspect-square flex items-center justify-center pointer-events-auto hover:scale-106 transition-transform duration-500">
+            <Image
+              src="/polaris-standalone.png"
+              alt="Polaris Star Core"
+              fill
+              sizes="(max-width: 768px) 256px, (max-width: 1024px) 320px, 384px"
+              className="object-contain select-none pointer-events-none drop-shadow-[0_0_60px_rgba(147,51,234,0.45)]"
+              priority
+            />
           </div>
         </motion.div>
 
@@ -129,7 +136,7 @@ export function DreamyCloudsParallaxSection() {
         >
           <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/[0.05] border border-white/10 text-white/80">
             <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span>WebGL 3.0 Navier-Stokes</span>
+            <span>Autonomous Intelligence Core</span>
           </div>
           <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white/[0.05] border border-white/10 text-white/80">
             <Compass className="w-3.5 h-3.5 text-indigo-400" />

@@ -6,8 +6,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sylva — Into the living world</title>
-<meta name="description" content="Restoring wild places through patient design, native planting, and a deeper kind of stewardship.">
+<title>Polaris — Grounded AI Academic Platform</title>
+<meta name="description" content="Autonomous citation verification, prerequisite gap analysis, and grounded revision plans for serious students.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 24'%3E%3Crect width='22' height='24' fill='%234a4d44'/%3E%3Cpath fill='%23fff' d='M11 1.3c-2.1 0-3.95 1.2-4.75 2.95C3.95 4.55 2.3 6.25 2.3 8.35c0 2.3 1.9 4.2 4.3 4.2h8.8c2.4 0 4.3-1.9 4.3-4.2 0-2.1-1.65-3.8-4-4.1C14.95 2.5 13.1 1.3 11 1.3Z'/%3E%3Cpath fill='%23fff' d='M9.6 12.55h2.8v4.2c1.35.3 2.45 1.15 3.15 2.4-1.35.4-2.4.15-3.15-.4v4.15H9.6v-4.15c-.75.55-1.8.8-3.15.4.7-1.25 1.8-2.1 3.15-2.4v-4.2Z'/%3E%3C/svg%3E">
 <script>document.documentElement.className += " js";</script>
 <style>
@@ -716,8 +716,17 @@
 <style data-polaris-theme>
 html, body {
   background: #020616 !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  height: 100% !important;
+  height: 100svh !important;
+  touch-action: pan-y !important;
 }
 .hero {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
   background:
     radial-gradient(64% 52% at 27% 84%, rgba(124, 58, 237, 0.16) 0%, rgba(124, 58, 237, 0) 72%),
     radial-gradient(70% 60% at 92% 8%,  rgba(59, 130, 246, 0.14) 0%, rgba(59, 130, 246, 0) 68%),
@@ -759,23 +768,40 @@ html, body {
   display: none !important;
 }
 
-/* ── Modern Polaris Typography ────────────────────────────────────────── */
+/* ── Modern Polaris Brand Wordmark (PolarisState.png) ── */
 .headline {
   left: calc(56 * var(--u)) !important;
-  top: calc(180 * var(--u)) !important;
-  font-family: 'Syncopate', var(--font-syncopate), -apple-system, sans-serif !important;
-  font-size: calc(76 * var(--u)) !important;
-  line-height: calc(80 * var(--u)) !important;
-  letter-spacing: calc(0.06em) !important;
-  text-transform: uppercase !important;
-  color: #ffffff !important;
+  top: calc(150 * var(--u)) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+.headline span {
+  display: block !important;
+  padding: 0 !important;
 }
 .headline span i {
-  background: linear-gradient(135deg, #ffffff 35%, #c7d2fe 75%, #818cf8 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  filter: drop-shadow(0 6px 30px rgba(124, 58, 237, 0.40)) !important;
-  display: inline-block;
+  display: inline-block !important;
+}
+.headline-logo-img {
+  display: block !important;
+  width: calc(340 * var(--u)) !important;
+  max-width: 82vw !important;
+  height: auto !important;
+  object-fit: contain !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  filter: drop-shadow(0 calc(10 * var(--u)) calc(32 * var(--u)) rgba(0, 0, 0, 0.8)) !important;
+}
+
+@media (max-width: 900px) {
+  .headline {
+    left: calc(34 * var(--u)) !important;
+    top: calc(120 * var(--u)) !important;
+  }
+  .headline-logo-img {
+    width: min(calc(280 * var(--u)), 75vw) !important;
+  }
 }
 
 /* ── Left-Stacked Clean Copy & Action Stack ────────────────────────────── */
@@ -893,15 +919,15 @@ html, body {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
-/* ── Seamless Bottom Gradient Dissolve ─────────────────────────────────── */
+/* ── Seamless Bottom Vignette ───────────────────────────────────────── */
 .hero-bottom-fade {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   width: 100%;
-  height: 38%;
-  background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.75) 70%, #000000 100%);
+  height: 12%;
+  background: linear-gradient(to bottom, transparent 0%, rgba(2, 6, 22, 0.35) 60%, #020616 100%);
   pointer-events: none;
   z-index: 6;
 }
@@ -933,6 +959,34 @@ function polarisNavigate(url) {
     } catch (e2) {}
   }
 }
+
+// Forward wheel events to parent window so scrolling over the 3D scene smoothly scrolls the main page
+window.addEventListener('wheel', function(e) {
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'POLARIS_SCROLL_RELAY',
+        deltaY: e.deltaY,
+        deltaX: e.deltaX
+      }, '*');
+    }
+  } catch (err) {}
+}, { passive: true });
+
+// Wire clicking "Discover" scroll cue to scroll down to next section
+document.addEventListener('DOMContentLoaded', function() {
+  var sc = document.querySelector('.scroll');
+  if (sc) {
+    sc.addEventListener('click', function(e) {
+      e.preventDefault();
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ type: 'POLARIS_SCROLL_TO_NEXT' }, '*');
+        }
+      } catch (err) {}
+    });
+  }
+});
 </script>
 </head>
 <body>
@@ -973,7 +1027,7 @@ function polarisNavigate(url) {
     </span>
 
     <h1 class="headline" style="--pd:18; --pr:1.2">
-      <span><i style="--d:260ms">Polaris</i></span>
+      <span><i style="--d:260ms"><img src="/PolarisState.png" alt="Polaris" class="headline-logo-img" /></i></span>
     </h1>
 
     <p class="lede mask" style="--d:480ms; --pd:14; --pr:1">Autonomous citation verification, prerequisite gap analysis, and grounded revision plans for serious students.</p>
@@ -2941,23 +2995,23 @@ window.__seek   = v => { clock = v; drawn = null; };
         '  float mottle = gfbm(q * 0.28 + 21.0) * 0.5 + 0.5;',
         '  float crack  = smoothstep(0.30, 0.86, ridged(q * 1.9 + 4.0));',
 
-        /* Old rain-forest wood: silvered grey where the light rakes it,
-           near-black in the splits, with a slow drift into damp umber. */
-        '  vec3 silver = mix(vec3(0.020, 0.019, 0.018), vec3(0.290, 0.283, 0.264), grain);',
-        '  vec3 umber  = mix(vec3(0.024, 0.019, 0.016), vec3(0.175, 0.140, 0.110), grain);',
+        /* Obsidian midnight wood: deep cosmic slate where light rakes it,
+           near-black in the splits, with a slow drift into deep indigo-tinted bark. */
+        '  vec3 silver = mix(vec3(0.012, 0.010, 0.025), vec3(0.125, 0.115, 0.220), grain);',
+        '  vec3 umber  = mix(vec3(0.016, 0.010, 0.030), vec3(0.088, 0.065, 0.155), grain);',
         '  vec3 wood   = mix(silver, umber, mottle * 0.78);',
         '  wood *= 1.0 - 0.70 * crack;',
 
-        /* the cushion: two greens, mottled, darkest where it packs deepest */
+        /* the cushion: deep celestial violet and luminous royal purple */
         '  float mo = gfbm(vec2(vW.x * 2.6, vW.z * 2.6 + vW.y * 1.9)) * 0.5 + 0.5;',
-        '  vec3 moss = mix(vec3(0.0204, 0.0311, 0.0050), vec3(0.0914, 0.1392, 0.0227), mo);',
+        '  vec3 moss = mix(vec3(0.024, 0.012, 0.056), vec3(0.120, 0.045, 0.235), mo);',
         '  moss *= 0.80 + 0.42 * cap;',
 
         '  vec3 col = mix(wood, moss, m);',
-        /* a pale lichen crust where the wood shows and faces up */
+        /* a starlight lichen crust where the wood shows and faces up */
         '  float lich = smoothstep(0.56, 0.84, gfbm(q * 0.62 + 31.0) * 0.5 + 0.5);',
         '  lich *= (1.0 - m) * smoothstep(-0.10, 0.70, N.y) * smoothstep(0.15, 0.50, h);',
-        '  col = mix(col, vec3(0.162, 0.176, 0.132), lich * 0.78);',
+        '  col = mix(col, vec3(0.145, 0.130, 0.250), lich * 0.78);',
 
         /* Contact shadow along the moss line. The cushion overhangs the bark
            it sits on, and without this the two materials meet on a clean
@@ -3058,15 +3112,13 @@ window.__seek   = v => { clock = v; drawn = null; };
         'varying float vTone; varying float vH; varying vec3 vN; varying vec3 vW; varying vec3 vL;',
         'void main(){',
         '  if (unscanned(vW, 520.0)) discard;',
-        /* Linear-space colours; the output pass handles the sRGB transfer.
-           Channel ratios are solved backwards from the reference screen: its
-           moss sits at hue 77°, saturation 56%, value 23%, which is a good
-           deal more yellow and a good deal deeper than the green a shader
-           reaches for on its own. */
-        '  vec3 deep = vec3(0.0126, 0.0192, 0.0031);',
-        '  vec3 mid  = vec3(0.0488, 0.0744, 0.0121);',
-        '  vec3 tip  = vec3(0.1222, 0.1860, 0.0304);',
-        '  vec3 tipHi = vec3(0.2600, 0.3900, 0.0640);',
+        /* Celestial Violet & Indigo moss gradient:
+           Deep cosmic indigo base, royal violet mid-section, vibrant amethyst tips,
+           and star-kissed lilac highlights. */
+        '  vec3 deep = vec3(0.018, 0.009, 0.052);',
+        '  vec3 mid  = vec3(0.075, 0.028, 0.175);',
+        '  vec3 tip  = vec3(0.180, 0.075, 0.335);',
+        '  vec3 tipHi = vec3(0.390, 0.220, 0.600);',
         '  vec3 col = mix(deep, mid, smoothstep(0.0, 0.62, vT));',
         '  col = mix(col, tip, smoothstep(0.38, 1.0, vT) * (0.35 + 0.65 * vTone));',
         /* slow drifts of colour so the pile never reads as flat velvet */
@@ -3188,7 +3240,7 @@ window.__seek   = v => { clock = v; drawn = null; };
         '  vec3 N = normalize(vN);',
         '  if (!gl_FrontFacing) N = -N;',
         '  vec3 V = normalize(cameraPosition - vW);',
-        '  vec3 base = mix(vec3(0.0270, 0.0450, 0.0099), vec3(0.0690, 0.1150, 0.0253), vTint);',
+        '  vec3 base = mix(vec3(0.035, 0.018, 0.088), vec3(0.115, 0.055, 0.235), vTint);',
         '  base *= 0.80 + 0.30 * smoothstep(0.0, 0.8, vUv.x);',
         '  vec3 lit = litSurface(N, base, 0.9);',
         /* fronds are thin — light comes through them */
@@ -3258,7 +3310,7 @@ window.__seek   = v => { clock = v; drawn = null; };
         '  if (a < 0.004) discard;',
         /* survey ticks running out along the beam */
         '  a *= 0.66 + 0.34 * sin(d * 0.045 - uTime * 7.0);',
-        '  vec3 col = mix(vec3(0.30, 0.72, 0.46), vec3(0.86, 1.00, 0.90), rim);',
+        '  vec3 col = mix(vec3(0.55, 0.32, 0.95), vec3(0.92, 0.88, 1.00), rim);',
         '  gl_FragColor = vec4(col, clamp(a, 0.0, 1.0));',
         '}'
       ].join('\n')
@@ -3361,16 +3413,13 @@ window.__seek   = v => { clock = v; drawn = null; };
     var u = {
       uTime: uTime, uWind: uWind,
       uKeyDir:  { value: KEY.clone() },
-      uKeyCol:  { value: new THREE.Color(1.14, 1.06, 0.88) },
+      uKeyCol:  { value: new THREE.Color(1.12, 1.04, 1.28) },
       uFillDir: { value: FILL.clone() },
-      /* the pale pool on the floor of the hero, bouncing back up */
-      uFillCol: { value: new THREE.Color(0.78, 0.78, 0.62) },
-      uAmbCol:  { value: new THREE.Color(0.086, 0.090, 0.080) },
-      /* Aerial perspective goes toward LIT air, not toward the background:
-         the far ridge in the reference is paler than the page behind it, and
-         so are the near crowns. Keep the amount small on the near root or the
-         moss greys out (its saturation is the first thing to go). */
-      uHazeCol: { value: new THREE.Color(0.176, 0.195, 0.145) },
+      /* ethereal violet ground bounce */
+      uFillCol: { value: new THREE.Color(0.65, 0.45, 0.95) },
+      uAmbCol:  { value: new THREE.Color(0.075, 0.050, 0.120) },
+      /* Aerial perspective in celestial space haze */
+      uHazeCol: { value: new THREE.Color(0.145, 0.095, 0.240) },
       uHaze:    { value: 0.14 },
       uHazeLift:{ value: 0.20 },
       uFog:     { value: 0.0 },
@@ -3415,7 +3464,7 @@ window.__seek   = v => { clock = v; drawn = null; };
       uBoxH:   { value: BOXW / opt.aspect },
       uHaze:   { value: opt.haze },
       uFog:    { value: opt.fog },
-      uHazeCol:{ value: new THREE.Color().fromArray(opt.hazeCol || [0.176, 0.195, 0.145]) },
+      uHazeCol:{ value: new THREE.Color().fromArray(opt.hazeCol || [0.145, 0.095, 0.240]) },
       uHazeLift:{ value: opt.hazeLift === undefined ? 0.20 : opt.hazeLift },
       uAlpha:  { value: opt.alpha },
       uMask:   { value: new THREE.Vector4(opt.mask ? opt.mask[0] : 0, opt.mask ? opt.mask[1] : 1,
@@ -3573,16 +3622,23 @@ window.__seek   = v => { clock = v; drawn = null; };
    * ================================================================== */
   function build() {
     var narrow = NARROW.matches;
-    var small = narrow || (window.innerWidth * window.innerHeight) < 620000;
-    var BLADES_NEAR = small ? 70000 : 190000;
-    var BLADES_FAR  = small ? 20000 :  60000;
+    var isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    var small = narrow || isMobile || (window.innerWidth * window.innerHeight) < 700000;
+    // Optimized density for fluid 60-120fps loading across all laptops, phones, and tablets
+    var BLADES_NEAR = small ? 25000 : 65000;
+    var BLADES_FAR  = small ?  8000 : 20000;
 
     var q = /[?&]blades=(\d+)/.exec(location.search);
     if (q) { BLADES_NEAR = +q[1]; BLADES_FAR = Math.round(+q[1] * 0.21); }
 
-    renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: !small });
+    renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      alpha: true,
+      antialias: !small,
+      powerPreference: "high-performance"
+    });
     renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.6 : 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.25 : 1.75));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.30;
     if ('sRGBEncoding' in THREE) renderer.outputEncoding = THREE.sRGBEncoding;
@@ -3629,7 +3685,7 @@ window.__seek   = v => { clock = v; drawn = null; };
       aspect: FAR.aspect, haze: 0.16, fog: 0.26, alpha: 1.0, order: 0,
       /* dimmer air than the near root's: at 0.46 of the pale tone the ridge
          lost its silhouette entirely and read as a smudge on the background */
-      hazeCol: [0.150, 0.164, 0.120], hazeLift: 0.92,
+      hazeCol: [0.130, 0.085, 0.220], hazeLift: 0.92,
       blades: BLADES_FAR, ferns: small ? 8 : 16, flowers: small ? 40 : 90,
       fernSize: [0.26, 0.56], flowerSize: [0.034, 0.062],
       mask: [0.4, 3.4, 0.0, 0.42], wire: true,
@@ -3668,7 +3724,7 @@ window.__seek   = v => { clock = v; drawn = null; };
     scene.add(shadowMesh);
 
     glowMesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({
-      map: radialTexture(256, [[0, 'rgba(226,236,212,0.30)'], [0.42, 'rgba(214,226,200,0.10)'], [1, 'rgba(214,226,200,0)']]),
+      map: radialTexture(256, [[0, 'rgba(180,145,255,0.30)'], [0.42, 'rgba(130,95,235,0.10)'], [1, 'rgba(110,75,220,0)']]),
       transparent: true, depthWrite: false, depthTest: false,
       blending: THREE.AdditiveBlending
     }));
@@ -3699,7 +3755,7 @@ window.__seek   = v => { clock = v; drawn = null; };
     pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     pg.setAttribute('seed', new THREE.BufferAttribute(seed, 4));
 
-    poleTex = radialTexture(64, [[0, 'rgba(255,255,255,1)'], [0.35, 'rgba(236,244,224,0.5)'], [1, 'rgba(236,244,224,0)']]);
+    poleTex = radialTexture(64, [[0, 'rgba(255,255,255,1)'], [0.35, 'rgba(225,205,255,0.6)'], [1, 'rgba(185,150,255,0)']]);
     motes = new THREE.Points(pg, new THREE.ShaderMaterial({
       uniforms: {
         uTime: uTime,
@@ -4017,20 +4073,19 @@ window.__seek   = v => { clock = v; drawn = null; };
         /* Kept well under 1: on the cherry bough this ran HDR into ACES on
            purpose, but that scene was a sunset. Here the same numbers clip to
            cream and the green never arrives. */
-        '  vec3 face = vec3(0.330, 0.560, 0.042);',
-        '  vec3 edge = vec3(0.062, 0.190, 0.014);',
+        '  vec3 face = vec3(0.380, 0.240, 0.740);',
+        '  vec3 edge = vec3(0.075, 0.095, 0.320);',
         '  vec3 wing = mix(edge, face, pow(facing, 0.65));',
         '  wing *= 0.62 + 0.72 * smoothstep(0.02, 0.46, s) * (1.0 - 0.34 * smoothstep(0.45, 1.0, u));',
         /* scales lie in overlapping rows running out from the base */
         '  vec4 tx = texture2D(uTex, vUv);',
         '  float rows = tx.r, grain = tx.g, mottle = tx.b, shim = tx.a;',
         '  wing *= 0.78 + 0.44 * mottle;',
-        /* the hue swings green to yellow across the disc rather than merely
-           brightening — that swing is what reads as diffraction */
-        '  wing = mix(wing * vec3(0.46, 1.14, 0.30), wing * vec3(1.34, 1.06, 0.16), shim);',
-        '  vec3 dark  = vec3(0.030, 0.026, 0.014);',
-        '  vec3 cream = vec3(0.520, 0.500, 0.290);',
-        '  vec3 amber = vec3(0.400, 0.270, 0.045);',
+        /* diffraction swing: amethyst to celestial starlight violet */
+        '  wing = mix(wing * vec3(0.65, 0.50, 1.30), wing * vec3(1.10, 0.85, 1.45), shim);',
+        '  vec3 dark  = vec3(0.022, 0.018, 0.036);',
+        '  vec3 cream = vec3(0.550, 0.520, 0.480);',
+        '  vec3 amber = vec3(0.420, 0.280, 0.550);',
         /* the wide sooty border down the whole distal edge */
         '  float border = max(smoothstep(0.60, 0.74, s), smoothstep(0.78, 0.94, u));',
         '  vec3 c = mix(wing, dark, border);',
