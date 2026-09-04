@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import uuid
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
@@ -56,6 +57,154 @@ class SyllabusNotFoundError(SyllabusServiceError):
 
 class SyllabusValidationError(SyllabusServiceError):
     """Raised when input validation fails."""
+
+
+ADMIN_TOPIC_KEYWORDS = (
+    "semester",
+    "academic year",
+    "academic calendar",
+    "term",
+    "course code",
+    "subject code",
+    "course credit",
+    "credits",
+    "credit hours",
+    "instructor",
+    "professor",
+    "faculty",
+    "office hours",
+    "contact hours",
+    "lecture hours",
+    "grading",
+    "evaluation",
+    "assessment",
+    "exam schedule",
+    "examination",
+    "marks distribution",
+    "scheme of examination",
+    "prerequisite",
+    "pre-requisite",
+    "co-requisite",
+    "textbook",
+    "reference book",
+    "references",
+    "bibliography",
+    "attendance",
+    "course objective",
+    "course outcome",
+    "program outcome",
+    "department of",
+    "college of",
+    "university",
+    "essential reading",
+    "suggested reading",
+    "recommended reading",
+    "reading list",
+)
+
+ADMIN_SECTION_REGEX = re.compile(
+    r'(?i)\b(?:essential\s+reading|text\s*books?|reference\s*books?|suggested\s*readings?|recommended\s*reading|reading\s*list|references?|bibliography|evaluation|grading\s*scheme|marks\s*distribution|academic\s*calendar)\b.*$',
+    re.DOTALL,
+)
+
+MODULE_SPLIT_REGEX = re.compile(
+    r'(?i)(?:^|\s+)((?:module|unit|chapter|part)\s+(?:[0-9ivxlcdm]+|[a-z]))[:\-\s]*'
+)
+
+HOURS_CLEAN_REGEX = re.compile(
+    r'(?i)\b\d+\s*(?:hours?|hrs?|periods?|lectures?)\b'
+)
+
+
+def _is_administrative_topic(title: str) -> bool:
+    t = title.strip().lower()
+    if not t:
+        return True
+    for kw in ADMIN_TOPIC_KEYWORDS:
+        if kw in t and len(t) < len(kw) + 35:
+            return True
+        if t.startswith(f"{kw}:") or t.startswith(f"{kw} -") or t.startswith(f"{kw} "):
+            return True
+    return False
+
+
+def _parse_syllabus_deterministic(text: str) -> list[Topic]:
+    """Deterministically extracts Module blocks and distinct Subtopics from syllabus text,
+    stripping out administrative boilerplate (hours, essential reading, textbooks)."""
+    cleaned_full = ADMIN_SECTION_REGEX.sub("", text).strip()
+    matches = list(MODULE_SPLIT_REGEX.finditer(cleaned_full))
+    module_chunks: list[tuple[str, str]] = []
+
+    if matches:
+        first_m = matches[0]
+        if first_m.start() > 0:
+            pre_text = cleaned_full[:first_m.start()].strip()
+            pre_text = HOURS_CLEAN_REGEX.sub("", pre_text).strip()
+            if len(pre_text) > 10:
+                first_tag = first_m.group(1).strip()
+                if re.search(r'(?i)\b(?:ii|2)\b', first_tag):
+                    mod1_tag = re.sub(r'(?i)\b(?:ii|2)\b', 'I', first_tag)
+                else:
+                    mod1_tag = "Module I"
+                module_chunks.append((mod1_tag, pre_text))
+
+        for i, m in enumerate(matches):
+            tag = m.group(1).strip()
+            start = m.end()
+            end = matches[i + 1].start() if i + 1 < len(matches) else len(cleaned_full)
+            body = cleaned_full[start:end].strip()
+            body = HOURS_CLEAN_REGEX.sub("", body).strip()
+            module_chunks.append((tag, body))
+    else:
+        lines = [
+            line.strip("- *#\t")
+            for line in cleaned_full.splitlines()
+            if len(line.strip("- *#\t")) > 3 and not _is_administrative_topic(line.strip("- *#\t"))
+        ]
+        if len(lines) > 1:
+            for idx, line in enumerate(lines[:10], start=1):
+                module_chunks.append((f"Module {idx}", line))
+        else:
+            module_chunks.append(("Module I", cleaned_full))
+
+    result_modules: list[Topic] = []
+    for mod_idx, (tag, body) in enumerate(module_chunks, start=1):
+        raw_items = re.split(r'(?<=[.?!;])\s+|\n+|(?:,\s+(?=[A-Z][a-z]))', body)
+        subtopics: list[Topic] = []
+        for raw in raw_items:
+            s = raw.strip(" -–—\t.,:;")
+            if not s or len(s) < 3 or _is_administrative_topic(s):
+                continue
+            if HOURS_CLEAN_REGEX.fullmatch(s):
+                continue
+            subtopics.append(
+                Topic(
+                    id=f"sub-{mod_idx}-{len(subtopics) + 1}",
+                    title=s[:160],
+                    description="Curriculum sub-topic",
+                    subtopics=[],
+                )
+            )
+
+        first_concept = subtopics[0].title if subtopics else ""
+        if first_concept:
+            concept_head = re.split(r':|\s+[-–—]\s+', first_concept)[0].strip()
+            if len(concept_head) > 65:
+                concept_head = concept_head[:65].strip() + "..."
+            mod_title = f"{tag}: {concept_head}" if not tag.lower().endswith(concept_head.lower()) else tag
+        else:
+            mod_title = tag
+
+        result_modules.append(
+            Topic(
+                id=f"mod-{mod_idx}",
+                title=mod_title[:120],
+                description=f"Course module covering {len(subtopics)} core concepts.",
+                subtopics=subtopics,
+            )
+        )
+
+    return result_modules
 
 
 class SyllabusService:
@@ -284,7 +433,15 @@ class SyllabusService:
     # ------- Internal Helpers / LLM JSON validation retries -------
 
     async def _extract_topic_tree(self, text: str) -> list[Topic]:
-        """Call LLM with JSON mode and Pydantic validation. Retries on mismatch."""
+        """Extract Module and Subtopic tree from syllabus text.
+        Fast-paths deterministic regex extraction when module/unit boundaries exist,
+        or calls LLM with guaranteed clean fallback."""
+        # Fast path: If the syllabus has explicit module/unit boundaries, parse deterministically
+        if MODULE_SPLIT_REGEX.search(text):
+            parsed_modules = _parse_syllabus_deterministic(text)
+            if parsed_modules:
+                return parsed_modules
+
         template = prompts.load("syllabus_extraction", "v1")
         prompt = template.format(syllabus_text=text)
 
@@ -317,25 +474,8 @@ class SyllabusService:
                 except Exception as final_exc:
                     log.error("syllabus.extract_tree.retry_failed", error=str(final_exc))
 
-            # Guaranteed non-empty fallback: derive topics directly from text lines
-            lines = [line.strip("- *#\t") for line in text.splitlines() if len(line.strip("- *#\t")) > 3]
-            subtopics = [
-                Topic(
-                    id=f"topic-{i+1}",
-                    title=line[:80],
-                    description="Extracted curriculum topic",
-                    subtopics=[],
-                )
-                for i, line in enumerate(lines[:12])
-            ]
-            return [
-                Topic(
-                    id="module-1",
-                    title="Course Curriculum & Overview",
-                    description="Curriculum topics extracted from uploaded syllabus document.",
-                    subtopics=subtopics,
-                )
-            ]
+            # Guaranteed robust deterministic fallback
+            return _parse_syllabus_deterministic(text)
 
     async def _grade_topic_coverage_with_llm(
         self, topic: Topic, chunks: list[Any]
@@ -383,15 +523,24 @@ class SyllabusService:
                     )
 
     def _map_llm_topics(self, llm_topics: list[LLMTopic]) -> list[Topic]:
-        """Recursively map the flat LLMTopic validation models to the db Topic models."""
-        result = []
+        """Recursively map the flat LLMTopic validation models to the db Topic models,
+        strictly filtering out administrative metadata (semester, credits, instructor, grading, etc.)."""
+        result: list[Topic] = []
         for t in llm_topics:
+            if _is_administrative_topic(t.title):
+                continue
+
+            cleaned_subtopics = [
+                s for s in self._map_llm_topics(t.subtopics)
+                if not _is_administrative_topic(s.title)
+            ]
+
             result.append(
                 Topic(
                     id=t.id,
                     title=t.title,
                     description=t.description,
-                    subtopics=self._map_llm_topics(t.subtopics),
+                    subtopics=cleaned_subtopics,
                 )
             )
         return result

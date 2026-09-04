@@ -146,16 +146,69 @@ async def quick_discover_resources(
         "error": None,
     }
     config = {"configurable": {"thread_id": thread_id}}
-    result_state = await graph.ainvoke(state, config)
 
-    ranked_data = result_state.get("ranked_resources") or []
-    resources = [ResourceItem(**item) for item in ranked_data if isinstance(item, dict)]
+    resources: list[ResourceItem] = []
+    from_cache = False
+
+    try:
+        result_state = await graph.ainvoke(state, config)
+        from_cache = result_state.get("from_cache", False)
+        ranked_data = result_state.get("ranked_resources") or []
+        resources = [ResourceItem(**item) for item in ranked_data if isinstance(item, dict)]
+
+        # If ranking returned empty, fallback to raw candidates from state
+        if not resources:
+            raw = result_state.get("raw_candidates") or []
+            if raw:
+                resources = [
+                    ResourceItem(
+                        title=c.get("title", ""),
+                        video_id=c.get("video_id", ""),
+                        url=c.get("url", ""),
+                        channel_title=c.get("channel_title", ""),
+                        thumbnail_url=c.get("thumbnail_url", ""),
+                        duration=c.get("duration", "N/A"),
+                        publication_date=c.get("publication_date"),
+                        view_count=c.get("view_count"),
+                        description=c.get("description", ""),
+                        rank_score=0.8,
+                        why_recommended="Top educational tutorial matching this syllabus topic.",
+                    )
+                    for c in raw
+                    if isinstance(c, dict)
+                ]
+    except Exception as exc:
+        logger.error("Resource agent graph quick discovery error: %s", exc)
+
+    # Guaranteed non-empty fallback: direct YouTube search if graph failed or returned empty
+    if not resources:
+        try:
+            yt = YouTubeService()
+            fallback_videos = await yt.search_videos(body.topic_title, max_results=6)
+            resources = [
+                ResourceItem(
+                    title=c.get("title", ""),
+                    video_id=c.get("video_id", ""),
+                    url=c.get("url", ""),
+                    channel_title=c.get("channel_title", ""),
+                    thumbnail_url=c.get("thumbnail_url", ""),
+                    duration=c.get("duration", "N/A"),
+                    publication_date=c.get("publication_date"),
+                    view_count=c.get("view_count"),
+                    description=c.get("description", ""),
+                    rank_score=0.85,
+                    why_recommended="High-relevance educational tutorial discovered for this topic.",
+                )
+                for c in fallback_videos
+            ]
+        except Exception as yt_err:
+            logger.error("Direct YouTube fallback search error: %s", yt_err)
 
     return ResourceDiscoveryResponse(
         topic_id=body.topic_id,
         topic_title=body.topic_title,
         resources=resources,
-        from_cache=result_state.get("from_cache", False),
+        from_cache=from_cache,
         updated_at=datetime.now(UTC).isoformat(),
     )
 

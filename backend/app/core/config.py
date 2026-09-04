@@ -16,7 +16,9 @@ class Settings(BaseSettings):
     app_env: Literal["dev", "test", "prod"] = "dev"
     log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
 
-    allowed_origins: str = "http://localhost:3000"
+    allowed_origins: str = (
+        "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001"
+    )
 
     # --- Supabase ---
     supabase_url: str = ""
