@@ -112,7 +112,7 @@ export function DocumentList({ docs, onChange }: Props) {
               </div>
               <div className="flex items-center gap-2">
                 <StatusBadge status={d.status} />
-                {d.status === "ocr_complete" && (
+                {(d.status === "ocr_complete" || d.status === "indexed") && (
                   <Button
                     variant="ghost"
                     size="icon"
@@ -122,7 +122,7 @@ export function DocumentList({ docs, onChange }: Props) {
                     <Eye className="h-4 w-4" />
                   </Button>
                 )}
-                {(d.status === "failed" || d.status === "ocr_complete") && (
+                {(d.status === "failed" || d.status === "ocr_complete" || d.status === "indexed") && (
                   <Button
                     variant="ghost"
                     size="icon"
@@ -173,7 +173,7 @@ function IconForMime({ mime }: { mime: string }) {
 }
 
 function StatusBadge({ status }: { status: DocumentStatus }) {
-  if (status === "queued" || status === "processing") {
+  if (status === "queued" || status === "processing" || status === "indexing") {
     return (
       <Badge variant="secondary" className="gap-1">
         <Loader2 className="h-3 w-3 animate-spin" />
@@ -181,9 +181,10 @@ function StatusBadge({ status }: { status: DocumentStatus }) {
       </Badge>
     );
   }
+  const isComplete = status === "ocr_complete" || status === "indexed";
   const variant: Parameters<typeof Badge>[0]["variant"] =
-    status === "failed" ? "destructive" : status === "ocr_complete" ? "default" : "secondary";
-  return <Badge variant={variant}>{status}</Badge>;
+    status === "failed" ? "destructive" : isComplete ? "default" : "secondary";
+  return <Badge variant={variant}>{status.replace("_", " ")}</Badge>;
 }
 
 function formatBytes(n: number): string {

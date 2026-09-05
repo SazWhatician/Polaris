@@ -8,6 +8,9 @@ def test_loads_rag_answer_v1_real_prompt() -> None:
     assert "{context}" in text
     assert "{question}" in text
     assert "Polaris" in text
+    formatted = text.format(context="test_ctx", question="test_q")
+    assert "test_ctx" in formatted
+    assert "test_q" in formatted
 
 
 def test_missing_prompt_raises() -> None:

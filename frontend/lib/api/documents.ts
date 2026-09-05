@@ -6,6 +6,8 @@ export type DocumentStatus =
   | "queued"
   | "processing"
   | "ocr_complete"
+  | "indexing"
+  | "indexed"
   | "failed";
 
 export interface DocumentResponse {
@@ -18,6 +20,7 @@ export interface DocumentResponse {
   storage_path: string;
   content_hash: string | null;
   page_count: number | null;
+  ocr_completed_at?: string | null;
   error: string | null;
   created_at: string;
   updated_at: string;
@@ -50,16 +53,44 @@ interface PageListResponse {
   items: PageItem[];
 }
 
-export async function listDocuments(): Promise<DocumentResponse[]> {
-  const res = await api<DocumentListResponse>("/api/documents");
-  return res.items;
+let inFlightDocsPromise: Promise<DocumentResponse[]> | null = null;
+let cachedDocs: { data: DocumentResponse[]; timestamp: number } | null = null;
+const DOCS_CACHE_TTL_MS = 4000;
+
+export function invalidateDocumentsCache(): void {
+  cachedDocs = null;
+}
+
+export async function listDocuments(forceRefresh = false): Promise<DocumentResponse[]> {
+  const now = Date.now();
+  if (!forceRefresh && cachedDocs && now - cachedDocs.timestamp < DOCS_CACHE_TTL_MS) {
+    return cachedDocs.data;
+  }
+  if (!forceRefresh && inFlightDocsPromise) {
+    return inFlightDocsPromise;
+  }
+
+  inFlightDocsPromise = (async () => {
+    try {
+      const res = await api<DocumentListResponse>("/api/documents");
+      const items = res.items || [];
+      cachedDocs = { data: items, timestamp: Date.now() };
+      return items;
+    } finally {
+      inFlightDocsPromise = null;
+    }
+  })();
+
+  return inFlightDocsPromise;
 }
 
 export async function deleteDocument(id: string): Promise<void> {
+  invalidateDocumentsCache();
   await api<void>(`/api/documents/${id}`, { method: "DELETE" });
 }
 
 export async function reprocessDocument(id: string): Promise<DocumentResponse> {
+  invalidateDocumentsCache();
   return api<DocumentResponse>(`/api/documents/${id}/reprocess`, { method: "POST" });
 }
 
@@ -90,9 +121,11 @@ export async function uploadDocument(
         create.required_headers || { "Content-Type": file.type || "application/octet-stream" },
         onProgress,
       );
-      return await api<DocumentResponse>(`/api/documents/${create.document_id}/finalize`, {
+      const doc = await api<DocumentResponse>(`/api/documents/${create.document_id}/finalize`, {
         method: "POST",
       });
+      invalidateDocumentsCache();
+      return doc;
     } catch (err) {
       console.warn("Signed URL upload failed, falling back to direct upload", err);
     }
@@ -114,6 +147,7 @@ export async function uploadDirect(
     body: formData,
   });
 
+  invalidateDocumentsCache();
   if (onProgress) onProgress(100);
   return res;
 }

@@ -499,7 +499,7 @@ function UserProfileContent() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {filteredDocs.map((doc) => {
                   const sizeMb = ((doc.size_bytes || 0) / (1024 * 1024)).toFixed(2);
-                  const isReady = doc.status === "ocr_complete";
+                  const isReady = doc.status === "ocr_complete" || doc.status === "indexed";
 
                   return (
                     <div

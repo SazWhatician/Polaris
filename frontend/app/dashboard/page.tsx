@@ -64,7 +64,7 @@ export default function DashboardPage() {
   }, [user]);
 
   const totalDocs = docs.length;
-  const processedDocs = docs.filter((d) => d.status === "ocr_complete").length;
+  const processedDocs = docs.filter((d) => d.status === "ocr_complete" || d.status === "indexed").length;
   const totalPages = docs.reduce((acc, d) => acc + (d.page_count || 0), 0);
   const totalBytes = docs.reduce((acc, d) => acc + (d.size_bytes || 0), 0);
   const totalMb = (totalBytes / (1024 * 1024)).toFixed(1);

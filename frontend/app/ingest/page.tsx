@@ -44,7 +44,7 @@ import { useGsapEntrance } from "@/lib/use-animation-system";
 import { cn } from "@/lib/utils";
 
 const POLL_INTERVAL_MS = 3000;
-const IN_FLIGHT_STATES = new Set(["queued", "processing"]);
+const IN_FLIGHT_STATES = new Set(["queued", "processing", "indexing"]);
 
 export default function IngestPage() {
   const { user, loading } = useAuth();
@@ -52,7 +52,7 @@ export default function IngestPage() {
   const [docs, setDocs] = useState<DocumentResponse[]>([]);
   const [fetching, setFetching] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "ocr_complete" | "processing" | "failed">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "ready" | "processing" | "failed">("all");
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [viewingDoc, setViewingDoc] = useState<DocumentResponse | null>(null);
 
@@ -136,7 +136,7 @@ export default function IngestPage() {
   };
 
   const totalDocs = docs.length;
-  const processedDocs = docs.filter((d) => d.status === "ocr_complete").length;
+  const processedDocs = docs.filter((d) => d.status === "ocr_complete" || d.status === "indexed").length;
   const inFlightDocs = docs.filter((d) => IN_FLIGHT_STATES.has(d.status)).length;
   const totalPages = docs.reduce((acc, d) => acc + (d.page_count || 0), 0);
   const totalBytes = docs.reduce((acc, d) => acc + (d.size_bytes || 0), 0);
@@ -146,7 +146,13 @@ export default function IngestPage() {
   const filteredDocs = useMemo(() => {
     return docs.filter((d) => {
       const matchSearch = d.filename.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchStatus = statusFilter === "all" || d.status === statusFilter;
+      const matchStatus =
+        statusFilter === "all" ||
+        (statusFilter === "ready"
+          ? d.status === "ocr_complete" || d.status === "indexed"
+          : statusFilter === "processing"
+          ? IN_FLIGHT_STATES.has(d.status)
+          : d.status === statusFilter);
       return matchSearch && matchStatus;
     });
   }, [docs, searchQuery, statusFilter]);
@@ -275,7 +281,7 @@ export default function IngestPage() {
               </div>
 
               <div className="flex items-center p-1 rounded-xl bg-muted/40 border border-border/60 text-xs">
-                {(["all", "ocr_complete", "processing", "failed"] as const).map((mode) => (
+                {(["all", "ready", "processing", "failed"] as const).map((mode) => (
                   <button
                     key={mode}
                     onClick={() => setStatusFilter(mode)}
@@ -286,7 +292,7 @@ export default function IngestPage() {
                         : "text-muted-foreground hover:text-foreground"
                     )}
                   >
-                    {mode === "ocr_complete" ? "Ready" : mode}
+                    {mode}
                   </button>
                 ))}
               </div>
@@ -311,7 +317,7 @@ export default function IngestPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {filteredDocs.map((d) => {
-                const isReady = d.status === "ocr_complete";
+                const isReady = d.status === "ocr_complete" || d.status === "indexed";
                 const isFailed = d.status === "failed";
                 const sizeStr = ((d.size_bytes || 0) / (1024 * 1024)).toFixed(2);
 
