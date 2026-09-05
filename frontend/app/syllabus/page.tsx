@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
@@ -23,6 +24,8 @@ import {
   RefreshCw,
   ListVideo,
   Image as ImageIcon,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -118,6 +121,7 @@ const DEFAULT_SYLLABUS_MODULES: ModuleNode[] = [
 
 export default function SyllabusPage() {
   const { user, loading, signInAsDemo } = useAuth();
+  const router = useRouter();
 
   // Navigation / Filter State
   const [searchQuery, setSearchQuery] = useState("");

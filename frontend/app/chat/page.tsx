@@ -187,7 +187,7 @@ function ChatContent() {
   if (loading || !user) return null;
 
   return (
-    <div className="h-screen w-full max-h-screen text-foreground flex flex-col relative overflow-hidden pt-14 sm:pt-16">
+    <div className="h-screen w-full max-h-screen text-foreground flex flex-col relative overflow-hidden">
       <SiteHeader />
 
       {/* Unified Fullscreen Shader Screen Wrapper */}
@@ -201,7 +201,7 @@ function ChatContent() {
           onPromptSubmit={(val) => sendQuestion(val)}
         >
           {messages.length > 0 && (
-            <div className="w-full h-full max-w-5xl mx-auto flex flex-col justify-between p-2 sm:p-4 z-10 min-h-0">
+            <div className="w-full h-full max-w-5xl mx-auto flex flex-col justify-between px-2 sm:px-4 pb-2 sm:pb-3 pt-16 sm:pt-18 z-10 min-h-0">
               
               {/* Top Settings Bar */}
               <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl border border-border/80 shadow-md text-xs font-medium text-foreground shrink-0">

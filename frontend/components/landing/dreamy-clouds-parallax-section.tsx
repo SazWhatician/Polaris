@@ -3,11 +3,16 @@
 import React, { useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useTheme } from "next-themes";
 import { Sparkles, Compass, Layers, Zap } from "lucide-react";
+
+import { getTheme } from "@/lib/polaris-themes";
 import { CrystalGlow } from "@/components/ui/crystal-glow";
 
 export function DreamyCloudsParallaxSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { resolvedTheme, theme } = useTheme();
+  const palette = getTheme(resolvedTheme ?? theme);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,

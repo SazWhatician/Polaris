@@ -13,9 +13,35 @@
     position: relative;
   }
 
-  * {
+  body,
+  input,
+  button,
+  textarea,
+  select {
     font-family: var(--font-jakarta), var(--font-inter), system-ui, -apple-system, sans-serif;
   }
+
+  /* Preserve KaTeX mathematical typography and symbol metrics */
+  .katex {
+    text-rendering: auto;
+    font-size: 1.06em;
+  }
+  .katex,
+  .katex .katex-html {
+    white-space: normal;
+  }
+  .katex .mathnormal {
+    font-family: KaTeX_Math, KaTeX_Main, "Times New Roman", serif !important;
+    font-style: italic !important;
+  }
+  .katex .amsrm {
+    font-family: KaTeX_AMS, KaTeX_Main, serif !important;
+  }
+  .katex .mathbf {
+    font-family: KaTeX_Main, serif !important;
+    font-weight: bold !important;
+  }
+
 
   /* ── Theme 1 · Cosmic Obsidian (dark, default) ─────────────────────── */
   :root,

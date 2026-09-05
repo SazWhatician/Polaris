@@ -824,7 +824,7 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
             {children}
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center p-6 pointer-events-none">
+          <div className="flex-1 flex items-center justify-center p-6 pt-16 sm:pt-20 pointer-events-none">
             <div className="max-w-3xl w-full text-center" style={{ pointerEvents: "auto" }}>
               <h1 className="text-slate-900 dark:text-white text-3xl sm:text-5xl font-semibold tracking-tight drop-shadow-[0_1px_8px_rgba(31,61,188,0.25)]">
                 {title}
