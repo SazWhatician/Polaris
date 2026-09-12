@@ -47,6 +47,7 @@ function LoginContent() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
+    router.prefetch("/dashboard");
     if (user && !loading) {
       router.replace("/dashboard");
     }

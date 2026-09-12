@@ -95,11 +95,12 @@ function UserProfileContent() {
   };
 
   useEffect(() => {
+    router.prefetch("/chat");
     if (user) {
       loadDocs();
       loadSessions();
     }
-  }, [user]);
+  }, [user, router]);
 
   useEffect(() => {
     const handleUpdate = () => loadSessions();
@@ -371,7 +372,7 @@ function UserProfileContent() {
               </div>
             </div>
             <div className="mt-2.5">
-              <div className="text-xl sm:text-2xl font-black text-foreground font-mono">
+              <div className="text-xl sm:text-2xl font-black text-foreground font-mono" suppressHydrationWarning>
                 {communityPosts.length}
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5">

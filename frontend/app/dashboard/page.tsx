@@ -42,6 +42,8 @@ export default function DashboardPage() {
   const containerRef = useGsapEntrance(".gsap-dash", 0.04);
 
   useEffect(() => {
+    router.prefetch("/chat");
+    router.prefetch("/pathfinder");
     if (!loading && !user) router.replace("/");
   }, [loading, user, router]);
 

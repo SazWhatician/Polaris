@@ -37,7 +37,7 @@ export async function syncUserProfileToSupabase(user: {
     picture?: string;
   };
 }): Promise<void> {
-  if (!user || !user.id) return;
+  if (!user || !user.id || supabaseUrl.includes("sbumoqtswbsekmdchbyn") || supabaseUrl.includes("placeholder")) return;
   try {
     const supabase = getSupabase();
     const displayName =
@@ -62,7 +62,7 @@ export async function syncUserProfileToSupabase(user: {
       },
       { onConflict: "id" }
     );
-    if (error && error.code !== "42501") {
+    if (error && error.code !== "42501" && !error.message?.includes("Failed to fetch")) {
       console.warn("Supabase user profile sync note:", error.message);
     }
   } catch (err) {

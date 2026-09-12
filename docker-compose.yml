@@ -86,6 +86,7 @@ services:
     container_name: polaris-jaeger
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
+      LOG_LEVEL: "warn"
     ports:
       - "16686:16686"
       - "4317:4317"

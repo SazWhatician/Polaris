@@ -716,12 +716,12 @@ function MarkdownAnswerView({
       // 13. Standard Paragraph
       flushList();
       blocks.push(
-        <p
+        <div
           key={`p-${i}`}
           className="text-xs sm:text-sm leading-relaxed text-slate-800 dark:text-zinc-200 my-2"
         >
           {renderInlineContent(line, citations, onCitationClick)}
-        </p>
+        </div>
       );
     }
 

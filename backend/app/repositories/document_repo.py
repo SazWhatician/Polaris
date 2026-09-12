@@ -73,8 +73,8 @@ class DocumentRepository:
                     for d in docs:
                         _mem_docs[(d.user_id, d.id)] = d
                     return docs
-            except Exception as exc:
-                log.warning("supabase.document_list_fallback", error=str(exc))
+            except Exception:
+                import app.core.supabase; app.core.supabase._supabase_client = None
 
         items = [d for (uid, _), d in _mem_docs.items() if uid == user_id]
         items.sort(key=lambda d: d.created_at, reverse=True)

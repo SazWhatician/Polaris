@@ -129,21 +129,17 @@ async def get_planner_run_status(
     return RevisionPlan(**plan_dict)
 
 
-@router.get("/latest", response_model=RevisionPlan)
+@router.get("/latest", response_model=RevisionPlan | None)
 async def get_latest_revision_plan(
     user: CurrentUser,
-) -> RevisionPlan:
+) -> RevisionPlan | None:
     if not is_initialized():
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, detail="Firestore backend unavailable"
         )
 
     plan_repo = PlanRepository(get_firestore())
-    plan = await plan_repo.get_latest_plan(user.uid)
-    if not plan:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="No revision plan found")
-
-    return plan
+    return await plan_repo.get_latest_plan(user.uid)
 
 
 @router.get("/diff", response_model=PlanDiffResponse)
