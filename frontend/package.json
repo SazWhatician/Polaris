@@ -13,6 +13,7 @@
     "gen-api": "openapi-typescript ../backend/openapi.json -o lib/api/schema.gen.ts"
   },
   "dependencies": {
+    "@designcodeio/threeui": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
