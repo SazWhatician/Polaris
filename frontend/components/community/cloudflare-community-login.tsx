@@ -63,20 +63,6 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
     toast.info(`Filled with ${presetAlias} profile`);
   };
 
-  const handleDirectDemoLogin = (presetCollege: string, presetUsername: string, presetAlias: string, presetCourse: string) => {
-    loginWithCloudflare({
-      username: `@${presetUsername}`,
-      alias: presetAlias,
-      college: presetCollege,
-      course: presetCourse,
-      year: "3rd Year (Junior)",
-      bio: `Scholar from ${presetCollege} collaborating via Polaris Community.`,
-      cfRayId: rayId,
-    });
-    toast.success(`Welcome to Polaris Community as ${presetAlias}!`);
-    onSuccess?.();
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 

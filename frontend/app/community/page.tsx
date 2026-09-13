@@ -8,9 +8,6 @@ import {
   Flame,
   Send,
   UserPlus,
-  Compass,
-  BookOpen,
-  Users,
   Shield,
   FileText,
   Radio,
@@ -29,7 +26,7 @@ import { cn } from "@/lib/utils";
 type CommunityTab = "posts" | "friends" | "trending" | "dm";
 
 export default function CommunityPage() {
-  const { communityUser, profile, logoutCloudflare, setActiveDmUsername, friends, communities } = useCommunityStore();
+  const { communityUser, profile, logoutCloudflare, setActiveDmUsername, friends } = useCommunityStore();
   const [activeTab, setActiveTab] = useState<CommunityTab>("posts");
 
   const handleOpenDmWith = (username: string) => {

@@ -2,16 +2,12 @@
 
 import { useState } from "react";
 import {
-  TrendingUp,
   Flame,
   Hash,
   School,
   ArrowBigUp,
   MessageSquare,
   Send,
-  Users,
-  Check,
-  Plus,
 } from "lucide-react";
 import { useCommunityStore } from "@/lib/community-store";
 import { Button } from "@/components/ui/button";

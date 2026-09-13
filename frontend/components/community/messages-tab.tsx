@@ -6,7 +6,6 @@ import {
   MessageSquare,
   Search,
   School,
-  Sparkles,
   Plus,
 } from "lucide-react";
 import {
