@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 !.env.local.example
+*vercel_env*
 *serviceAccount*.json
 *service-account*.json
 *-firebase-adminsdk-*.json
