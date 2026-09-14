@@ -30,6 +30,18 @@ const nextConfig = {
       test: /\.html$/i,
       type: "asset/source",
     });
+
+    // Fix Webpack 5 Asset Modules schema mismatch for asset/inline (e.g. data: URLs in @designcodeio/threeui)
+    if (config.module.generator?.asset?.filename) {
+      if (!config.module.generator["asset/resource"]) {
+        config.module.generator["asset/resource"] = config.module.generator.asset;
+      }
+      delete config.module.generator.asset;
+    }
+
+    config.module.generator = config.module.generator || {};
+    config.module.generator["asset/inline"] = config.module.generator["asset/inline"] || {};
+
     return config;
   },
 };
