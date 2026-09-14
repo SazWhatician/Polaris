@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ["three", "gsap"],
+  transpilePackages: ["three", "gsap", "@designcodeio/threeui"],
   typedRoutes: true,
   images: {
     formats: ["image/avif", "image/webp"],
