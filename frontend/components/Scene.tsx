@@ -2,7 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { SylvaHero } from "@designcodeio/threeui";
+import { SylvaHero as _SylvaHero } from "@designcodeio/threeui/components/SylvaHero";
+
+// Subpath re-export loses the variant intersection type; restore it.
+const SylvaHero = _SylvaHero as React.ComponentType<
+  React.ComponentProps<typeof _SylvaHero> & { variant?: string }
+>;
 import "@designcodeio/threeui/style.css";
 
 export function Scene() {
