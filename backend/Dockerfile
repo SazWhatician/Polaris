@@ -35,17 +35,18 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN groupadd -g 1000 app && useradd -u 1000 -g 1000 --create-home --shell /bin/bash app
 
 WORKDIR /app
+RUN mkdir -p /app/storage /home/app/.cache/huggingface && chown -R app:app /app /home/app
 
 # Copy optimized venv from builder
 COPY --from=builder --chown=app:app /opt/venv /opt/venv
 
 # Pre-bake embedding model as app user for ultra-fast startup (~70 MB)
 USER app
-RUN mkdir -p /home/app/.cache/huggingface \
- && python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 
 # Copy application source
 COPY --chown=app:app app ./app
+COPY --chown=app:app app.py ./app.py
 
 ENV PORT=7860
 EXPOSE 7860 8000

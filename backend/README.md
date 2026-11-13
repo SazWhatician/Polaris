@@ -3,8 +3,8 @@ title: Polaris Academic AI Backend
 emoji: 🌌
 colorFrom: indigo
 colorTo: blue
-sdk: gradio
-app_file: app.py
+sdk: docker
+app_port: 7860
 pinned: false
 ---
 

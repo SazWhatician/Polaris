@@ -1,41 +1,38 @@
-name: CI & Production Deploy
+name: Deploy Backend to Hugging Face Spaces
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-hf-spaces
+  cancel-in-progress: true
 
 jobs:
-  lint-and-test:
+  deploy:
+    name: Sync Backend to Hugging Face Space
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install Backend Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
-          pip install pytest
+      - name: Install Hugging Face Hub
+        run: pip install huggingface_hub
 
-      - name: Run Backend Tests
+      - name: Deploy Backend to Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE: ${{ secrets.HF_SPACE || 'saswatml123/polaris' }}
+          HF_COMMIT_MESSAGE: "Deploy from GitHub commit ${{ github.sha }}: ${{ github.event.head_commit.message || 'manual trigger' }}"
         run: |
           cd backend
-          pytest tests/
-
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install Frontend Dependencies & Typecheck
-        run: |
-          cd frontend
-          npm ci
-          npm run typecheck || true
+          python -m scripts.deploy_hf

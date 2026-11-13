@@ -68,5 +68,8 @@ gen-api:
 eval:
     python -m evals.runners.run_eval
 
+deploy-hf:
+    cd backend && python -m scripts.deploy_hf
+
 check: be-check fe-check
     @echo "All checks passed."
