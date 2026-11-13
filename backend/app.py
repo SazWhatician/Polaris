@@ -11,6 +11,20 @@ if not hasattr(enum, "StrEnum"):
         pass
     enum.StrEnum = StrEnum
 
+import sys
+import types
+try:
+    import sse_starlette
+    if "sse_starlette.event" not in sys.modules:
+        import sse_starlette.sse as _sse
+        _event_mod = types.ModuleType("sse_starlette.event")
+        _event_mod.ServerSentEvent = getattr(_sse, "ServerSentEvent", None)
+        _event_mod.JSONServerSentEvent = getattr(_sse, "JSONServerSentEvent", None)
+        sys.modules["sse_starlette.event"] = _event_mod
+        sse_starlette.event = _event_mod
+except ImportError:
+    pass
+
 import os
 # Ensure Gradio 6 does not attempt Node SSR proxy (which conflicts with ZeroGPU sidecar on 7861)
 os.environ["GRADIO_NODE_PATH"] = ""
