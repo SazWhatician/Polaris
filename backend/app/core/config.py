@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     supabase_anon_key: str = ""
     supabase_jwt_secret: str = ""
     supabase_storage_bucket: str = "polaris-documents"
+    storage_dir: str | None = None
 
     # --- Legacy / optional Firebase fields ---
     firebase_project_id: str = "polaris-dev"

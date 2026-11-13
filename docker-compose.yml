@@ -12,6 +12,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
       REDIS_URL: redis://redis:6379
       QDRANT_URL: http://qdrant:6333
+      STORAGE_DIR: /app/storage
     ports:
       - "8010:8000"
     volumes:
@@ -46,6 +47,7 @@ services:
       OTEL_SERVICE_NAME: polaris-worker
       REDIS_URL: redis://redis:6379
       QDRANT_URL: http://qdrant:6333
+      STORAGE_DIR: /app/storage
     volumes:
       - ./backend/app:/app/app:ro
       - ./backend/secrets:/app/secrets:ro

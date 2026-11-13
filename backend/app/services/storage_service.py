@@ -21,10 +21,38 @@ class UploadAuthorization:
 
 
 class StorageService:
-    def __init__(self, bucket_name: str = "polaris-documents") -> None:
+    def __init__(
+        self,
+        bucket_name: str = "polaris-documents",
+        storage_dir: str | Path | None = None,
+    ) -> None:
         self._bucket_name = bucket_name
-        self._storage_dir = Path(os.environ.get("STORAGE_DIR", "/app/storage"))
-        self._storage_dir.mkdir(parents=True, exist_ok=True)
+        self._storage_dir = self._resolve_storage_dir(storage_dir)
+
+    @staticmethod
+    def _resolve_storage_dir(custom_path: str | Path | None = None) -> Path:
+        import tempfile
+
+        raw_path = custom_path or os.environ.get("STORAGE_DIR")
+        candidates: list[Path] = []
+        if raw_path:
+            candidates.append(Path(raw_path))
+        if os.name != "nt" and Path("/app/storage").is_dir():
+            candidates.append(Path("/app/storage"))
+        candidates.append(Path.cwd() / "storage_data")
+        candidates.append(Path(tempfile.gettempdir()) / "polaris_storage")
+
+        for cand in candidates:
+            try:
+                cand.mkdir(parents=True, exist_ok=True)
+                test_probe = cand / ".write_probe"
+                test_probe.touch(exist_ok=True)
+                test_probe.unlink(missing_ok=True)
+                return cand
+            except (PermissionError, OSError) as exc:
+                log.warning("storage.dir_init_failed", path=str(cand), error=str(exc))
+                continue
+        return Path(tempfile.gettempdir())
 
     def _local_path(self, storage_path: str) -> Path:
         return self._storage_dir / storage_path

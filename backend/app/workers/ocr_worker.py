@@ -81,7 +81,10 @@ async def _startup(ctx: dict[str, Any]) -> None:
     ctx["ocr_service"] = OcrService(
         doc_repo=DocumentRepository(),
         page_repo=PageRepository(),
-        storage=StorageService(bucket_name=settings.supabase_storage_bucket),
+        storage=StorageService(
+            bucket_name=settings.supabase_storage_bucket,
+            storage_dir=settings.storage_dir,
+        ),
         engine=engine,
         max_pages=settings.ocr_max_pages,
         render_scale=settings.ocr_render_scale,

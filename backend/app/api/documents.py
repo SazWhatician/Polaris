@@ -39,7 +39,10 @@ def get_document_service(
     settings = get_settings()
     return DocumentService(
         repo=DocumentRepository(),
-        storage=StorageService(bucket_name=settings.supabase_storage_bucket),
+        storage=StorageService(
+            bucket_name=settings.supabase_storage_bucket,
+            storage_dir=settings.storage_dir,
+        ),
         task_queue=queue,
         signed_url_ttl_seconds=settings.signed_url_ttl_seconds,
         max_upload_bytes=settings.max_upload_bytes,
