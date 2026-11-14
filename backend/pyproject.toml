@@ -68,11 +68,13 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 testpaths = ["tests"]
 addopts = "-ra --strict-markers --cov=app --cov-report=term-missing --cov-report=xml"
 markers = [
     "integration: requires Firestore/Qdrant emulators",
     "slow: takes >1s",
+    "asyncio: mark test to run with asyncio event loop",
 ]
 
 [tool.coverage.run]
