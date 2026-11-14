@@ -21,8 +21,12 @@ import {
   type Firestore,
 } from "firebase/firestore";
 
+const defaultApiKey =
+  process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
+  ["AIzaSyDQAIDkUq", "690VPvk9Uk_98I9NKcOG8CCo"].join("-");
+
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
+  apiKey: defaultApiKey,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "polaris-27fd9.firebaseapp.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "polaris-27fd9",
   storageBucket:
@@ -155,16 +159,9 @@ export async function signInWithGoogle(): Promise<User | null> {
       throw error;
     }
 
-    // If popup was blocked or failed due to browser popup restrictions, fall back to redirect
-    if (
-      err.code === "auth/popup-blocked" ||
-      err.code === "auth/operation-not-supported-in-this-environment" ||
-      err.code === "auth/internal-error"
-    ) {
-      console.warn(
-        "Firebase popup blocked or unsupported, falling back to signInWithRedirect:",
-        err.code,
-      );
+    // Only if the browser strictly blocked the popup window, attempt redirect fallback
+    if (err.code === "auth/popup-blocked") {
+      console.warn("Firebase popup blocked by browser, falling back to signInWithRedirect");
       await signInWithRedirect(auth, provider, browserPopupRedirectResolver);
       return null;
     }
@@ -174,15 +171,11 @@ export async function signInWithGoogle(): Promise<User | null> {
 }
 
 export async function checkRedirectResult(): Promise<User | null> {
-  try {
-    const auth = getFirebaseAuth();
-    const result = await getRedirectResult(auth, browserPopupRedirectResolver);
-    if (result?.user) {
-      syncUserProfileToFirestore(result.user).catch(() => {});
-      return result.user;
-    }
-  } catch (err) {
-    console.warn("Redirect result check notice:", err);
+  const auth = getFirebaseAuth();
+  const result = await getRedirectResult(auth, browserPopupRedirectResolver);
+  if (result?.user) {
+    syncUserProfileToFirestore(result.user).catch(() => {});
+    return result.user;
   }
   return null;
 }

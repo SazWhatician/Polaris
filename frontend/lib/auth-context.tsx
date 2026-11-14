@@ -115,10 +115,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           setLoading(false);
           toast.success(`Welcome, ${mappedUser.displayName}!`);
+
+          if (typeof window !== "undefined") {
+            const p = window.location.pathname;
+            if (p === "/" || p === "/login") {
+              window.location.replace("/dashboard");
+            }
+          }
         }
       })
-      .catch((err) => {
-        console.warn("Redirect result check notice:", err);
+      .catch((err: unknown) => {
+        const errorObj = err as { code?: string; message?: string };
+        console.warn("Redirect result check error:", err);
+        if (
+          errorObj?.code &&
+          errorObj.code !== "auth/null-user" &&
+          errorObj.code !== "auth/no-current-user"
+        ) {
+          toast.error(errorObj.message || "Google authentication failed");
+        }
       });
 
     // 3. Setup Firebase Auth listener for real-time auth state
