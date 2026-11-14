@@ -41,7 +41,7 @@ export default function DashboardPage() {
   useEffect(() => {
     router.prefetch("/chat");
     router.prefetch("/pathfinder");
-    if (!loading && !user) router.replace("/");
+    if (!loading && !user) router.replace("/login");
   }, [loading, user, router]);
 
   const loadDocs = async () => {

@@ -100,6 +100,13 @@ export async function getUserProfileFromSupabase(uid: string): Promise<UserProfi
 }
 
 export async function signInWithGoogle(): Promise<{ url?: string | null; error: Error | null }> {
+  if (
+    !supabaseUrl ||
+    supabaseUrl.includes("placeholder") ||
+    supabaseUrl.includes("sbumoqtswbsekmdchbyn")
+  ) {
+    return { url: null, error: new Error("Supabase OAuth endpoint not configured or offline") };
+  }
   try {
     const supabase = getSupabase();
     const redirectUrl =

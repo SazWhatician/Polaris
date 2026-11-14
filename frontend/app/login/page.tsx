@@ -105,8 +105,10 @@ function LoginContent() {
     setIsSubmitting(true);
     try {
       saveScholarProfileToStore();
-      await signIn();
-      window.location.href = "/dashboard";
+      const success = await signIn();
+      if (success) {
+        router.replace("/dashboard");
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -117,7 +119,7 @@ function LoginContent() {
   const handleDemoSignIn = () => {
     saveScholarProfileToStore("Alex Vance", "alex_vance");
     signInAsDemo();
-    window.location.href = "/dashboard";
+    router.replace("/dashboard");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,7 +137,7 @@ function LoginContent() {
       } else {
         await signInWithEmail(email, password);
       }
-      window.location.href = "/dashboard";
+      router.replace("/dashboard");
     } catch (err) {
       console.error(err);
     } finally {

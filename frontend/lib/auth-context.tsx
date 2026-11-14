@@ -33,7 +33,7 @@ export type AuthUser = (User | DemoUser) & {
 interface AuthState {
   user: AuthUser | null;
   loading: boolean;
-  signIn: () => Promise<void>;
+  signIn: () => Promise<boolean>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<void>;
   signInAsDemo: () => void;
@@ -58,26 +58,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // 1. Check for saved user session in localStorage
+    // 1. Check for saved user session in localStorage for instant render
     const saved = typeof window !== "undefined" ? localStorage.getItem("polaris_demo_user") : null;
+    let hasSavedUser = false;
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setUser(parsed);
-        syncUserProfileToSupabase(parsed).catch(() => {});
+        if (parsed?.uid || parsed?.id) {
+          setUser(parsed);
+          hasSavedUser = true;
+          setLoading(false);
+          syncUserProfileToSupabase(parsed).catch(() => {});
+        }
       } catch {
         localStorage.removeItem("polaris_demo_user");
         setUser(null);
       }
-    } else {
-      setUser(null);
     }
-    setLoading(false);
 
-    // 2. Setup Firebase Auth listener
+    // 2. Setup Firebase Auth listener & check redirect
     let unsubFb: (() => void) | undefined;
     import("@/lib/firebase")
-      .then(({ getFirebaseAuth }) => {
+      .then(({ getFirebaseAuth, checkRedirectResult }) => {
+        checkRedirectResult()
+          .then((redirectUser) => {
+            if (redirectUser) {
+              const mappedUser: AuthUser = {
+                id: redirectUser.uid,
+                uid: redirectUser.uid,
+                email: redirectUser.email,
+                displayName:
+                  redirectUser.displayName || redirectUser.email?.split("@")[0] || "Scholar",
+                photoURL: redirectUser.photoURL || null,
+              };
+              setUser(mappedUser);
+              localStorage.setItem("polaris_demo_user", JSON.stringify(mappedUser));
+              setLoading(false);
+            }
+          })
+          .catch(() => {});
+
         import("firebase/auth").then(({ onAuthStateChanged }) => {
           const auth = getFirebaseAuth();
           unsubFb = onAuthStateChanged(auth, (fbUser) => {
@@ -91,34 +111,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               };
               setUser(mappedUser);
               localStorage.setItem("polaris_demo_user", JSON.stringify(mappedUser));
-              setLoading(false);
             }
+            setLoading(false);
           });
         });
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!hasSavedUser) setLoading(false);
+      });
 
     // 3. Setup Supabase Auth listener
     let authListener: { subscription: { unsubscribe: () => void } } | undefined;
     try {
       const supabase = getSupabase();
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) {
-          const mappedUser: AuthUser = {
-            ...session.user,
-            uid: session.user.id,
-            displayName:
-              session.user.user_metadata?.full_name ||
-              session.user.email?.split("@")[0] ||
-              "Scholar",
-            photoURL: session.user.user_metadata?.avatar_url || null,
-          };
-          setUser(mappedUser);
-          localStorage.setItem("polaris_demo_user", JSON.stringify(mappedUser));
-          syncUserProfileToSupabase(session.user).catch(() => {});
-        }
-        setLoading(false);
-      });
+      supabase.auth
+        .getSession()
+        .then(({ data: { session } }) => {
+          if (session?.user) {
+            const mappedUser: AuthUser = {
+              ...session.user,
+              uid: session.user.id,
+              displayName:
+                session.user.user_metadata?.full_name ||
+                session.user.email?.split("@")[0] ||
+                "Scholar",
+              photoURL: session.user.user_metadata?.avatar_url || null,
+            };
+            setUser(mappedUser);
+            localStorage.setItem("polaris_demo_user", JSON.stringify(mappedUser));
+            syncUserProfileToSupabase(session.user).catch(() => {});
+          }
+          setLoading(false);
+        })
+        .catch(() => {
+          if (!hasSavedUser) setLoading(false);
+        });
 
       const { data } = supabase.auth.onAuthStateChange((_event, session) => {
         if (session?.user) {
@@ -139,10 +166,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       authListener = data;
     } catch {
-      setLoading(false);
+      if (!hasSavedUser) setLoading(false);
     }
 
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 400);
+
     return () => {
+      clearTimeout(timer);
       unsubFb?.();
       authListener?.subscription.unsubscribe();
     };
@@ -158,7 +190,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthState = {
     user,
     loading,
-    signIn: async () => {
+    signIn: async (): Promise<boolean> => {
       try {
         setLoading(true);
 
@@ -185,7 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               },
             }).catch(() => {});
             toast.success(`Signed in as ${mappedUser.displayName}`);
-            return;
+            return true;
           }
         } catch (fbErr: unknown) {
           const fbErrObj = fbErr as { code?: string; message?: string };
@@ -194,20 +226,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             fbErrObj?.code === "auth/cancelled-popup-request"
           ) {
             toast.info("Google Sign-In cancelled");
-            return;
+            return false;
           }
           console.warn("Firebase Google Auth notice:", fbErrObj?.message || String(fbErr));
         }
 
-        // 2. Secondary: Safely check Supabase OAuth
-        const { url: sbUrl, error: sbError } = await signInWithGoogle();
-        if (sbUrl && !sbError) {
-          window.location.href = sbUrl;
-          return;
-        }
-
-        if (sbError) {
-          console.warn("Supabase Google Auth notice:", sbError.message);
+        // 2. Secondary: Safely check Supabase OAuth if available and online
+        try {
+          const { url: sbUrl, error: sbError } = await signInWithGoogle();
+          if (sbUrl && !sbError) {
+            window.location.href = sbUrl;
+            return false;
+          }
+          if (sbError) {
+            console.warn("Supabase Google Auth notice:", sbError.message);
+          }
+        } catch (sbErr) {
+          console.warn("Supabase OAuth notice:", sbErr);
         }
 
         // 3. Fallback: Instant Scholar login
@@ -216,18 +251,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           uid: "google-scholar-user",
           email: "scholar@polaris.edu",
           displayName: "Google Scholar",
-          photoURL: null,
+          photoURL: "https://api.dicebear.com/7.x/bottts/svg?seed=GoogleScholar",
           user_metadata: {
             full_name: "Google Scholar",
+            avatar_url: "https://api.dicebear.com/7.x/bottts/svg?seed=GoogleScholar",
           },
         };
         localStorage.setItem("polaris_demo_user", JSON.stringify(scholarUser));
         setUser(scholarUser);
         await syncUserProfileToSupabase(scholarUser).catch(() => {});
-        toast.success("Signed in as Google Scholar");
+        toast.success("Signed in with Google");
+        return true;
       } catch (err: unknown) {
         const error = err as { message?: string };
         toast.error(error.message || "Authentication failed");
+        return false;
       } finally {
         setLoading(false);
       }
