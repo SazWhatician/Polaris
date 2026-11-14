@@ -40,6 +40,16 @@ def configure_tracing(settings: Settings) -> None:
 def instrument_app(app: FastAPI) -> None:
     """Auto-instrument FastAPI. Call AFTER app routes are registered."""
     try:
+        # FastAPI 0.137.0+ compatibility with opentelemetry-instrumentation-fastapi:
+        # _IncludedRouter does not define .path, which crashes older otel instrumentors.
+        try:
+            from fastapi.routing import _IncludedRouter
+
+            if not hasattr(_IncludedRouter, "path"):
+                _IncludedRouter.path = ""
+        except (ImportError, AttributeError):
+            pass
+
         from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
         FastAPIInstrumentor.instrument_app(app, excluded_urls="/health,/docs,/openapi.json")

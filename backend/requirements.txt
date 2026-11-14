@@ -2,7 +2,7 @@
 # Regenerate with: pip-compile requirements.in (when you adopt pip-tools).
 
 # --- Web framework ---
-fastapi>=0.115.2,<1.0.0
+fastapi>=0.115.2,<0.137.0
 uvicorn[standard]>=0.30.0
 python-multipart>=0.0.18
 
