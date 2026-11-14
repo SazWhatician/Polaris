@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import asyncio
-from dataclasses import dataclass
 import os
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -109,7 +109,7 @@ class StorageService:
                     return res.signed_url
             except Exception as exc:
                 log.warning("supabase.signed_upload_url_fallback", error=str(exc))
-        return f"/api/documents/direct"
+        return "/api/documents/direct"
 
     def _exists_sync(self, storage_path: str) -> bool:
         local_file = self._local_path(storage_path)
@@ -190,5 +190,3 @@ class StorageService:
                 )
             except Exception as exc:
                 log.warning("supabase.storage_upload_skipped", error=str(exc), path=storage_path)
-
-

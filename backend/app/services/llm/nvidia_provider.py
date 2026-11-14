@@ -1,11 +1,12 @@
 import json
-import httpx
-from typing import AsyncIterator, Type, TypeVar, Optional, List
-from pydantic import BaseModel
+from collections.abc import AsyncIterator
+from typing import TypeVar
 
-from app.services.llm.base import BaseLLMProvider
-from app.services.key_pool import KeyPool
+import httpx
 from app.core.logging import get_logger
+from app.services.key_pool import KeyPool
+from app.services.llm.base import BaseLLMProvider
+from pydantic import BaseModel
 
 log = get_logger(__name__)
 T = TypeVar("T", bound=BaseModel)
@@ -19,9 +20,9 @@ class NvidiaLLMProvider(BaseLLMProvider):
     def __init__(
         self,
         *,
-        api_key: Optional[str] = None,
-        api_keys: Optional[List[str]] = None,
-        key_pool: Optional[KeyPool] = None,
+        api_key: str | None = None,
+        api_keys: list[str] | None = None,
+        key_pool: KeyPool | None = None,
         model: str = "deepseek-ai/deepseek-v4-pro",
     ):
         self._model = model
@@ -65,7 +66,9 @@ class NvidiaLLMProvider(BaseLLMProvider):
                     "Content-Type": "application/json",
                 }
                 try:
-                    resp = await client.post(f"{NVIDIA_BASE_URL}/chat/completions", headers=headers, json=payload)
+                    resp = await client.post(
+                        f"{NVIDIA_BASE_URL}/chat/completions", headers=headers, json=payload
+                    )
                     if resp.status_code == 429:
                         log.warning("nvidia.rate_limit_exceeded", attempt=attempts)
                         await self._key_pool.mark_cooldown(key)
@@ -100,7 +103,6 @@ class NvidiaLLMProvider(BaseLLMProvider):
             "chat_template_kwargs": {"thinking": False},
         }
 
-
         attempts = 0
         max_attempts = self._key_pool.total_keys
 
@@ -113,7 +115,9 @@ class NvidiaLLMProvider(BaseLLMProvider):
                     "Content-Type": "application/json",
                 }
                 try:
-                    async with client.stream("POST", f"{NVIDIA_BASE_URL}/chat/completions", headers=headers, json=payload) as resp:
+                    async with client.stream(
+                        "POST", f"{NVIDIA_BASE_URL}/chat/completions", headers=headers, json=payload
+                    ) as resp:
                         if resp.status_code == 429:
                             log.warning("nvidia.rate_limit_exceeded_stream", attempt=attempts)
                             await self._key_pool.mark_cooldown(key)
@@ -145,7 +149,7 @@ class NvidiaLLMProvider(BaseLLMProvider):
     async def structured_complete(
         self,
         prompt: str,
-        schema_class: Type[T],
+        schema_class: type[T],
         *,
         temperature: float = 0.1,
     ) -> T:
@@ -154,4 +158,3 @@ class NvidiaLLMProvider(BaseLLMProvider):
         clean_text = res_text.replace("```json", "").replace("```", "").strip()
         data = json.loads(clean_text)
         return schema_class.model_validate(data)
-

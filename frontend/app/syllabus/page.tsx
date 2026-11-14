@@ -79,39 +79,114 @@ const DEFAULT_SYLLABUS_MODULES: ModuleNode[] = [
     id: "mod-1",
     code: "UNIT I",
     title: "Tree Data Structures & Self-Balancing",
-    description: "Core BST tree invariants, lookup complexity, rotational balancing algorithms, and multiway search indexing.",
+    description:
+      "Core BST tree invariants, lookup complexity, rotational balancing algorithms, and multiway search indexing.",
     coverage: 87,
     subtopics: [
-      { id: "sub-1-1", title: "Binary Search Trees (BST) & Invariants", coverage: 95, status: "mastered", notes: "Cited in Lecture 3 PDF" },
-      { id: "sub-1-2", title: "AVL Trees & Self-Balancing Rotations", coverage: 85, status: "mastered", notes: "Cited in Lecture 4 PDF" },
-      { id: "sub-1-3", title: "Red-Black Trees & Color Properties", coverage: 70, status: "learning", notes: "Needs review on deletion cases" },
-      { id: "sub-1-4", title: "B-Trees & Multiway Search Indexing", coverage: 88, status: "mastered", notes: "Database indexing chapter" },
+      {
+        id: "sub-1-1",
+        title: "Binary Search Trees (BST) & Invariants",
+        coverage: 95,
+        status: "mastered",
+        notes: "Cited in Lecture 3 PDF",
+      },
+      {
+        id: "sub-1-2",
+        title: "AVL Trees & Self-Balancing Rotations",
+        coverage: 85,
+        status: "mastered",
+        notes: "Cited in Lecture 4 PDF",
+      },
+      {
+        id: "sub-1-3",
+        title: "Red-Black Trees & Color Properties",
+        coverage: 70,
+        status: "learning",
+        notes: "Needs review on deletion cases",
+      },
+      {
+        id: "sub-1-4",
+        title: "B-Trees & Multiway Search Indexing",
+        coverage: 88,
+        status: "mastered",
+        notes: "Database indexing chapter",
+      },
     ],
   },
   {
     id: "mod-2",
     code: "UNIT II",
     title: "Advanced Graph Algorithms & Network Flows",
-    description: "Breadth-first traversals, single-source shortest paths, minimum spanning trees, and negative weight cycle relaxation.",
+    description:
+      "Breadth-first traversals, single-source shortest paths, minimum spanning trees, and negative weight cycle relaxation.",
     coverage: 72,
     subtopics: [
-      { id: "sub-2-1", title: "Breadth-First Search (BFS) & Topological Sort", coverage: 100, status: "mastered", notes: "Fully mapped in Qdrant" },
-      { id: "sub-2-2", title: "Dijkstra's Single-Source Shortest Path", coverage: 80, status: "mastered", notes: "Lecture 8 notes" },
-      { id: "sub-2-3", title: "Minimum Spanning Trees (Prim / Kruskal)", coverage: 45, status: "gap", notes: "Identified gap in tutorial 3" },
-      { id: "sub-2-4", title: "Bellman-Ford & Negative Weight Cycles", coverage: 65, status: "learning", notes: "Algorithm assignment 2" },
+      {
+        id: "sub-2-1",
+        title: "Breadth-First Search (BFS) & Topological Sort",
+        coverage: 100,
+        status: "mastered",
+        notes: "Fully mapped in Qdrant",
+      },
+      {
+        id: "sub-2-2",
+        title: "Dijkstra's Single-Source Shortest Path",
+        coverage: 80,
+        status: "mastered",
+        notes: "Lecture 8 notes",
+      },
+      {
+        id: "sub-2-3",
+        title: "Minimum Spanning Trees (Prim / Kruskal)",
+        coverage: 45,
+        status: "gap",
+        notes: "Identified gap in tutorial 3",
+      },
+      {
+        id: "sub-2-4",
+        title: "Bellman-Ford & Negative Weight Cycles",
+        coverage: 65,
+        status: "learning",
+        notes: "Algorithm assignment 2",
+      },
     ],
   },
   {
     id: "mod-3",
     code: "UNIT III",
     title: "Dynamic Programming & Combinatorial Optimization",
-    description: "Subproblem formulation, memoization tables, classical knapsack reductions, and sequence alignment algorithms.",
+    description:
+      "Subproblem formulation, memoization tables, classical knapsack reductions, and sequence alignment algorithms.",
     coverage: 64,
     subtopics: [
-      { id: "sub-3-1", title: "Memoization vs Bottom-up Tabulation", coverage: 85, status: "mastered", notes: "Complete coverage in notes" },
-      { id: "sub-3-2", title: "0/1 Knapsack & Subset Sum Reductions", coverage: 55, status: "gap", notes: "Recommended YT lecture queued" },
-      { id: "sub-3-3", title: "Longest Common Subsequence (LCS) & Alignment", coverage: 75, status: "learning", notes: "Lecture 12 notes" },
-      { id: "sub-3-4", title: "Matrix Chain Multiplication & DP On Trees", coverage: 40, status: "gap", notes: "Missing in current notes" },
+      {
+        id: "sub-3-1",
+        title: "Memoization vs Bottom-up Tabulation",
+        coverage: 85,
+        status: "mastered",
+        notes: "Complete coverage in notes",
+      },
+      {
+        id: "sub-3-2",
+        title: "0/1 Knapsack & Subset Sum Reductions",
+        coverage: 55,
+        status: "gap",
+        notes: "Recommended YT lecture queued",
+      },
+      {
+        id: "sub-3-3",
+        title: "Longest Common Subsequence (LCS) & Alignment",
+        coverage: 75,
+        status: "learning",
+        notes: "Lecture 12 notes",
+      },
+      {
+        id: "sub-3-4",
+        title: "Matrix Chain Multiplication & DP On Trees",
+        coverage: 40,
+        status: "gap",
+        notes: "Missing in current notes",
+      },
     ],
   },
 ];
@@ -209,7 +284,14 @@ export default function SyllabusPage() {
               title: data.name || "Curriculum",
               description: "Curriculum overview extracted from uploaded document.",
               coverage: 0,
-              subtopics: [{ id: "sub-empty", title: data.name || "Course Overview", coverage: 0, status: "gap" }],
+              subtopics: [
+                {
+                  id: "sub-empty",
+                  title: data.name || "Course Overview",
+                  coverage: 0,
+                  status: "gap",
+                },
+              ],
             },
           ]);
         }
@@ -461,9 +543,7 @@ export default function SyllabusPage() {
         (m.description && m.description.toLowerCase().includes(q));
 
       const matchedSubtopics = m.subtopics.filter(
-        (s) =>
-          s.title.toLowerCase().includes(q) ||
-          (s.notes && s.notes.toLowerCase().includes(q))
+        (s) => s.title.toLowerCase().includes(q) || (s.notes && s.notes.toLowerCase().includes(q)),
       );
 
       return {
@@ -475,15 +555,14 @@ export default function SyllabusPage() {
 
   const totalSubtopics = modules.reduce((acc, m) => acc + m.subtopics.length, 0);
   const masteredSubtopics = modules.reduce(
-    (acc, m) =>
-      acc + m.subtopics.filter((s) => s.status === "mastered").length,
-    0
+    (acc, m) => acc + m.subtopics.filter((s) => s.status === "mastered").length,
+    0,
   );
 
   return (
-    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 selection:bg-primary/30 selection:text-foreground">
+    <div className="min-h-screen pb-32 pt-14 text-foreground selection:bg-primary/30 selection:text-foreground sm:pt-16">
       <SiteHeader />
-      <main ref={containerRef} className="max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
+      <main ref={containerRef} className="mx-auto max-w-7xl space-y-6 px-3 py-4 sm:px-6 lg:px-8">
         {/* Page Header */}
         <div className="gsap-syllabus">
           <PageHeader
@@ -501,7 +580,7 @@ export default function SyllabusPage() {
                 <Button
                   onClick={() => setShowUploadModal(true)}
                   size="sm"
-                  className="gap-2 text-xs font-bold rounded-xl shadow-xs bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="shadow-xs gap-2 rounded-xl bg-primary text-xs font-bold text-primary-foreground hover:bg-primary/90"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   <span>Upload Syllabus</span>
@@ -510,11 +589,11 @@ export default function SyllabusPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2 text-xs font-bold rounded-xl border-border/80"
+                    className="gap-2 rounded-xl border-border/80 text-xs font-bold"
                   >
                     <Target className="h-4 w-4 text-primary" />
                     <span>Gap Analysis</span>
-                    <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
+                    <ArrowRight className="ml-0.5 h-3.5 w-3.5" />
                   </Button>
                 </Link>
               </div>
@@ -524,15 +603,15 @@ export default function SyllabusPage() {
 
         {/* Syllabus Selector Bar (if multiple syllabi exist) */}
         {syllabusList.length > 0 && (
-          <div className="gsap-syllabus flex items-center justify-between gap-3 p-3 rounded-2xl bg-card/85 border border-border/80 bento-card">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
+          <div className="gsap-syllabus bento-card flex items-center justify-between gap-3 rounded-2xl border border-border/80 bg-card/85 p-3">
+            <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
               <BookMarked className="h-4 w-4 text-primary" />
               <span>Select Active Syllabus:</span>
             </div>
             <select
               value={selectedSyllabusId || ""}
               onChange={(e) => setSelectedSyllabusId(e.target.value)}
-              className="text-xs bg-muted/50 border border-border/80 rounded-xl px-3 py-1.5 font-sans font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              className="rounded-xl border border-border/80 bg-muted/50 px-3 py-1.5 font-sans text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             >
               {syllabusList.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -544,7 +623,7 @@ export default function SyllabusPage() {
         )}
 
         {/* Telemetry Stats Grid */}
-        <div className="gsap-syllabus grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="gsap-syllabus grid grid-cols-1 gap-3 sm:grid-cols-3">
           <StatCard
             label="Curriculum Coverage"
             numericValue={82}
@@ -581,27 +660,27 @@ export default function SyllabusPage() {
 
         {/* Search & Filter Bar */}
         <div className="gsap-syllabus space-y-3">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            <div className="relative flex-1 max-w-md">
-              <Search className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+            <div className="relative max-w-md flex-1">
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search modules or exact sub-topics..."
-                className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-card/85 border border-border/80 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary shadow-xs"
+                className="shadow-xs w-full rounded-xl border border-border/80 bg-card/85 py-1.5 pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
 
             <div className="flex items-center gap-1.5 text-xs">
-              <span className="text-muted-foreground font-mono text-[10px]">Legend:</span>
-              <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[9px] font-mono font-bold">
+              <span className="font-mono text-[10px] text-muted-foreground">Legend:</span>
+              <span className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-bold text-emerald-500">
                 Mastered (&gt;80%)
               </span>
-              <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[9px] font-mono font-bold">
+              <span className="rounded-md border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 font-mono text-[9px] font-bold text-amber-500">
                 In Review
               </span>
-              <span className="px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-500 border border-rose-500/20 text-[9px] font-mono font-bold">
+              <span className="rounded-md border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 font-mono text-[9px] font-bold text-rose-500">
                 Gap Detected
               </span>
             </div>
@@ -615,18 +694,18 @@ export default function SyllabusPage() {
               return (
                 <Card
                   key={module.id}
-                  className="rounded-2xl sm:rounded-3xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs overflow-hidden transition-all duration-200"
+                  className="bento-card shadow-xs overflow-hidden rounded-2xl border border-border/80 bg-card/85 backdrop-blur-xl transition-all duration-200 sm:rounded-3xl"
                 >
                   {/* Module Header: The Bigger Block Header with "Find Videos" Button */}
                   <div
                     onClick={() => toggleModule(module.id)}
-                    className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-muted/30 transition-colors select-none"
+                    className="flex cursor-pointer select-none flex-col justify-between gap-4 p-4 transition-colors hover:bg-muted/30 sm:p-5 md:flex-row md:items-center"
                   >
-                    <div className="flex items-start sm:items-center gap-3 min-w-0">
+                    <div className="flex min-w-0 items-start gap-3 sm:items-center">
                       <button
                         type="button"
                         aria-label="Toggle module"
-                        className="p-1 rounded-lg bg-muted/60 text-muted-foreground mt-0.5 sm:mt-0"
+                        className="mt-0.5 rounded-lg bg-muted/60 p-1 text-muted-foreground sm:mt-0"
                       >
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4" />
@@ -635,12 +714,12 @@ export default function SyllabusPage() {
                         )}
                       </button>
 
-                      <div className="space-y-1 min-w-0">
+                      <div className="min-w-0 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
+                          <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[10px] font-bold text-primary">
                             {module.code}
                           </span>
-                          <h3 className="text-base sm:text-lg font-bold text-foreground truncate">
+                          <h3 className="truncate text-base font-bold text-foreground sm:text-lg">
                             {module.title}
                           </h3>
                         </div>
@@ -652,7 +731,7 @@ export default function SyllabusPage() {
                     </div>
 
                     {/* Right Header Actions: Find Module Videos + Coverage */}
-                    <div className="flex items-center gap-3 self-end md:self-center pl-7 sm:pl-0">
+                    <div className="flex items-center gap-3 self-end pl-7 sm:pl-0 md:self-center">
                       {/* Button next to Module to find videos for the module */}
                       <Button
                         type="button"
@@ -661,22 +740,22 @@ export default function SyllabusPage() {
                           e.stopPropagation();
                           handleFindVideosForModule(module);
                         }}
-                        className="h-8 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 hover:text-rose-400 border border-rose-500/30 text-xs font-bold gap-1.5 shadow-xs transition-all shrink-0"
+                        className="shadow-xs h-8 shrink-0 gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 text-xs font-bold text-rose-500 transition-all hover:bg-rose-500/20 hover:text-rose-400"
                       >
                         <Youtube className="h-3.5 w-3.5 text-rose-500" />
                         <span>Find Videos</span>
-                        <Sparkles className="h-3 w-3 text-amber-400 ml-0.5" />
+                        <Sparkles className="ml-0.5 h-3 w-3 text-amber-400" />
                       </Button>
 
                       {/* Progress Bar & Percentage */}
                       <div className="flex items-center gap-2.5">
-                        <div className="w-24 sm:w-32 bg-muted/60 h-1.5 rounded-full overflow-hidden">
+                        <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted/60 sm:w-32">
                           <div
-                            className="h-full bg-primary rounded-full transition-all duration-500"
+                            className="h-full rounded-full bg-primary transition-all duration-500"
                             style={{ width: `${module.coverage}%` }}
                           />
                         </div>
-                        <span className="text-xs font-mono font-bold text-primary w-9 text-right">
+                        <span className="w-9 text-right font-mono text-xs font-bold text-primary">
                           {module.coverage}%
                         </span>
                       </div>
@@ -685,41 +764,41 @@ export default function SyllabusPage() {
 
                   {/* Sub-topics listed directly inside the Module block */}
                   {isExpanded && (
-                    <div className="px-4 sm:px-6 pb-5 pt-2 border-t border-border/40 space-y-3 bg-muted/10">
+                    <div className="space-y-3 border-t border-border/40 bg-muted/10 px-4 pb-5 pt-2 sm:px-6">
                       <div className="flex items-center justify-between pt-1">
-                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted-foreground">
+                        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                           Sub-topics ({module.subtopics.length})
                         </span>
-                        <span className="text-[11px] text-muted-foreground hidden sm:inline">
+                        <span className="hidden text-[11px] text-muted-foreground sm:inline">
                           Click &quot;Find Video&quot; next to any sub-topic for targeted lectures
                         </span>
                       </div>
 
-                      <div className="divide-y divide-border/40 rounded-2xl border border-border/60 bg-card/60 overflow-hidden shadow-xs">
+                      <div className="shadow-xs divide-y divide-border/40 overflow-hidden rounded-2xl border border-border/60 bg-card/60">
                         {module.subtopics.map((sub, sIdx) => (
                           <div
                             key={sub.id || sIdx}
-                            className="p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-muted/30 transition-colors group"
+                            className="group flex flex-col justify-between gap-3 p-3 transition-colors hover:bg-muted/30 sm:flex-row sm:items-center sm:p-3.5"
                           >
                             {/* Subtopic info */}
-                            <div className="flex items-start sm:items-center gap-3 min-w-0">
-                              <span className="text-xs font-mono text-muted-foreground w-6 shrink-0 pt-0.5 sm:pt-0">
+                            <div className="flex min-w-0 items-start gap-3 sm:items-center">
+                              <span className="w-6 shrink-0 pt-0.5 font-mono text-xs text-muted-foreground sm:pt-0">
                                 {(sIdx + 1).toString().padStart(2, "0")}
                               </span>
 
-                              <div className="space-y-0.5 min-w-0">
+                              <div className="min-w-0 space-y-0.5">
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <h4 className="text-xs sm:text-sm font-semibold text-foreground leading-snug">
+                                  <h4 className="text-xs font-semibold leading-snug text-foreground sm:text-sm">
                                     {sub.title}
                                   </h4>
                                   <span
                                     className={cn(
-                                      "text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border shrink-0",
+                                      "shrink-0 rounded border px-1.5 py-0.5 font-mono text-[9px] font-bold",
                                       sub.status === "mastered"
-                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                        ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
                                         : sub.status === "learning"
-                                          ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                          : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                                          ? "border-amber-500/20 bg-amber-500/10 text-amber-400"
+                                          : "border-rose-500/20 bg-rose-500/10 text-rose-400",
                                     )}
                                   >
                                     {sub.status === "mastered"
@@ -730,7 +809,7 @@ export default function SyllabusPage() {
                                   </span>
                                 </div>
                                 {sub.notes && (
-                                  <p className="text-[11px] text-muted-foreground truncate">
+                                  <p className="truncate text-[11px] text-muted-foreground">
                                     {sub.notes}
                                   </p>
                                 )}
@@ -738,13 +817,13 @@ export default function SyllabusPage() {
                             </div>
 
                             {/* Subtopic Action: "Find Video" button next to each subtopic */}
-                            <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+                            <div className="flex shrink-0 items-center gap-2 self-end sm:self-center">
                               <Button
                                 type="button"
                                 size="sm"
                                 variant="outline"
                                 onClick={() => handleFindVideosForSubtopic(sub, module.title)}
-                                className="h-7 px-2.5 rounded-lg border-rose-500/30 bg-rose-500/5 hover:bg-rose-500/15 text-rose-500 hover:text-rose-400 text-xs font-semibold gap-1.5 transition-colors shadow-xs"
+                                className="shadow-xs h-7 gap-1.5 rounded-lg border-rose-500/30 bg-rose-500/5 px-2.5 text-xs font-semibold text-rose-500 transition-colors hover:bg-rose-500/15 hover:text-rose-400"
                               >
                                 <Youtube className="h-3 w-3 text-rose-500" />
                                 <span>Find Video</span>
@@ -764,11 +843,11 @@ export default function SyllabusPage() {
 
       {/* Upload Syllabus Modal (Supports PDF, Photos/Images, and Text) */}
       {showUploadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-3xl bg-card border border-border/80 shadow-2xl p-6 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-md duration-200 animate-in fade-in">
+          <div className="w-full max-w-lg space-y-5 rounded-3xl border border-border/80 bg-card p-6 shadow-2xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
+                <div className="rounded-xl border border-primary/20 bg-primary/10 p-2.5 text-primary">
                   <Upload className="h-4 w-4" />
                 </div>
                 <div>
@@ -780,22 +859,22 @@ export default function SyllabusPage() {
               </div>
               <button
                 onClick={() => setShowUploadModal(false)}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Tabs: File Upload vs Text */}
-            <div className="flex rounded-xl bg-muted/60 p-1 gap-1">
+            <div className="flex gap-1 rounded-xl bg-muted/60 p-1">
               <button
                 type="button"
                 onClick={() => setUploadTab("file")}
                 className={cn(
-                  "flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5",
+                  "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold transition-all",
                   uploadTab === "file"
-                    ? "bg-card text-foreground shadow-xs"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "shadow-xs bg-card text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 <FileText className="h-3.5 w-3.5" />
@@ -805,10 +884,10 @@ export default function SyllabusPage() {
                 type="button"
                 onClick={() => setUploadTab("text")}
                 className={cn(
-                  "flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5",
+                  "flex flex-1 items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-bold transition-all",
                   uploadTab === "text"
-                    ? "bg-card text-foreground shadow-xs"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "shadow-xs bg-card text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 <BookOpen className="h-3.5 w-3.5" />
@@ -818,7 +897,7 @@ export default function SyllabusPage() {
 
             <form onSubmit={handleUploadSyllabus} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-foreground mb-1">
+                <label className="mb-1 block text-xs font-bold text-foreground">
                   Course or Subject Name
                 </label>
                 <input
@@ -827,18 +906,18 @@ export default function SyllabusPage() {
                   onChange={(e) => setSyllabusName(e.target.value)}
                   placeholder="e.g. CS 301 — Advanced Algorithms & Data Structures"
                   required
-                  className="w-full px-3.5 py-2 rounded-xl bg-muted/40 border border-border/80 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full rounded-xl border border-border/80 bg-muted/40 px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
 
               {uploadTab === "file" ? (
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">
+                  <label className="mb-1 block text-xs font-bold text-foreground">
                     Syllabus Photo or Document (JPG, PNG, WebP, PDF, TXT)
                   </label>
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-border/80 hover:border-primary/60 rounded-2xl p-5 text-center cursor-pointer transition-colors bg-muted/20"
+                    className="cursor-pointer rounded-2xl border-2 border-dashed border-border/80 bg-muted/20 p-5 text-center transition-colors hover:border-primary/60"
                   >
                     <input
                       ref={fileInputRef}
@@ -850,17 +929,17 @@ export default function SyllabusPage() {
 
                     {imagePreviewUrl ? (
                       <div className="space-y-2">
-                        <div className="relative max-h-44 mx-auto rounded-xl overflow-hidden border border-border/80 bg-black/20">
+                        <div className="relative mx-auto max-h-44 overflow-hidden rounded-xl border border-border/80 bg-black/20">
                           <img
                             src={imagePreviewUrl}
                             alt="Syllabus Preview"
-                            className="max-h-44 mx-auto object-contain rounded-xl"
+                            className="mx-auto max-h-44 rounded-xl object-contain"
                           />
                         </div>
-                        <div className="flex items-center justify-center gap-2 text-xs font-bold text-primary font-mono truncate">
+                        <div className="flex items-center justify-center gap-2 truncate font-mono text-xs font-bold text-primary">
                           <ImageIcon className="h-3.5 w-3.5" />
                           <span className="truncate">{uploadFile?.name}</span>
-                          <span className="text-[10px] text-muted-foreground font-mono">
+                          <span className="font-mono text-[10px] text-muted-foreground">
                             ({Math.round((uploadFile?.size || 0) / 1024)} KB)
                           </span>
                         </div>
@@ -870,21 +949,19 @@ export default function SyllabusPage() {
                       </div>
                     ) : uploadFile ? (
                       <div className="space-y-1">
-                        <FileText className="h-7 w-7 text-primary mx-auto mb-1" />
-                        <p className="text-xs font-bold text-primary font-mono truncate">
+                        <FileText className="mx-auto mb-1 h-7 w-7 text-primary" />
+                        <p className="truncate font-mono text-xs font-bold text-primary">
                           Selected: {uploadFile.name}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          Click to change file
-                        </p>
+                        <p className="text-[10px] text-muted-foreground">Click to change file</p>
                       </div>
                     ) : (
                       <>
-                        <Upload className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
+                        <Upload className="mx-auto mb-2 h-6 w-6 text-muted-foreground" />
                         <p className="text-xs font-medium text-foreground">
                           Click to select or drag & drop syllabus photo or PDF
                         </p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                        <p className="mt-0.5 text-[10px] text-muted-foreground">
                           Photos (JPG, PNG, WebP) & Documents (PDF, TXT) up to 20 MB
                         </p>
                       </>
@@ -893,7 +970,7 @@ export default function SyllabusPage() {
                 </div>
               ) : (
                 <div>
-                  <label className="block text-xs font-bold text-foreground mb-1">
+                  <label className="mb-1 block text-xs font-bold text-foreground">
                     Syllabus Text
                   </label>
                   <textarea
@@ -902,7 +979,7 @@ export default function SyllabusPage() {
                     placeholder="Paste modules, unit breakdowns, chapters, and sub-topics here..."
                     rows={6}
                     required
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-muted/40 border border-border/80 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none font-mono"
+                    className="w-full resize-none rounded-xl border border-border/80 bg-muted/40 px-3.5 py-2.5 font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
               )}
@@ -922,7 +999,7 @@ export default function SyllabusPage() {
                   type="submit"
                   disabled={isUploading}
                   size="sm"
-                  className="rounded-xl text-xs font-bold gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="gap-2 rounded-xl bg-primary text-xs font-bold text-primary-foreground hover:bg-primary/90"
                 >
                   {isUploading ? (
                     <>
@@ -944,47 +1021,47 @@ export default function SyllabusPage() {
 
       {/* Suggested Videos & Playlists Modal / Drawer */}
       {videoDrawerContext && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-background/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-4xl max-h-[90vh] rounded-3xl bg-card border border-border/80 shadow-2xl flex flex-col overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-3 backdrop-blur-md duration-200 animate-in fade-in sm:p-6">
+          <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-border/80 bg-card shadow-2xl">
             {/* Modal Header */}
-            <div className="p-4 sm:p-5 border-b border-border/80 flex items-start justify-between gap-3 bg-muted/20 shrink-0">
+            <div className="flex shrink-0 items-start justify-between gap-3 border-b border-border/80 bg-muted/20 p-4 sm:p-5">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-500 border border-rose-500/20">
+                  <span className="rounded-md border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 font-mono text-[9px] font-bold text-rose-500">
                     {videoDrawerContext.badge}
                   </span>
                   {videoDrawerContext.type === "module" && (
-                    <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20">
+                    <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[9px] font-bold text-primary">
                       {videoDrawerContext.subtopics.length} Sub-topics
                     </span>
                   )}
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
-                  <Youtube className="h-5 w-5 text-rose-500 shrink-0" />
+                <h3 className="flex items-center gap-2 text-base font-bold text-foreground sm:text-lg">
+                  <Youtube className="h-5 w-5 shrink-0 text-rose-500" />
                   <span className="truncate">{videoDrawerContext.title}</span>
                 </h3>
               </div>
               <button
                 onClick={() => setVideoDrawerContext(null)}
-                className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                className="rounded-xl p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             {/* Modal Content Body */}
-            <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1">
+            <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6">
               {loadingResources ? (
-                <div className="py-16 text-center space-y-3">
+                <div className="space-y-3 py-16 text-center">
                   <div className="flex items-center justify-center">
-                    <div className="p-4 rounded-2xl bg-rose-500/10 text-rose-500 animate-pulse border border-rose-500/20">
+                    <div className="animate-pulse rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-rose-500">
                       <Youtube className="h-8 w-8 animate-bounce" />
                     </div>
                   </div>
                   <h4 className="text-sm font-bold text-foreground">
                     Discovering YouTube Video Lectures & Playlists…
                   </h4>
-                  <p className="text-xs text-muted-foreground font-mono">
+                  <p className="font-mono text-xs text-muted-foreground">
                     Searching ranked educational videos for &quot;{videoDrawerContext.title}&quot;
                   </p>
                 </div>
@@ -992,69 +1069,72 @@ export default function SyllabusPage() {
                 /* Subtopic View: Targeted videos for the exact subtopic */
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-2 font-mono uppercase tracking-wider">
+                    <h4 className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-foreground sm:text-sm">
                       <Play className="h-4 w-4 text-primary" />
                       <span>Recommended Videos for Exact Sub-topic</span>
                     </h4>
-                    <span className="text-[10px] text-muted-foreground font-mono">
+                    <span className="font-mono text-[10px] text-muted-foreground">
                       {directVideos.length || (blockResources?.videos.length ?? 0)} videos found
                     </span>
                   </div>
 
                   {(() => {
                     const vids =
-                      directVideos.length > 0
-                        ? directVideos
-                        : blockResources?.videos ?? [];
+                      directVideos.length > 0 ? directVideos : (blockResources?.videos ?? []);
 
                     if (vids.length === 0) {
                       return (
-                        <div className="p-8 rounded-2xl bg-muted/20 border border-border/40 text-center text-xs text-muted-foreground space-y-1">
+                        <div className="space-y-1 rounded-2xl border border-border/40 bg-muted/20 p-8 text-center text-xs text-muted-foreground">
                           <p>No video tutorials discovered for this subtopic.</p>
-                          <p className="text-[11px]">Try checking back in a moment or searching on YouTube directly.</p>
+                          <p className="text-[11px]">
+                            Try checking back in a moment or searching on YouTube directly.
+                          </p>
                         </div>
                       );
                     }
 
                     return (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                      <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2">
                         {vids.map((video, vIdx) => (
                           <div
                             key={vIdx}
-                            className="p-3.5 rounded-2xl bg-card/90 border border-border/80 flex flex-col justify-between space-y-3 bento-card shadow-xs hover:border-primary/40 transition-all group"
+                            className="bento-card shadow-xs group flex flex-col justify-between space-y-3 rounded-2xl border border-border/80 bg-card/90 p-3.5 transition-all hover:border-primary/40"
                           >
                             <div className="space-y-2.5">
                               <div className="flex gap-3">
-                                <div className="relative w-28 sm:w-32 aspect-video rounded-xl bg-muted overflow-hidden shrink-0">
+                                <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-xl bg-muted sm:w-32">
                                   <img
                                     src={video.thumbnail_url}
                                     alt={video.title}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
                                     onError={(e) => {
                                       (e.target as HTMLElement).style.display = "none";
                                     }}
                                   />
                                   {video.duration !== "N/A" && (
-                                    <span className="absolute bottom-1 right-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/80 text-white">
+                                    <span className="absolute bottom-1 right-1 rounded bg-black/80 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white">
                                       {video.duration}
                                     </span>
                                   )}
                                 </div>
 
                                 <div className="min-w-0 flex-1 space-y-1">
-                                  <h5 className="text-xs font-bold text-foreground leading-snug line-clamp-2">
+                                  <h5 className="line-clamp-2 text-xs font-bold leading-snug text-foreground">
                                     {video.title}
                                   </h5>
-                                  <p className="text-[11px] text-muted-foreground font-mono truncate flex items-center gap-1">
-                                    <Youtube className="h-3 w-3 text-rose-500 shrink-0" />
+                                  <p className="flex items-center gap-1 truncate font-mono text-[11px] text-muted-foreground">
+                                    <Youtube className="h-3 w-3 shrink-0 text-rose-500" />
                                     {video.channel_title}
                                   </p>
                                 </div>
                               </div>
 
                               {video.why_recommended && (
-                                <p className="text-[11px] text-muted-foreground bg-muted/40 p-2 rounded-xl border border-border/40 leading-relaxed font-sans">
-                                  💡 <span className="font-semibold text-foreground">Why Recommended:</span>{" "}
+                                <p className="rounded-xl border border-border/40 bg-muted/40 p-2 font-sans text-[11px] leading-relaxed text-muted-foreground">
+                                  💡{" "}
+                                  <span className="font-semibold text-foreground">
+                                    Why Recommended:
+                                  </span>{" "}
                                   {video.why_recommended}
                                 </p>
                               )}
@@ -1063,7 +1143,7 @@ export default function SyllabusPage() {
                             <div className="flex items-center gap-2 pt-1">
                               <button
                                 onClick={() => setActiveVideoModal(video)}
-                                className="flex-1 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-xs"
+                                className="shadow-xs flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary py-1.5 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90"
                               >
                                 <Play className="h-3 w-3 fill-current" />
                                 <span>Watch on Website</span>
@@ -1072,7 +1152,7 @@ export default function SyllabusPage() {
                                 href={video.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="py-1.5 px-2.5 rounded-xl bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground text-xs font-bold transition-colors flex items-center justify-center gap-1 border border-border/80"
+                                className="flex items-center justify-center gap-1 rounded-xl border border-border/80 bg-muted/60 px-2.5 py-1.5 text-xs font-bold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                 title="Open on YouTube"
                               >
                                 <ExternalLink className="h-3.5 w-3.5" />
@@ -1090,48 +1170,48 @@ export default function SyllabusPage() {
                   {/* Playlists for the Module */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-2 font-mono uppercase tracking-wider">
+                      <h4 className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-foreground sm:text-sm">
                         <ListVideo className="h-4 w-4 text-rose-500" />
                         <span>Suggested Full Course Playlists for Module</span>
                       </h4>
-                      <span className="text-[10px] text-muted-foreground font-mono">
+                      <span className="font-mono text-[10px] text-muted-foreground">
                         {blockResources.playlists.length} playlists found
                       </span>
                     </div>
 
                     {blockResources.playlists.length === 0 ? (
-                      <div className="p-4 rounded-2xl bg-muted/20 border border-border/40 text-center text-xs text-muted-foreground">
+                      <div className="rounded-2xl border border-border/40 bg-muted/20 p-4 text-center text-xs text-muted-foreground">
                         No full series playlists found. Browse individual lectures below.
                       </div>
                     ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
                         {blockResources.playlists.map((pl, pIdx) => (
                           <div
                             key={pIdx}
-                            className="rounded-2xl bg-card/90 border border-border/80 overflow-hidden flex flex-col justify-between hover:border-rose-500/40 transition-all bento-card shadow-xs group"
+                            className="bento-card shadow-xs group flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card/90 transition-all hover:border-rose-500/40"
                           >
-                            <div className="relative aspect-video bg-muted overflow-hidden">
+                            <div className="relative aspect-video overflow-hidden bg-muted">
                               <img
                                 src={pl.thumbnail_url}
                                 alt={pl.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                                 onError={(e) => {
                                   (e.target as HTMLElement).style.display = "none";
                                 }}
                               />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2.5">
-                                <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-black/80 text-white border border-white/20">
+                              <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/80 via-transparent to-transparent p-2.5">
+                                <span className="rounded border border-white/20 bg-black/80 px-2 py-0.5 font-mono text-[9px] font-bold text-white">
                                   {pl.video_count || "Playlist"}
                                 </span>
                               </div>
                             </div>
 
-                            <div className="p-3 space-y-1.5 flex-1 flex flex-col justify-between">
+                            <div className="flex flex-1 flex-col justify-between space-y-1.5 p-3">
                               <div>
-                                <h5 className="text-xs font-bold text-foreground line-clamp-2 leading-snug">
+                                <h5 className="line-clamp-2 text-xs font-bold leading-snug text-foreground">
                                   {pl.title}
                                 </h5>
-                                <p className="text-[11px] text-muted-foreground font-mono mt-0.5 truncate">
+                                <p className="mt-0.5 truncate font-mono text-[11px] text-muted-foreground">
                                   {pl.channel_title}
                                 </p>
                               </div>
@@ -1140,7 +1220,7 @@ export default function SyllabusPage() {
                                 href={pl.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="mt-2 w-full py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-[11px] font-bold transition-colors flex items-center justify-center gap-1 border border-rose-500/20"
+                                className="mt-2 flex w-full items-center justify-center gap-1 rounded-lg border border-rose-500/20 bg-rose-500/10 py-1.5 text-[11px] font-bold text-rose-500 transition-colors hover:bg-rose-500/20"
                               >
                                 <span>Open Full Playlist</span>
                                 <ExternalLink className="h-3 w-3" />
@@ -1155,11 +1235,11 @@ export default function SyllabusPage() {
                   {/* Topic & Subtopic Video Lectures Breakdown */}
                   <div className="space-y-3 pt-2">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs sm:text-sm font-bold text-foreground flex items-center gap-2 font-mono uppercase tracking-wider">
+                      <h4 className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-foreground sm:text-sm">
                         <Play className="h-4 w-4 text-primary" />
                         <span>Module Video Lectures & Subtopic Breakdowns</span>
                       </h4>
-                      <span className="text-[10px] text-muted-foreground font-mono">
+                      <span className="font-mono text-[10px] text-muted-foreground">
                         Ranked by educational quality
                       </span>
                     </div>
@@ -1169,31 +1249,30 @@ export default function SyllabusPage() {
                       <button
                         onClick={() => setActiveSubtopicFilter("all")}
                         className={cn(
-                          "px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition-all border",
+                          "whitespace-nowrap rounded-xl border px-3 py-1 text-xs font-bold transition-all",
                           activeSubtopicFilter === "all"
-                            ? "bg-primary text-primary-foreground border-primary shadow-xs"
-                            : "bg-muted/40 text-muted-foreground hover:text-foreground border-border/80"
+                            ? "shadow-xs border-primary bg-primary text-primary-foreground"
+                            : "border-border/80 bg-muted/40 text-muted-foreground hover:text-foreground",
                         )}
                       >
                         All Module Videos ({blockResources.videos.length})
                       </button>
 
                       {videoDrawerContext.subtopics.map((sub, sIdx) => {
-                        const subVids =
-                          blockResources.subtopics_resources[sub.title] || [];
+                        const subVids = blockResources.subtopics_resources[sub.title] || [];
                         return (
                           <button
                             key={sIdx}
                             onClick={() => setActiveSubtopicFilter(sub.title)}
                             className={cn(
-                              "px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap transition-all border flex items-center gap-1.5",
+                              "flex items-center gap-1.5 whitespace-nowrap rounded-xl border px-3 py-1 text-xs font-bold transition-all",
                               activeSubtopicFilter === sub.title
-                                ? "bg-primary text-primary-foreground border-primary shadow-xs"
-                                : "bg-muted/40 text-muted-foreground hover:text-foreground border-border/80"
+                                ? "shadow-xs border-primary bg-primary text-primary-foreground"
+                                : "border-border/80 bg-muted/40 text-muted-foreground hover:text-foreground",
                             )}
                           >
                             <span>{sub.title}</span>
-                            <span className="text-[9px] font-mono opacity-80">
+                            <span className="font-mono text-[9px] opacity-80">
                               ({subVids.length})
                             </span>
                           </button>
@@ -1210,51 +1289,54 @@ export default function SyllabusPage() {
 
                       if (displayedVideos.length === 0) {
                         return (
-                          <div className="p-6 rounded-2xl bg-muted/20 border border-border/40 text-center text-xs text-muted-foreground">
+                          <div className="rounded-2xl border border-border/40 bg-muted/20 p-6 text-center text-xs text-muted-foreground">
                             No specific video tutorials found for this selection.
                           </div>
                         );
                       }
 
                       return (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                           {displayedVideos.map((video, vIdx) => (
                             <div
                               key={vIdx}
-                              className="p-3.5 rounded-2xl bg-card/90 border border-border/80 flex flex-col justify-between space-y-3 bento-card shadow-xs hover:border-primary/40 transition-all group"
+                              className="bento-card shadow-xs group flex flex-col justify-between space-y-3 rounded-2xl border border-border/80 bg-card/90 p-3.5 transition-all hover:border-primary/40"
                             >
                               <div className="space-y-2.5">
                                 <div className="flex gap-3">
-                                  <div className="relative w-28 sm:w-32 aspect-video rounded-xl bg-muted overflow-hidden shrink-0">
+                                  <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-xl bg-muted sm:w-32">
                                     <img
                                       src={video.thumbnail_url}
                                       alt={video.title}
-                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                      className="h-full w-full object-cover transition-transform group-hover:scale-105"
                                       onError={(e) => {
                                         (e.target as HTMLElement).style.display = "none";
                                       }}
                                     />
                                     {video.duration !== "N/A" && (
-                                      <span className="absolute bottom-1 right-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/80 text-white">
+                                      <span className="absolute bottom-1 right-1 rounded bg-black/80 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white">
                                         {video.duration}
                                       </span>
                                     )}
                                   </div>
 
                                   <div className="min-w-0 flex-1 space-y-1">
-                                    <h5 className="text-xs font-bold text-foreground leading-snug line-clamp-2">
+                                    <h5 className="line-clamp-2 text-xs font-bold leading-snug text-foreground">
                                       {video.title}
                                     </h5>
-                                    <p className="text-[11px] text-muted-foreground font-mono truncate flex items-center gap-1">
-                                      <Youtube className="h-3 w-3 text-rose-500 shrink-0" />
+                                    <p className="flex items-center gap-1 truncate font-mono text-[11px] text-muted-foreground">
+                                      <Youtube className="h-3 w-3 shrink-0 text-rose-500" />
                                       {video.channel_title}
                                     </p>
                                   </div>
                                 </div>
 
                                 {video.why_recommended && (
-                                  <p className="text-[11px] text-muted-foreground bg-muted/40 p-2 rounded-xl border border-border/40 leading-relaxed font-sans">
-                                    💡 <span className="font-semibold text-foreground">Why Recommended:</span>{" "}
+                                  <p className="rounded-xl border border-border/40 bg-muted/40 p-2 font-sans text-[11px] leading-relaxed text-muted-foreground">
+                                    💡{" "}
+                                    <span className="font-semibold text-foreground">
+                                      Why Recommended:
+                                    </span>{" "}
                                     {video.why_recommended}
                                   </p>
                                 )}
@@ -1263,7 +1345,7 @@ export default function SyllabusPage() {
                               <div className="flex items-center gap-2 pt-1">
                                 <button
                                   onClick={() => setActiveVideoModal(video)}
-                                  className="flex-1 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-xs"
+                                  className="shadow-xs flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary py-1.5 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90"
                                 >
                                   <Play className="h-3 w-3 fill-current" />
                                   <span>Watch on Website</span>
@@ -1272,7 +1354,7 @@ export default function SyllabusPage() {
                                   href={video.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="py-1.5 px-2.5 rounded-xl bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground text-xs font-bold transition-colors flex items-center justify-center gap-1 border border-border/80"
+                                  className="flex items-center justify-center gap-1 rounded-xl border border-border/80 bg-muted/60 px-2.5 py-1.5 text-xs font-bold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                                   title="Open on YouTube"
                                 >
                                   <ExternalLink className="h-3.5 w-3.5" />
@@ -1293,45 +1375,45 @@ export default function SyllabusPage() {
 
       {/* Embedded YouTube Video Player Modal: Watch Directly on the Website */}
       {activeVideoModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-3xl rounded-3xl bg-card border border-border/80 overflow-hidden shadow-2xl space-y-4 p-4 sm:p-5">
+        <div className="z-60 fixed inset-0 flex items-center justify-center bg-black/85 p-3 backdrop-blur-md duration-200 animate-in fade-in sm:p-6">
+          <div className="w-full max-w-3xl space-y-4 overflow-hidden rounded-3xl border border-border/80 bg-card p-4 shadow-2xl sm:p-5">
             <div className="flex items-center justify-between">
               <div className="min-w-0 pr-4">
-                <h4 className="text-sm font-bold text-foreground truncate">
+                <h4 className="truncate text-sm font-bold text-foreground">
                   {activeVideoModal.title}
                 </h4>
-                <p className="text-xs text-muted-foreground font-mono flex items-center gap-1 mt-0.5">
+                <p className="mt-0.5 flex items-center gap-1 font-mono text-xs text-muted-foreground">
                   <Youtube className="h-3.5 w-3.5 text-rose-500" />
                   {activeVideoModal.channel_title}
                 </p>
               </div>
               <button
                 onClick={() => setActiveVideoModal(null)}
-                className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="rounded-xl p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-border/40 shadow-inner">
+            <div className="aspect-video w-full overflow-hidden rounded-2xl border border-border/40 bg-black shadow-inner">
               <iframe
                 src={`https://www.youtube.com/embed/${activeVideoModal.video_id}?autoplay=1`}
                 title={activeVideoModal.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                className="w-full h-full border-0"
+                className="h-full w-full border-0"
               />
             </div>
 
-            <div className="flex items-center justify-between text-xs pt-1">
-              <p className="text-muted-foreground text-[11px] font-sans truncate mr-3">
+            <div className="flex items-center justify-between pt-1 text-xs">
+              <p className="mr-3 truncate font-sans text-[11px] text-muted-foreground">
                 {activeVideoModal.why_recommended}
               </p>
               <a
                 href={activeVideoModal.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline flex items-center gap-1 font-bold shrink-0"
+                className="flex shrink-0 items-center gap-1 font-bold text-primary hover:underline"
               >
                 <span>Open in YouTube</span>
                 <ExternalLink className="h-3 w-3" />

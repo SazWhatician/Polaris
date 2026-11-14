@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+from langgraph.checkpoint.memory import MemorySaver
 from pydantic import BaseModel, Field
 
 from app.agents.resource_agent import ResourceAgent
@@ -14,7 +15,6 @@ from app.models.resource import ResourceDiscoveryResponse, ResourceItem
 from app.repositories.checkpoint_repo import FirestoreCheckpointSaver
 from app.repositories.resource_cache_repo import ResourceCacheRepository, compute_topic_hash
 from app.services.youtube_service import YouTubeService
-from langgraph.checkpoint.memory import MemorySaver
 
 router = APIRouter(prefix="/api/agents/resource", tags=["resource_agent"])
 

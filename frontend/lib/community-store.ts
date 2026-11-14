@@ -147,13 +147,33 @@ export const YEARS: string[] = [
 ];
 
 export const TRENDING_TOPICS = [
-  { tag: "#CS229_MachineLearning", postsCount: 1240, college: "Stanford University", category: "AI & ML" },
+  {
+    tag: "#CS229_MachineLearning",
+    postsCount: 1240,
+    college: "Stanford University",
+    category: "AI & ML",
+  },
   { tag: "#TransformersRoPE", postsCount: 980, college: "MIT", category: "Deep Learning" },
   { tag: "#PintosOperatingSystems", postsCount: 840, college: "UC Berkeley", category: "Systems" },
-  { tag: "#RaftDistributedConsensus", postsCount: 710, college: "CMU", category: "Cloud & Networks" },
+  {
+    tag: "#RaftDistributedConsensus",
+    postsCount: 710,
+    college: "CMU",
+    category: "Cloud & Networks",
+  },
   { tag: "#AdvancedGraphTheory", postsCount: 650, college: "IIT Bombay", category: "Algorithms" },
-  { tag: "#QuantumGateCompilation", postsCount: 520, college: "Oxford University", category: "Quantum" },
-  { tag: "#PlacementInterviewPrep", postsCount: 1450, college: "Global Scholars", category: "Career" },
+  {
+    tag: "#QuantumGateCompilation",
+    postsCount: 520,
+    college: "Oxford University",
+    category: "Quantum",
+  },
+  {
+    tag: "#PlacementInterviewPrep",
+    postsCount: 1450,
+    college: "Global Scholars",
+    category: "Career",
+  },
 ];
 
 export const INITIAL_DISCOVERABLE_SCHOLARS: Friend[] = [
@@ -250,7 +270,8 @@ const INITIAL_COMMUNITIES: Community[] = [
     college: "Other / Global Academy",
     course: "B.S. Computer Science & AI",
     yearRange: "All Years",
-    description: "Multi-university study circle focusing on distributed systems, algorithms, and graph theory.",
+    description:
+      "Multi-university study circle focusing on distributed systems, algorithms, and graph theory.",
     icon: "Network",
     color: "from-blue-500/20 to-indigo-500/20",
     membersCount: 1420,
@@ -262,7 +283,8 @@ const INITIAL_COMMUNITIES: Community[] = [
     college: "Stanford University",
     course: "M.S. Artificial Intelligence & ML",
     yearRange: "Graduate & Senior",
-    description: "Deep learning transformer architectures, attention mechanisms, and LangGraph agents.",
+    description:
+      "Deep learning transformer architectures, attention mechanisms, and LangGraph agents.",
     icon: "Brain",
     color: "from-purple-500/20 to-pink-500/20",
     membersCount: 890,
@@ -274,7 +296,8 @@ const INITIAL_COMMUNITIES: Community[] = [
     college: "Massachusetts Institute of Technology (MIT)",
     course: "B.Tech Electrical & Computer Engineering",
     yearRange: "2nd & 3rd Year",
-    description: "Computation structures, digital systems hardware, and distributed networking review notes.",
+    description:
+      "Computation structures, digital systems hardware, and distributed networking review notes.",
     icon: "Cpu",
     color: "from-emerald-500/20 to-teal-500/20",
     membersCount: 650,
@@ -286,7 +309,8 @@ const INITIAL_COMMUNITIES: Community[] = [
     college: "UC Berkeley",
     course: "B.S. Computer Science & AI",
     yearRange: "3rd Year (Junior)",
-    description: "Pintos kernel projects, concurrency synchronization, virtual memory paging, and file systems.",
+    description:
+      "Pintos kernel projects, concurrency synchronization, virtual memory paging, and file systems.",
     icon: "Layers",
     color: "from-amber-500/20 to-orange-500/20",
     membersCount: 780,
@@ -298,7 +322,8 @@ const INITIAL_COMMUNITIES: Community[] = [
     college: "IIT Bombay",
     course: "Mathematics & Quantum Computing",
     yearRange: "3rd & 4th Year",
-    description: "Max-Flow Min-Cut, dynamic programming proofs, and randomized algorithms study group.",
+    description:
+      "Max-Flow Min-Cut, dynamic programming proofs, and randomized algorithms study group.",
     icon: "Sparkles",
     color: "from-rose-500/20 to-red-500/20",
     membersCount: 540,
@@ -333,7 +358,8 @@ const INITIAL_STORIES: CommunityStory[] = [
     alias: "Kai Tanaka",
     college: "UC Berkeley",
     avatarColor: "bg-emerald-600",
-    previewNote: "Pintos file system buffer cache test cases passed 100%! Cheatsheet attached in DM.",
+    previewNote:
+      "Pintos file system buffer cache test cases passed 100%! Cheatsheet attached in DM.",
     timestamp: "2h ago",
     hasUnread: false,
   },
@@ -361,7 +387,8 @@ const INITIAL_POSTS: CommunityPost[] = [
     authorYear: "Master's Degree Candidate",
     authorAvatarColor: "bg-indigo-600",
     title: "CS224N Transformer Attention & RoPE Coordinate Rotations",
-    description: "Synthesized complete matrix derivations for Scaled Dot-Product Attention, Multi-Head projections, and RoPE coordinate rotations with 1024-dim tensors. Check out the attached derivations sheet!",
+    description:
+      "Synthesized complete matrix derivations for Scaled Dot-Product Attention, Multi-Head projections, and RoPE coordinate rotations with 1024-dim tensors. Check out the attached derivations sheet!",
     category: "Notes & Cheatsheets",
     tags: ["#CS224N", "#Transformers", "#Attention", "#DeepLearning"],
     likes: 34,
@@ -375,7 +402,8 @@ const INITIAL_POSTS: CommunityPost[] = [
         authorAlias: "Marcus Thorne",
         authorUsername: "@marcus_dist",
         authorCollege: "MIT",
-        content: "The coordinate rotation proof on page 3 is so clean! Thanks for sharing this Elena.",
+        content:
+          "The coordinate rotation proof on page 3 is so clean! Thanks for sharing this Elena.",
         createdAt: "1 hour ago",
         likes: 4,
       },
@@ -392,7 +420,8 @@ const INITIAL_POSTS: CommunityPost[] = [
     authorYear: "3rd Year (Junior)",
     authorAvatarColor: "bg-purple-600",
     title: "Distributed Raft Consensus: Network Partition & Split-Brain Edge Cases",
-    description: "Study guide on network partition recovery, term increment rules, and log replication consistency across asynchronous node clusters. Essential for systems midterms.",
+    description:
+      "Study guide on network partition recovery, term increment rules, and log replication consistency across asynchronous node clusters. Essential for systems midterms.",
     category: "Study Groups",
     tags: ["#DistributedSystems", "#Raft", "#Consensus", "#MIT6033"],
     likes: 21,
@@ -413,7 +442,8 @@ const INITIAL_POSTS: CommunityPost[] = [
     authorYear: "2nd Year (Sophomore)",
     authorAvatarColor: "bg-emerald-600",
     title: "Pintos Virtual Memory Paging & Multi-Level Page Tables Guide",
-    description: "Breakdown of supplemental page tables, frame allocation table, and swap slot disk operations. Includes ASCII diagrams and lock hierarchy ordering.",
+    description:
+      "Breakdown of supplemental page tables, frame allocation table, and swap slot disk operations. Includes ASCII diagrams and lock hierarchy ordering.",
     category: "Exam Prep",
     tags: ["#CS162", "#OperatingSystems", "#Pintos", "#Paging"],
     likes: 19,
@@ -581,7 +611,14 @@ export function useCommunityStore() {
       ? params.username.toLowerCase()
       : `@${params.username.toLowerCase().replace(/[^a-z0-9_]/g, "")}`;
 
-    const colors = ["bg-indigo-600", "bg-purple-600", "bg-emerald-600", "bg-amber-600", "bg-rose-600", "bg-cyan-600"];
+    const colors = [
+      "bg-indigo-600",
+      "bg-purple-600",
+      "bg-emerald-600",
+      "bg-amber-600",
+      "bg-rose-600",
+      "bg-cyan-600",
+    ];
     const avatarColor = colors[Math.floor(Math.random() * colors.length)] || "bg-indigo-600";
 
     const newProfile: ScholarProfile = {
@@ -624,13 +661,15 @@ export function useCommunityStore() {
             isJoined: !c.isJoined,
             membersCount: c.isJoined ? c.membersCount - 1 : c.membersCount + 1,
           }
-        : c
+        : c,
     );
     saveToStorage();
   };
 
   // ── Post Actions ──
-  const createPost = (newPostData: Omit<CommunityPost, "id" | "likes" | "likedByUser" | "comments" | "createdAt">) => {
+  const createPost = (
+    newPostData: Omit<CommunityPost, "id" | "likes" | "likedByUser" | "comments" | "createdAt">,
+  ) => {
     const newPost: CommunityPost = {
       id: `post-${Date.now()}`,
       likes: 0,
@@ -678,7 +717,7 @@ export function useCommunityStore() {
             ...p,
             comments: [...p.comments, newComment],
           }
-        : p
+        : p,
     );
     saveToStorage();
   };
@@ -692,15 +731,25 @@ export function useCommunityStore() {
     year?: string;
     bio?: string;
   }) => {
-    const cleanHandle = userData.username.startsWith("@") ? userData.username : `@${userData.username}`;
-    const existingIndex = globalFriends.findIndex((f) => f.username.toLowerCase() === cleanHandle.toLowerCase());
+    const cleanHandle = userData.username.startsWith("@")
+      ? userData.username
+      : `@${userData.username}`;
+    const existingIndex = globalFriends.findIndex(
+      (f) => f.username.toLowerCase() === cleanHandle.toLowerCase(),
+    );
 
     if (existingIndex >= 0 && globalFriends[existingIndex]) {
       const current = globalFriends[existingIndex];
       const newStatus = current.status === "friends" ? "friends" : "pending_sent";
       globalFriends[existingIndex] = { ...current, status: newStatus };
     } else {
-      const colors = ["bg-indigo-600", "bg-purple-600", "bg-emerald-600", "bg-amber-600", "bg-rose-600"];
+      const colors = [
+        "bg-indigo-600",
+        "bg-purple-600",
+        "bg-emerald-600",
+        "bg-amber-600",
+        "bg-rose-600",
+      ];
       const randomColor = colors[Math.floor(Math.random() * colors.length)] || "bg-indigo-600";
       const newFriend: Friend = {
         id: `user-${Date.now()}`,
@@ -720,7 +769,9 @@ export function useCommunityStore() {
   };
 
   const acceptFriendRequest = (friendId: string) => {
-    globalFriends = globalFriends.map((f) => (f.id === friendId ? { ...f, status: "friends" as const } : f));
+    globalFriends = globalFriends.map((f) =>
+      f.id === friendId ? { ...f, status: "friends" as const } : f,
+    );
     saveToStorage();
   };
 
@@ -747,7 +798,9 @@ export function useCommunityStore() {
     const myUsername = globalCommunityUser?.username || "@scholar";
     const cleanTo = toUsername.startsWith("@") ? toUsername : `@${toUsername}`;
 
-    const friendInfo = globalFriends.find((f) => f.username.toLowerCase() === cleanTo.toLowerCase());
+    const friendInfo = globalFriends.find(
+      (f) => f.username.toLowerCase() === cleanTo.toLowerCase(),
+    );
     const peerAlias = friendInfo?.alias || cleanTo.replace("@", "");
     const peerCollege = friendInfo?.college || "Global University";
     const peerColor = friendInfo?.avatarColor || "bg-indigo-600";
@@ -794,7 +847,8 @@ export function useCommunityStore() {
         "That makes total sense. Have you solved question 4 from the problem set yet?",
         "Awesome! I'll share the summary notes from our study circle shortly.",
       ];
-      const replyText = replies[Math.floor(Math.random() * replies.length)] || "Thanks for reaching out!";
+      const replyText =
+        replies[Math.floor(Math.random() * replies.length)] || "Thanks for reaching out!";
 
       const peerReply: DirectMessage = {
         id: `dm-reply-${Date.now()}`,
@@ -827,7 +881,9 @@ export function useCommunityStore() {
     globalActiveDmUsername = cleanTo;
 
     if (!globalConversations[cleanTo]) {
-      const friendInfo = globalFriends.find((f) => f.username.toLowerCase() === cleanTo.toLowerCase());
+      const friendInfo = globalFriends.find(
+        (f) => f.username.toLowerCase() === cleanTo.toLowerCase(),
+      );
       globalConversations = {
         ...globalConversations,
         [cleanTo]: {

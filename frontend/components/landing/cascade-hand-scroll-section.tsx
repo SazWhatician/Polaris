@@ -72,7 +72,7 @@ export function CascadeHandScrollSection() {
           cascadeEl,
           { scale: 1.04, y: -20, opacity: 0.88, force3D: true },
           { scale: 1.0, y: 20, opacity: 1, ease: "none", force3D: true },
-          0
+          0,
         );
       }
 
@@ -96,7 +96,7 @@ export function CascadeHandScrollSection() {
           ease: "power1.inOut",
           force3D: true,
         },
-        0
+        0,
       );
     }, triggerRef);
 
@@ -111,7 +111,7 @@ export function CascadeHandScrollSection() {
           videoEl.pause();
         }
       },
-      { rootMargin: "250px" }
+      { rootMargin: "250px" },
     );
     if (triggerEl) videoObserver.observe(triggerEl);
 
@@ -126,62 +126,61 @@ export function CascadeHandScrollSection() {
       ref={triggerRef}
       id="cascade-section"
       data-testid="cascade-hand-scroll-section"
-      className="relative w-full h-screen min-h-screen bg-black text-white select-none overflow-hidden flex flex-col justify-between items-center z-10"
+      className="relative z-10 flex h-screen min-h-screen w-full select-none flex-col items-center justify-between overflow-hidden bg-black text-white"
     >
       {/* Top Dissolve Gradient seamlessly blending with Hero 3D scene above */}
       <div
-        className="absolute inset-x-0 top-0 h-16 sm:h-24 pointer-events-none z-20 bg-gradient-to-b from-black via-black/70 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 z-20 h-16 bg-gradient-to-b from-black via-black/70 to-transparent sm:h-24"
         aria-hidden="true"
       />
 
       {/* 1. Fullscreen Cascade Phone Background (Spanning Entire Screen Width) */}
       <div
         ref={cascadeRef}
-        className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden flex items-center justify-center will-change-transform"
+        className="pointer-events-none absolute inset-0 z-0 flex h-full w-full items-center justify-center overflow-hidden will-change-transform"
       >
         {/* Ambient Lighting */}
-        <div className="absolute inset-0 bg-radial from-primary/15 via-transparent to-black pointer-events-none z-10" />
+        <div className="bg-radial pointer-events-none absolute inset-0 z-10 from-primary/15 via-transparent to-black" />
 
         {/* Full Cover Image covering 100% width and height */}
-        <div className="relative w-full h-full min-w-full min-h-screen">
+        <div className="relative h-full min-h-screen w-full min-w-full">
           <Image
             src="/cascade.png"
             alt="Multi-Device Cascade Grid"
             fill
             priority
             sizes="100vw"
-            className="w-full h-full object-cover object-center opacity-90 scale-100"
+            className="h-full w-full scale-100 object-cover object-center opacity-90"
           />
         </div>
 
         {/* Vignette Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/80 z-10 pointer-events-none" />
+        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black via-transparent to-black/80" />
       </div>
 
       {/* 2. Top Header Text */}
-      <div className="relative z-20 pt-16 sm:pt-20 text-center px-4 max-w-3xl space-y-2 pointer-events-none">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.08] border border-white/20 backdrop-blur-2xl text-[10px] font-mono tracking-[0.28em] uppercase text-white shadow-xl">
-          <Smartphone className="w-3.5 h-3.5 text-primary animate-pulse" />
+      <div className="pointer-events-none relative z-20 max-w-3xl space-y-2 px-4 pt-16 text-center sm:pt-20">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.08] px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.28em] text-white shadow-xl backdrop-blur-2xl">
+          <Smartphone className="h-3.5 w-3.5 animate-pulse text-primary" />
           <span>RESPONSIVE ACADEMIC FEED · REAL-TIME SYNC</span>
         </div>
 
-        <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight leading-tight uppercase drop-shadow-2xl">
+        <h2 className="text-xl font-black uppercase leading-tight tracking-tight drop-shadow-2xl sm:text-3xl md:text-4xl">
           Live Streamed Knowledge
         </h2>
       </div>
 
       {/* 3. Hand + Video Composite: LAYER 1 (Video) is BEHIND, LAYER 2 (ActualHand.png) is ON TOP */}
-      <div className="relative z-30 flex-1 w-full max-w-4xl flex items-center justify-center pointer-events-none my-auto">
+      <div className="pointer-events-none relative z-30 my-auto flex w-full max-w-4xl flex-1 items-center justify-center">
         <div
           ref={handContainerRef}
-          className="relative will-change-transform flex items-center justify-center"
+          className="relative flex items-center justify-center will-change-transform"
         >
           {/* Hand Container Frame (1024x1536 aspect ratio) */}
-          <div className="relative w-[320px] sm:w-[420px] md:w-[480px] aspect-[1024/1536] drop-shadow-[0_35px_70px_rgba(0,0,0,0.95)]">
-            
+          <div className="relative aspect-[1024/1536] w-[320px] drop-shadow-[0_35px_70px_rgba(0,0,0,0.95)] sm:w-[420px] md:w-[480px]">
             {/* LAYER 1 (FIRST LAYER - UNDERNEATH): Video playing precisely within the screen bezel */}
             <div
-              className="absolute overflow-hidden rounded-[20px] sm:rounded-[28px] md:rounded-[32px] bg-black shadow-inner z-0"
+              className="absolute z-0 overflow-hidden rounded-[20px] bg-black shadow-inner sm:rounded-[28px] md:rounded-[32px]"
               style={{
                 top: "2.73%",
                 left: "27.15%",
@@ -196,11 +195,11 @@ export function CascadeHandScrollSection() {
                 loop
                 muted
                 playsInline
-                className="w-full h-full object-cover select-none pointer-events-none"
+                className="pointer-events-none h-full w-full select-none object-cover"
               />
 
               {/* Glass sheen highlight */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent pointer-events-none" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent" />
             </div>
 
             {/* LAYER 2 (SECOND LAYER - ON TOP): ActualHand.png Overlay with transparent screen window */}
@@ -210,31 +209,33 @@ export function CascadeHandScrollSection() {
               fill
               priority
               sizes="(max-width: 768px) 320px, (max-width: 1024px) 420px, 480px"
-              className="object-contain relative z-10 pointer-events-none"
+              className="pointer-events-none relative z-10 object-contain"
             />
           </div>
         </div>
       </div>
 
       {/* 4. Bottom Solid Wall Indicator & Dock Settle Bar */}
-      <div className="relative z-20 w-full max-w-5xl px-6 pb-8 flex flex-col items-center gap-3 pointer-events-none">
+      <div className="pointer-events-none relative z-20 flex w-full max-w-5xl flex-col items-center gap-3 px-6 pb-8">
         {/* Wall Hit Impact Flare */}
         <div
           ref={wallGlowRef}
-          className="w-full h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-300 shadow-[0_0_20px_rgba(99,102,241,0.8)]"
+          className="h-[2px] w-full bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 shadow-[0_0_20px_rgba(99,102,241,0.8)] transition-opacity duration-300"
         />
 
         <div
           ref={badgeRef}
-          className="opacity-0 scale-90 transition-all duration-300 flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/90 border border-primary/40 text-[10px] font-mono text-primary uppercase tracking-widest shadow-2xl"
+          className="flex scale-90 items-center gap-2 rounded-full border border-primary/40 bg-black/90 px-3.5 py-1 font-mono text-[10px] uppercase tracking-widest text-primary opacity-0 shadow-2xl transition-all duration-300"
         >
-          <Sparkles className="w-3 h-3 text-primary animate-spin" />
+          <Sparkles className="h-3 w-3 animate-spin text-primary" />
           <span>[FEED LOCKED // READY TO ADVANCE]</span>
         </div>
 
-        <div className="w-full flex items-center justify-between text-[9px] font-mono text-white/40 border-t border-white/[0.08] pt-3">
+        <div className="flex w-full items-center justify-between border-t border-white/[0.08] pt-3 font-mono text-[9px] text-white/40">
           <span className="uppercase">GESTURE SCROLL: ACTIVE</span>
-          <span className="uppercase tracking-[0.2em] hidden sm:inline">60FPS HARDWARE ACCELERATED</span>
+          <span className="hidden uppercase tracking-[0.2em] sm:inline">
+            60FPS HARDWARE ACCELERATED
+          </span>
           <span className="uppercase">POLARIS STREAM ENGINE</span>
         </div>
       </div>

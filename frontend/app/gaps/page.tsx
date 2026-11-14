@@ -70,7 +70,9 @@ export default function GapsPage() {
   const [loadingSyllabi, setLoadingSyllabi] = useState(true);
   const [loadingDocs, setLoadingDocs] = useState(false);
   const [computingCoverage, setComputingCoverage] = useState(false);
-  const [agentStatus, setAgentStatus] = useState<"idle" | "running" | "completed" | "failed">("idle");
+  const [agentStatus, setAgentStatus] = useState<"idle" | "running" | "completed" | "failed">(
+    "idle",
+  );
   const [saving, setSaving] = useState(false);
   const [deletingSyllabusId, setDeletingSyllabusId] = useState<string | null>(null);
 
@@ -185,7 +187,11 @@ export default function GapsPage() {
         const runState = await getGapAnalysisStatus(threadId);
         if (!isSubscribed) return;
 
-        if (runState && ("detail" in runState) && (runState as Record<string, unknown>).detail === "Gap analysis is still running") {
+        if (
+          runState &&
+          "detail" in runState &&
+          (runState as Record<string, unknown>).detail === "Gap analysis is still running"
+        ) {
           setAgentStatus("running");
         } else {
           setAgentStatus("completed");
@@ -221,7 +227,11 @@ export default function GapsPage() {
     const poll = async () => {
       try {
         const runState = await getGapAnalysisStatus(threadId);
-        if (runState && ("detail" in runState) && (runState as Record<string, unknown>).detail === "Gap analysis is still running") {
+        if (
+          runState &&
+          "detail" in runState &&
+          (runState as Record<string, unknown>).detail === "Gap analysis is still running"
+        ) {
           return;
         }
 
@@ -408,7 +418,15 @@ export default function GapsPage() {
       // Find coverage details
       const cov = coverage?.topics[topicId];
       const score = cov?.score ?? 0;
-      const status = gapsMap[topicId] || (cov ? (cov.status === "good" ? "known" : cov.status === "partial" ? "weak" : "missing") : "missing");
+      const status =
+        gapsMap[topicId] ||
+        (cov
+          ? cov.status === "good"
+            ? "known"
+            : cov.status === "partial"
+              ? "weak"
+              : "missing"
+          : "missing");
 
       const item = { id: topicId, title: topic.title, score };
       if (status === "known") {
@@ -437,14 +455,14 @@ export default function GapsPage() {
   if (loading || !user) return null;
 
   return (
-    <div className="relative min-h-screen text-foreground pb-32 pt-14 sm:pt-16 overflow-x-hidden selection:bg-primary/30 selection:text-foreground">
+    <div className="relative min-h-screen overflow-x-hidden pb-32 pt-14 text-foreground selection:bg-primary/30 selection:text-foreground sm:pt-16">
       {/* ── Ambient Fluid Liquid Caustic Spheres (iOS/visionOS Glass Glow) ── */}
-      <div className="ambient-liquid-glow -top-24 -left-24 w-[500px] h-[500px] bg-indigo-500/20" />
-      <div className="ambient-liquid-glow top-[38%] -right-32 w-[550px] h-[550px] bg-purple-500/15" />
-      <div className="ambient-liquid-glow bottom-12 left-[20%] w-[600px] h-[600px] bg-emerald-500/12" />
+      <div className="ambient-liquid-glow -left-24 -top-24 h-[500px] w-[500px] bg-indigo-500/20" />
+      <div className="ambient-liquid-glow -right-32 top-[38%] h-[550px] w-[550px] bg-purple-500/15" />
+      <div className="ambient-liquid-glow bg-emerald-500/12 bottom-12 left-[20%] h-[600px] w-[600px]" />
 
       <SiteHeader />
-      <main className="relative z-10 max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
+      <main className="relative z-10 mx-auto max-w-7xl space-y-6 px-3 py-4 sm:px-6 lg:px-8">
         {/* Standardized Page Header */}
         <PageHeader
           category="ACADEMIC INTELLIGENCE // GAP DETECTOR"
@@ -459,7 +477,7 @@ export default function GapsPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowCreateModal(true)}
-                className="gap-1.5 text-xs font-bold rounded-2xl border-white/20 bg-white/10 dark:bg-white/5 hover:bg-white/15 backdrop-blur-xl"
+                className="gap-1.5 rounded-2xl border-white/20 bg-white/10 text-xs font-bold backdrop-blur-xl hover:bg-white/15 dark:bg-white/5"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>New Syllabus</span>
@@ -472,7 +490,7 @@ export default function GapsPage() {
                   disabled={deletingSyllabusId === selectedSyllabusId}
                   onClick={() => void handleDeleteSyllabus(selectedSyllabusId)}
                   title="Delete current syllabus"
-                  className="h-9 w-9 rounded-2xl text-destructive hover:bg-destructive/10 border-white/20 bg-white/5"
+                  className="h-9 w-9 rounded-2xl border-white/20 bg-white/5 text-destructive hover:bg-destructive/10"
                 >
                   {deletingSyllabusId === selectedSyllabusId ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -487,13 +505,17 @@ export default function GapsPage() {
 
         {/* Empty State */}
         {syllabi.length === 0 && !loadingSyllabi && (
-          <div className="flex flex-col items-center justify-center p-12 text-center border-dashed rounded-3xl liquid-glass">
-            <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
+          <div className="liquid-glass flex flex-col items-center justify-center rounded-3xl border-dashed p-12 text-center">
+            <BookOpen className="mb-4 h-12 w-12 text-muted-foreground" />
             <CardTitle>No syllabi added yet</CardTitle>
-            <CardDescription className="max-w-md mt-2">
-              Create a syllabus first by pasting your syllabus outline or linking an uploaded PDF notes document to map coverage.
+            <CardDescription className="mt-2 max-w-md">
+              Create a syllabus first by pasting your syllabus outline or linking an uploaded PDF
+              notes document to map coverage.
             </CardDescription>
-            <Button onClick={() => setShowCreateModal(true)} className="mt-6 gap-2 rounded-2xl bg-primary text-primary-foreground">
+            <Button
+              onClick={() => setShowCreateModal(true)}
+              className="mt-6 gap-2 rounded-2xl bg-primary text-primary-foreground"
+            >
               <Plus className="h-4 w-4" />
               Create First Syllabus
             </Button>
@@ -502,32 +524,29 @@ export default function GapsPage() {
 
         {selectedSyllabus && (
           <div className="space-y-6">
-            
             {/* Overview & Action Bar */}
             <div className="grid gap-3.5 md:grid-cols-3">
-              <div className="liquid-glass p-5 flex flex-col justify-between">
+              <div className="liquid-glass flex flex-col justify-between p-5">
                 <div>
-                  <div className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                  <div className="font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Syllabus Coverage Score
                   </div>
-                  <div className="space-y-2 mt-2">
+                  <div className="mt-2 space-y-2">
                     {coverage ? (
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-black font-mono tracking-tight text-primary">
+                        <span className="font-mono text-3xl font-black tracking-tight text-primary">
                           {coverage.overall_score.toFixed(0)}%
                         </span>
-                        <span className="text-xs text-muted-foreground">
-                          covered by notes
-                        </span>
+                        <span className="text-xs text-muted-foreground">covered by notes</span>
                       </div>
                     ) : (
                       <p className="text-xs text-muted-foreground">Not calculated yet</p>
                     )}
-                    
+
                     {coverage && (
-                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
                         <div
-                          className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
+                          className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500"
                           style={{ width: `${coverage.overall_score}%` }}
                         />
                       </div>
@@ -540,7 +559,7 @@ export default function GapsPage() {
                     disabled={computingCoverage}
                     variant="outline"
                     size="sm"
-                    className="w-full gap-1.5 h-8 text-xs font-bold rounded-xl"
+                    className="h-8 w-full gap-1.5 rounded-xl text-xs font-bold"
                   >
                     {computingCoverage ? (
                       <>
@@ -557,21 +576,19 @@ export default function GapsPage() {
                 </div>
               </div>
 
-              <div className="liquid-glass p-5 flex flex-col justify-between">
+              <div className="liquid-glass flex flex-col justify-between p-5">
                 <div>
-                  <div className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                  <div className="font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Study Recommendations
                   </div>
                   <div className="mt-2">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-black font-mono tracking-tight text-primary">
+                      <span className="font-mono text-3xl font-black tracking-tight text-primary">
                         {recommendations.length}
                       </span>
-                      <span className="text-xs text-muted-foreground">
-                        gaps to address
-                      </span>
+                      <span className="text-xs text-muted-foreground">gaps to address</span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground mt-1">
+                    <p className="mt-1 text-[11px] text-muted-foreground">
                       Ranked by prerequisite dependencies.
                     </p>
                   </div>
@@ -582,7 +599,7 @@ export default function GapsPage() {
                     disabled={agentStatus === "running" || !coverage}
                     data-agent-target="run-gap-agent-btn"
                     size="sm"
-                    className="w-full gap-1.5 h-8.5 text-xs font-bold rounded-2xl bg-primary text-primary-foreground shadow-xs"
+                    className="h-8.5 shadow-xs w-full gap-1.5 rounded-2xl bg-primary text-xs font-bold text-primary-foreground"
                   >
                     {agentStatus === "running" ? (
                       <>
@@ -592,35 +609,35 @@ export default function GapsPage() {
                     ) : (
                       <>
                         <Sparkles className="h-3 w-3" />
-                        <span>{recommendations.length > 0 ? "Re-Run Gap Agent" : "Run Gap Agent"}</span>
+                        <span>
+                          {recommendations.length > 0 ? "Re-Run Gap Agent" : "Run Gap Agent"}
+                        </span>
                       </>
                     )}
                   </Button>
                 </div>
               </div>
 
-              <div className="liquid-glass p-5 flex flex-col justify-between">
+              <div className="liquid-glass flex flex-col justify-between p-5">
                 <div>
-                  <div className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">
+                  <div className="font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     Total Estimated Study Time
                   </div>
                   <div className="mt-2">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-black font-mono tracking-tight text-primary">
+                      <span className="font-mono text-3xl font-black tracking-tight text-primary">
                         {recommendations.reduce((sum, r) => sum + r.estimated_hours, 0).toFixed(1)}
                       </span>
-                      <span className="text-xs text-muted-foreground">
-                        hours of focused study
-                      </span>
+                      <span className="text-xs text-muted-foreground">hours of focused study</span>
                     </div>
-                    <p className="text-[11px] text-muted-foreground mt-1">
+                    <p className="mt-1 text-[11px] text-muted-foreground">
                       Calculated from conceptual complexity.
                     </p>
                   </div>
                 </div>
                 <div className="pt-3">
-                  <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 h-8.5">
-                    <Info className="h-3 w-3 text-primary shrink-0" />
+                  <div className="h-8.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                    <Info className="h-3 w-3 shrink-0 text-primary" />
                     <span>Drag cards below to customize order.</span>
                   </div>
                 </div>
@@ -629,42 +646,43 @@ export default function GapsPage() {
 
             {/* Main Dashboard Layout */}
             <div className="grid gap-6 lg:grid-cols-12">
-              
               {/* Left Column: Topics Board (7 cols) */}
-              <div className="lg:col-span-7 space-y-6">
+              <div className="space-y-6 lg:col-span-7">
                 <div className="flex items-center justify-between border-b pb-2">
-                  <h2 className="text-xl font-bold tracking-tight text-primary flex items-center gap-2">
+                  <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-primary">
                     <BookOpen className="h-5 w-5 text-indigo-500" />
                     Syllabus Topics Board
                   </h2>
-                  <span className="text-xs text-muted-foreground">Click card for matched notes and context</span>
+                  <span className="text-xs text-muted-foreground">
+                    Click card for matched notes and context
+                  </span>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-3">
                   {/* Known Column */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between px-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-green-600 dark:text-green-400 flex items-center gap-1">
+                      <span className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-green-600 dark:text-green-400">
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Known ({columns.known.length})
                       </span>
                     </div>
-                    <div className="bg-muted/40 rounded-lg p-2 min-h-[300px] space-y-2 border border-muted/60">
+                    <div className="min-h-[300px] space-y-2 rounded-lg border border-muted/60 bg-muted/40 p-2">
                       {columns.known.length === 0 ? (
-                        <p className="text-xs text-muted-foreground text-center py-8">None yet</p>
+                        <p className="py-8 text-center text-xs text-muted-foreground">None yet</p>
                       ) : (
                         columns.known.map((t) => (
                           <div
                             key={t.id}
                             onClick={() => setSelectedTopicId(t.id)}
-                            className="bg-card hover:bg-accent/40 border border-muted rounded-md p-3 shadow-sm cursor-pointer transition duration-150 ease-in-out group flex flex-col justify-between"
+                            className="group flex cursor-pointer flex-col justify-between rounded-md border border-muted bg-card p-3 shadow-sm transition duration-150 ease-in-out hover:bg-accent/40"
                           >
-                            <span className="text-xs font-medium line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+                            <span className="line-clamp-2 text-xs font-medium leading-snug transition-colors group-hover:text-primary">
                               {t.title}
                             </span>
-                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-muted/50">
+                            <div className="mt-2 flex items-center justify-between border-t border-muted/50 pt-2">
                               <span className="text-[10px] text-muted-foreground">ID: {t.id}</span>
-                              <Badge className="text-[10px] bg-green-500/10 text-green-600 hover:bg-green-500/10 border-0">
+                              <Badge className="border-0 bg-green-500/10 text-[10px] text-green-600 hover:bg-green-500/10">
                                 {t.score.toFixed(0)}%
                               </Badge>
                             </div>
@@ -677,27 +695,27 @@ export default function GapsPage() {
                   {/* Weak Column */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between px-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                      <span className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                         <AlertCircle className="h-3.5 w-3.5" />
                         Weak ({columns.weak.length})
                       </span>
                     </div>
-                    <div className="bg-muted/40 rounded-lg p-2 min-h-[300px] space-y-2 border border-muted/60">
+                    <div className="min-h-[300px] space-y-2 rounded-lg border border-muted/60 bg-muted/40 p-2">
                       {columns.weak.length === 0 ? (
-                        <p className="text-xs text-muted-foreground text-center py-8">None yet</p>
+                        <p className="py-8 text-center text-xs text-muted-foreground">None yet</p>
                       ) : (
                         columns.weak.map((t) => (
                           <div
                             key={t.id}
                             onClick={() => setSelectedTopicId(t.id)}
-                            className="bg-card hover:bg-accent/40 border border-muted rounded-md p-3 shadow-sm cursor-pointer transition duration-150 ease-in-out group flex flex-col justify-between"
+                            className="group flex cursor-pointer flex-col justify-between rounded-md border border-muted bg-card p-3 shadow-sm transition duration-150 ease-in-out hover:bg-accent/40"
                           >
-                            <span className="text-xs font-medium line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+                            <span className="line-clamp-2 text-xs font-medium leading-snug transition-colors group-hover:text-primary">
                               {t.title}
                             </span>
-                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-muted/50">
+                            <div className="mt-2 flex items-center justify-between border-t border-muted/50 pt-2">
                               <span className="text-[10px] text-muted-foreground">ID: {t.id}</span>
-                              <Badge className="text-[10px] bg-amber-500/10 text-amber-600 hover:bg-amber-500/10 border-0">
+                              <Badge className="border-0 bg-amber-500/10 text-[10px] text-amber-600 hover:bg-amber-500/10">
                                 {t.score.toFixed(0)}%
                               </Badge>
                             </div>
@@ -710,27 +728,27 @@ export default function GapsPage() {
                   {/* Missing Column */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between px-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <span className="flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-red-600 dark:text-red-400">
                         <XCircle className="h-3.5 w-3.5" />
                         Missing ({columns.missing.length})
                       </span>
                     </div>
-                    <div className="bg-muted/40 rounded-lg p-2 min-h-[300px] space-y-2 border border-muted/60">
+                    <div className="min-h-[300px] space-y-2 rounded-lg border border-muted/60 bg-muted/40 p-2">
                       {columns.missing.length === 0 ? (
-                        <p className="text-xs text-muted-foreground text-center py-8">None yet</p>
+                        <p className="py-8 text-center text-xs text-muted-foreground">None yet</p>
                       ) : (
                         columns.missing.map((t) => (
                           <div
                             key={t.id}
                             onClick={() => setSelectedTopicId(t.id)}
-                            className="bg-card hover:bg-accent/40 border border-muted rounded-md p-3 shadow-sm cursor-pointer transition duration-150 ease-in-out group flex flex-col justify-between"
+                            className="group flex cursor-pointer flex-col justify-between rounded-md border border-muted bg-card p-3 shadow-sm transition duration-150 ease-in-out hover:bg-accent/40"
                           >
-                            <span className="text-xs font-medium line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+                            <span className="line-clamp-2 text-xs font-medium leading-snug transition-colors group-hover:text-primary">
                               {t.title}
                             </span>
-                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-muted/50">
+                            <div className="mt-2 flex items-center justify-between border-t border-muted/50 pt-2">
                               <span className="text-[10px] text-muted-foreground">ID: {t.id}</span>
-                              <Badge className="text-[10px] bg-red-500/10 text-red-600 hover:bg-red-500/10 border-0">
+                              <Badge className="border-0 bg-red-500/10 text-[10px] text-red-600 hover:bg-red-500/10">
                                 {t.score.toFixed(0)}%
                               </Badge>
                             </div>
@@ -743,25 +761,26 @@ export default function GapsPage() {
               </div>
 
               {/* Right Column: Ordered Study Path / Recommendations (5 cols) */}
-              <div className="lg:col-span-5 space-y-6">
+              <div className="space-y-6 lg:col-span-5">
                 <div className="flex items-center justify-between border-b pb-2">
-                  <h2 className="text-xl font-bold tracking-tight text-primary flex items-center gap-2">
+                  <h2 className="flex items-center gap-2 text-xl font-bold tracking-tight text-primary">
                     <Sparkles className="h-5 w-5 text-indigo-500" />
                     Personalized Study Path
                   </h2>
                   {saving && (
-                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Loader2 className="h-3 w-3 animate-spin" /> Saving cloud order...
                     </span>
                   )}
                 </div>
 
                 {recommendations.length === 0 ? (
-                  <Card className="flex flex-col items-center justify-center p-8 text-center bg-card/30 backdrop-blur-sm border-dashed">
-                    <Sparkles className="h-8 w-8 text-muted-foreground mb-3" />
+                  <Card className="flex flex-col items-center justify-center border-dashed bg-card/30 p-8 text-center backdrop-blur-sm">
+                    <Sparkles className="mb-3 h-8 w-8 text-muted-foreground" />
                     <CardTitle className="text-sm">No study path generated yet</CardTitle>
-                    <CardDescription className="max-w-xs mt-1">
-                      Ensure syllabus coverage has been calculated, then trigger the Learning Gap Agent to get started.
+                    <CardDescription className="mt-1 max-w-xs">
+                      Ensure syllabus coverage has been calculated, then trigger the Learning Gap
+                      Agent to get started.
                     </CardDescription>
                     <Button
                       onClick={handleRunAgent}
@@ -783,25 +802,25 @@ export default function GapsPage() {
                           onDragStart={(e) => handleDragStart(e, index)}
                           onDragOver={(e) => handleDragOver(e, index)}
                           onDrop={(e) => handleDrop(e, index)}
-                          className={`bg-card border rounded-lg p-4 shadow-sm select-none relative transition duration-200 group ${
+                          className={`group relative select-none rounded-lg border bg-card p-4 shadow-sm transition duration-200 ${
                             draggedIndex === index
-                              ? "opacity-40 border-dashed border-primary"
-                              : "hover:shadow-md hover:border-primary/30"
+                              ? "border-dashed border-primary opacity-40"
+                              : "hover:border-primary/30 hover:shadow-md"
                           }`}
                         >
                           <div className="flex items-start gap-3">
                             {/* Drag handle */}
-                            <div className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-primary mt-1 p-0.5 rounded transition">
+                            <div className="mt-1 cursor-grab rounded p-0.5 text-muted-foreground transition hover:text-primary active:cursor-grabbing">
                               <GripVertical className="h-4 w-4" />
                             </div>
 
                             <div className="flex-1 space-y-2">
                               <div className="flex items-start justify-between gap-2">
-                                <h3 className="font-semibold text-sm leading-tight text-primary">
+                                <h3 className="text-sm font-semibold leading-tight text-primary">
                                   {rec.title}
                                 </h3>
                                 <Badge
-                                  className={`text-[10px] py-0.5 border-0 ${
+                                  className={`border-0 py-0.5 text-[10px] ${
                                     isWeak
                                       ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/10"
                                       : "bg-red-500/10 text-red-600 hover:bg-red-500/10"
@@ -811,34 +830,43 @@ export default function GapsPage() {
                                 </Badge>
                               </div>
 
-                              <p className="text-xs text-muted-foreground leading-relaxed">
+                              <p className="text-xs leading-relaxed text-muted-foreground">
                                 {rec.reason}
                               </p>
 
                               {/* Checklist */}
                               {rec.actionable_steps && rec.actionable_steps.length > 0 && (
-                                <div className="space-y-1.5 pt-2 border-t border-muted/50">
-                                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                                <div className="space-y-1.5 border-t border-muted/50 pt-2">
+                                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                                     Actionable study tasks
                                   </span>
                                   <div className="space-y-1">
                                     {rec.actionable_steps.map((step, sIdx) => {
                                       const isChecked = step.startsWith("[x] ");
-                                      const text = step.startsWith("[x] ") || step.startsWith("[ ] ") ? step.slice(4) : step;
+                                      const text =
+                                        step.startsWith("[x] ") || step.startsWith("[ ] ")
+                                          ? step.slice(4)
+                                          : step;
                                       return (
                                         <div
                                           key={sIdx}
                                           onClick={() => toggleStep(index, sIdx)}
-                                          className="flex items-start gap-2 cursor-pointer group/item py-0.5"
+                                          className="group/item flex cursor-pointer items-start gap-2 py-0.5"
                                         >
-                                          <div className={`mt-0.5 h-3.5 w-3.5 rounded border flex items-center justify-center transition-colors ${
-                                            isChecked
-                                              ? "bg-primary border-primary text-primary-foreground"
-                                              : "border-muted-foreground/30 hover:border-primary"
-                                          }`}>
-                                            {isChecked && <Check className="h-2.5 w-2.5 stroke-[3]" />}
+                                          <div
+                                            className={`mt-0.5 flex h-3.5 w-3.5 items-center justify-center rounded border transition-colors ${
+                                              isChecked
+                                                ? "border-primary bg-primary text-primary-foreground"
+                                                : "border-muted-foreground/30 hover:border-primary"
+                                            }`}
+                                          >
+                                            {isChecked && (
+                                              <Check className="h-2.5 w-2.5 stroke-[3]" />
+                                            )}
                                           </div>
-                                          <span className={`text-xs ${isChecked ? "text-muted-foreground line-through decoration-muted-foreground/60" : "text-primary/95"}`}>
+                                          <span
+                                            className={`text-xs ${isChecked ? "text-muted-foreground line-through decoration-muted-foreground/60" : "text-primary/95"}`}
+                                          >
                                             {text}
                                           </span>
                                         </div>
@@ -848,7 +876,7 @@ export default function GapsPage() {
                                 </div>
                               )}
 
-                              <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-1">
+                              <div className="flex items-center justify-between pt-1 text-[11px] text-muted-foreground">
                                 <span>Topic ID: {rec.topic_id}</span>
                                 <span className="font-semibold text-primary/80">
                                   ~{rec.estimated_hours.toFixed(1)} hrs
@@ -863,7 +891,6 @@ export default function GapsPage() {
                 )}
               </div>
             </div>
-
           </div>
         )}
       </main>
@@ -891,25 +918,25 @@ export default function GapsPage() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2 flex flex-col">
+              <div className="flex flex-col space-y-2">
                 <Label htmlFor="syllabusText">Option A: Paste Syllabus text</Label>
                 <textarea
                   id="syllabusText"
                   placeholder="Paste syllabus, topics outline, or course content details here..."
                   value={newSyllabusText}
                   onChange={(e) => setNewSyllabusText(e.target.value)}
-                  className="flex-1 min-h-[150px] max-h-[250px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="max-h-[250px] min-h-[150px] w-full flex-1 rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
 
-              <div className="space-y-2 flex flex-col">
+              <div className="flex flex-col space-y-2">
                 <Label htmlFor="syllabusDoc">Option B: Select Syllabus Document</Label>
                 {loadingDocs ? (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+                  <div className="flex items-center gap-2 py-4 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" /> Loading uploaded notes...
                   </div>
                 ) : documents.length === 0 ? (
-                  <p className="text-sm text-muted-foreground py-4">
+                  <p className="py-4 text-sm text-muted-foreground">
                     No documents uploaded. Go to Documents tab to upload a file first.
                   </p>
                 ) : (
@@ -927,8 +954,9 @@ export default function GapsPage() {
                     ))}
                   </select>
                 )}
-                <p className="text-xs text-muted-foreground mt-auto pt-2">
-                  Linking an uploaded document parses its OCR text directly into the syllabus mapping system.
+                <p className="mt-auto pt-2 text-xs text-muted-foreground">
+                  Linking an uploaded document parses its OCR text directly into the syllabus
+                  mapping system.
                 </p>
               </div>
             </div>
@@ -940,7 +968,7 @@ export default function GapsPage() {
               <Button type="submit" disabled={creatingSyllabus || !newSyllabusName.trim()}>
                 {creatingSyllabus ? (
                   <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                    <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
                     Creating...
                   </>
                 ) : (
@@ -953,8 +981,11 @@ export default function GapsPage() {
       </Dialog>
 
       {/* Topic Detail Dialog */}
-      <Dialog open={selectedTopicId !== null} onOpenChange={(open) => !open && setSelectedTopicId(null)}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+      <Dialog
+        open={selectedTopicId !== null}
+        onOpenChange={(open) => !open && setSelectedTopicId(null)}
+      >
+        <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
           {selectedTopicDetails && (
             <>
               <DialogHeader>
@@ -963,19 +994,19 @@ export default function GapsPage() {
                     {selectedTopicDetails.topic?.title}
                   </DialogTitle>
                   <Badge
-                    className={`text-xs py-0.5 border-0 ${
+                    className={`border-0 py-0.5 text-xs ${
                       selectedTopicDetails.cov?.status === "good"
                         ? "bg-green-500/10 text-green-600 hover:bg-green-500/10"
                         : selectedTopicDetails.cov?.status === "partial"
-                        ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/10"
-                        : "bg-red-500/10 text-red-600 hover:bg-red-500/10"
+                          ? "bg-amber-500/10 text-amber-600 hover:bg-amber-500/10"
+                          : "bg-red-500/10 text-red-600 hover:bg-red-500/10"
                     }`}
                   >
                     {selectedTopicDetails.cov?.status === "good"
                       ? "Known"
                       : selectedTopicDetails.cov?.status === "partial"
-                      ? "Weak"
-                      : "Missing"}
+                        ? "Weak"
+                        : "Missing"}
                   </Badge>
                 </div>
                 <DialogDescription className="text-xs">
@@ -984,48 +1015,54 @@ export default function GapsPage() {
               </DialogHeader>
 
               <div className="space-y-6 py-4">
-                
                 {/* Score & Explanation */}
-                <div className="space-y-2 bg-muted/30 border rounded-lg p-4">
+                <div className="space-y-2 rounded-lg border bg-muted/30 p-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                       Confidence Assessment
                     </span>
                     <span className="text-sm font-bold text-primary">
                       Coverage Score: {selectedTopicDetails.cov?.score.toFixed(0) ?? 0}%
                     </span>
                   </div>
-                  <p className="text-sm text-primary/90 leading-relaxed pt-1">
-                    {selectedTopicDetails.cov?.explanation || "This topic has not been computed or matched yet."}
+                  <p className="pt-1 text-sm leading-relaxed text-primary/90">
+                    {selectedTopicDetails.cov?.explanation ||
+                      "This topic has not been computed or matched yet."}
                   </p>
                 </div>
 
                 {/* Subtopics */}
-                {selectedTopicDetails.topic?.subtopics && selectedTopicDetails.topic.subtopics.length > 0 && (
-                  <div className="space-y-2">
-                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                      Subtopics ({selectedTopicDetails.topic.subtopics.length})
-                    </span>
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      {selectedTopicDetails.topic.subtopics.map((sub) => (
-                        <div key={sub.id} className="border rounded p-2.5 bg-card text-xs flex justify-between items-center">
-                          <span>{sub.title}</span>
-                          <span className="text-[10px] text-muted-foreground">ID: {sub.id}</span>
-                        </div>
-                      ))}
+                {selectedTopicDetails.topic?.subtopics &&
+                  selectedTopicDetails.topic.subtopics.length > 0 && (
+                    <div className="space-y-2">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        Subtopics ({selectedTopicDetails.topic.subtopics.length})
+                      </span>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {selectedTopicDetails.topic.subtopics.map((sub) => (
+                          <div
+                            key={sub.id}
+                            className="flex items-center justify-between rounded border bg-card p-2.5 text-xs"
+                          >
+                            <span>{sub.title}</span>
+                            <span className="text-[10px] text-muted-foreground">ID: {sub.id}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Matched Documents (Citations) */}
                 <div className="space-y-3">
-                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                     <FileText className="h-4 w-4 text-indigo-500" />
-                    Source Notes References ({selectedTopicDetails.cov?.matched_chunks?.length ?? 0})
+                    Source Notes References ({selectedTopicDetails.cov?.matched_chunks?.length ?? 0}
+                    )
                   </span>
-                  
-                  {!selectedTopicDetails.cov?.matched_chunks || selectedTopicDetails.cov.matched_chunks.length === 0 ? (
-                    <div className="text-center py-6 border border-dashed rounded-lg bg-card text-xs text-muted-foreground">
+
+                  {!selectedTopicDetails.cov?.matched_chunks ||
+                  selectedTopicDetails.cov.matched_chunks.length === 0 ? (
+                    <div className="rounded-lg border border-dashed bg-card py-6 text-center text-xs text-muted-foreground">
                       No matching documents found in your notes.
                     </div>
                   ) : (
@@ -1033,14 +1070,21 @@ export default function GapsPage() {
                       {selectedTopicDetails.cov.matched_chunks.map((chunkItem, idx) => {
                         const chunk = chunkItem as Record<string, unknown>;
                         const meta = (chunk.metadata || {}) as Record<string, unknown>;
-                        const docName = String(chunk.document_name || meta.document_name || "Document Link");
+                        const docName = String(
+                          chunk.document_name || meta.document_name || "Document Link",
+                        );
                         const pageNum = String(chunk.page_number || meta.page_number || "N/A");
                         const scoreVal = typeof chunk.score === "number" ? chunk.score : 0;
-                        const snippet = String(chunk.text || chunk.content || "Snippet unavailable.");
+                        const snippet = String(
+                          chunk.text || chunk.content || "Snippet unavailable.",
+                        );
                         return (
-                          <div key={idx} className="border rounded-lg p-3 bg-card space-y-2 shadow-sm">
-                            <div className="flex items-center justify-between text-[11px] text-muted-foreground border-b pb-1.5">
-                              <span className="font-semibold text-primary/80 flex items-center gap-1">
+                          <div
+                            key={idx}
+                            className="space-y-2 rounded-lg border bg-card p-3 shadow-sm"
+                          >
+                            <div className="flex items-center justify-between border-b pb-1.5 text-[11px] text-muted-foreground">
+                              <span className="flex items-center gap-1 font-semibold text-primary/80">
                                 <FileText className="h-3 w-3" />
                                 {docName}
                               </span>
@@ -1048,7 +1092,7 @@ export default function GapsPage() {
                                 Page {pageNum} (score: {(scoreVal * 100).toFixed(0)}%)
                               </span>
                             </div>
-                            <p className="text-xs text-muted-foreground italic leading-relaxed bg-muted/20 p-2 rounded border border-muted/40">
+                            <p className="rounded border border-muted/40 bg-muted/20 p-2 text-xs italic leading-relaxed text-muted-foreground">
                               &ldquo;{snippet}&rdquo;
                             </p>
                           </div>
@@ -1057,7 +1101,6 @@ export default function GapsPage() {
                     </div>
                   )}
                 </div>
-
               </div>
             </>
           )}

@@ -20,10 +20,7 @@ import {
   CheckCircle2,
   ShieldCheck,
 } from "lucide-react";
-import {
-  useCommunityStore,
-  type CommunityPost,
-} from "@/lib/community-store";
+import { useCommunityStore, type CommunityPost } from "@/lib/community-store";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -60,7 +57,8 @@ export function CommunityFeed({}: Props) {
   // Post Creator Form State
   const [postTitle, setPostTitle] = useState("");
   const [postDescription, setPostDescription] = useState("");
-  const [postCategory, setPostCategory] = useState<CommunityPost["category"]>("Notes & Cheatsheets");
+  const [postCategory, setPostCategory] =
+    useState<CommunityPost["category"]>("Notes & Cheatsheets");
   const [postCommunityId, setPostCommunityId] = useState(communities[0]?.id || "comm-global-cs");
   const [postTags, setPostTags] = useState("");
   const [postAttachment, setPostAttachment] = useState("");
@@ -88,7 +86,14 @@ export function CommunityFeed({}: Props) {
 
       return matchCategory && matchCollege && matchCourse && matchYear && matchSearch;
     });
-  }, [posts, selectedCategory, selectedCollegeFilter, selectedCourseFilter, selectedYearFilter, searchQuery]);
+  }, [
+    posts,
+    selectedCategory,
+    selectedCollegeFilter,
+    selectedCourseFilter,
+    selectedYearFilter,
+    searchQuery,
+  ]);
 
   const handleCreatePost = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,8 +102,7 @@ export function CommunityFeed({}: Props) {
       return;
     }
 
-    const selectedComm =
-      communities.find((c) => c.id === postCommunityId) ||
+    const selectedComm = communities.find((c) => c.id === postCommunityId) ||
       communities[0] || {
         id: "comm-global-cs",
         name: "Global Algorithms & Systems Nexus",
@@ -157,42 +161,48 @@ export function CommunityFeed({}: Props) {
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-      
+    <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
       {/* ══════════════════════════════════════════════════════════════════════
           LEFT COLUMN (Span 3): Scholar Profile Badge, Hubs, & Filters
           ══════════════════════════════════════════════════════════════════════ */}
-      <div className="lg:col-span-3 space-y-4">
-        
+      <div className="space-y-4 lg:col-span-3">
         {/* 1. Scholar Identity Card (Locked from Login) */}
-        <div className="liquid-glass p-4 sm:p-5 space-y-3.5 border-primary/20">
+        <div className="liquid-glass space-y-3.5 border-primary/20 p-4 sm:p-5">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-primary/30 to-indigo-500/20 border border-primary/40 flex items-center justify-center font-black text-lg text-primary shadow-xs shrink-0">
+            <div className="shadow-xs flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary/40 bg-gradient-to-tr from-primary/30 to-indigo-500/20 text-lg font-black text-primary">
               {profile.alias.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <h3 className="text-sm font-bold text-foreground truncate">{profile.alias}</h3>
-              <p className="text-[11px] font-mono text-primary font-semibold truncate">{profile.username}</p>
+              <h3 className="truncate text-sm font-bold text-foreground">{profile.alias}</h3>
+              <p className="truncate font-mono text-[11px] font-semibold text-primary">
+                {profile.username}
+              </p>
             </div>
           </div>
 
-          <div className="pt-2.5 border-t border-border/40 space-y-2 text-xs">
+          <div className="space-y-2 border-t border-border/40 pt-2.5 text-xs">
             <div className="flex items-center gap-2 text-muted-foreground">
-              <School className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
-              <span className="truncate font-medium text-foreground text-[11px]">{profile.college}</span>
+              <School className="h-3.5 w-3.5 shrink-0 text-indigo-400" />
+              <span className="truncate text-[11px] font-medium text-foreground">
+                {profile.college}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <GraduationCap className="h-3.5 w-3.5 text-purple-400 shrink-0" />
-              <span className="truncate font-medium text-foreground text-[11px]">{profile.course}</span>
+              <GraduationCap className="h-3.5 w-3.5 shrink-0 text-purple-400" />
+              <span className="truncate text-[11px] font-medium text-foreground">
+                {profile.course}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-              <span className="truncate font-medium text-foreground text-[11px]">{profile.year}</span>
+              <Calendar className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+              <span className="truncate text-[11px] font-medium text-foreground">
+                {profile.year}
+              </span>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-border/30 flex items-center justify-between text-[10px] font-mono text-muted-foreground">
-            <span className="flex items-center gap-1 text-emerald-500 font-bold">
+          <div className="flex items-center justify-between border-t border-border/30 pt-2 font-mono text-[10px] text-muted-foreground">
+            <span className="flex items-center gap-1 font-bold text-emerald-500">
               <CheckCircle2 className="h-3 w-3" />
               <span>Verified Scholar</span>
             </span>
@@ -201,12 +211,12 @@ export function CommunityFeed({}: Props) {
         </div>
 
         {/* 2. University Hubs Switcher */}
-        <div className="liquid-glass p-4 sm:p-5 space-y-3">
+        <div className="liquid-glass space-y-3 p-4 sm:p-5">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider font-mono">
+            <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
               University Circles
             </h4>
-            <span className="text-[10px] font-mono text-muted-foreground">
+            <span className="font-mono text-[10px] text-muted-foreground">
               {communities.filter((c) => c.isJoined).length} Joined
             </span>
           </div>
@@ -216,25 +226,27 @@ export function CommunityFeed({}: Props) {
               <div
                 key={c.id}
                 className={cn(
-                  "p-2.5 rounded-xl border transition-all text-xs flex items-center justify-between gap-2 group",
+                  "group flex items-center justify-between gap-2 rounded-xl border p-2.5 text-xs transition-all",
                   c.isJoined
-                    ? "bg-primary/10 border-primary/30 text-foreground"
-                    : "bg-muted/30 border-border/40 text-muted-foreground hover:bg-muted/50"
+                    ? "border-primary/30 bg-primary/10 text-foreground"
+                    : "border-border/40 bg-muted/30 text-muted-foreground hover:bg-muted/50",
                 )}
               >
                 <div className="min-w-0">
-                  <div className="font-bold text-[11px] truncate text-foreground">{c.name}</div>
-                  <div className="text-[10px] text-muted-foreground font-mono truncate">{c.college}</div>
+                  <div className="truncate text-[11px] font-bold text-foreground">{c.name}</div>
+                  <div className="truncate font-mono text-[10px] text-muted-foreground">
+                    {c.college}
+                  </div>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => toggleJoinCommunity(c.id)}
                   className={cn(
-                    "px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all shrink-0",
+                    "shrink-0 rounded-lg px-2.5 py-1 font-mono text-[10px] font-bold transition-all",
                     c.isJoined
-                      ? "bg-primary text-primary-foreground shadow-xs"
-                      : "bg-muted/80 text-muted-foreground hover:text-foreground hover:bg-muted"
+                      ? "shadow-xs bg-primary text-primary-foreground"
+                      : "bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground",
                   )}
                 >
                   {c.isJoined ? "Joined" : "Join"}
@@ -245,8 +257,8 @@ export function CommunityFeed({}: Props) {
         </div>
 
         {/* 3. Category Filter List */}
-        <div className="liquid-glass p-4 sm:p-5 space-y-2.5">
-          <h4 className="text-xs font-bold text-foreground uppercase tracking-wider font-mono">
+        <div className="liquid-glass space-y-2.5 p-4 sm:p-5">
+          <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-foreground">
             Topic Categories
           </h4>
           <div className="space-y-1">
@@ -256,10 +268,10 @@ export function CommunityFeed({}: Props) {
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
                 className={cn(
-                  "w-full text-left px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center justify-between",
+                  "flex w-full items-center justify-between rounded-xl px-3 py-1.5 text-left text-xs font-medium transition-all",
                   selectedCategory === cat
-                    ? "bg-primary text-primary-foreground font-bold shadow-xs"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                    ? "shadow-xs bg-primary font-bold text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
                 )}
               >
                 <span>{cat}</span>
@@ -268,31 +280,29 @@ export function CommunityFeed({}: Props) {
             ))}
           </div>
         </div>
-
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
           CENTER COLUMN (Span 6): Search, Composer, & Academic Discussion Feed
           ══════════════════════════════════════════════════════════════════════ */}
-      <div className="lg:col-span-6 space-y-4">
-        
+      <div className="space-y-4 lg:col-span-6">
         {/* Search & Composer Trigger Bar */}
-        <div className="liquid-glass p-3.5 sm:p-4 flex flex-col sm:flex-row items-center gap-2.5">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+        <div className="liquid-glass flex flex-col items-center gap-2.5 p-3.5 sm:flex-row sm:p-4">
+          <div className="relative w-full flex-1">
+            <Search className="absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search topics, notes, formulas (#Attention, #Raft)..."
-              className="w-full h-9 pl-9 pr-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary shadow-xs"
+              className="shadow-xs h-9 w-full rounded-xl border border-border/60 bg-muted/40 pl-9 pr-3 text-xs text-foreground outline-none placeholder:text-muted-foreground focus:ring-1 focus:ring-primary"
             />
           </div>
 
           <Button
             size="sm"
             onClick={() => setShowComposer(!showComposer)}
-            className="h-9 px-4 rounded-xl text-xs font-bold bg-primary text-primary-foreground shadow-md hover:bg-primary/90 gap-1.5 w-full sm:w-auto shrink-0"
+            className="h-9 w-full shrink-0 gap-1.5 rounded-xl bg-primary px-4 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/90 sm:w-auto"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>{showComposer ? "Close Form" : "Share Knowledge"}</span>
@@ -301,13 +311,18 @@ export function CommunityFeed({}: Props) {
 
         {/* Expandable Liquid Glass Post Composer */}
         {showComposer && (
-          <form onSubmit={handleCreatePost} className="liquid-glass p-5 space-y-3.5 animate-in fade-in zoom-in-95 duration-200 border-primary/30">
+          <form
+            onSubmit={handleCreatePost}
+            className="liquid-glass space-y-3.5 border-primary/30 p-5 duration-200 animate-in fade-in zoom-in-95"
+          >
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-foreground uppercase tracking-wider font-mono flex items-center gap-1.5">
+              <h3 className="flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-foreground">
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
                 <span>Publish Course Notes or Question</span>
               </h3>
-              <span className="text-[10px] font-mono text-muted-foreground">Posting as {profile.username}</span>
+              <span className="font-mono text-[10px] text-muted-foreground">
+                Posting as {profile.username}
+              </span>
             </div>
 
             <div className="space-y-1">
@@ -317,15 +332,15 @@ export function CommunityFeed({}: Props) {
                 onChange={(e) => setPostTitle(e.target.value)}
                 placeholder="Title e.g. CS224N Attention & RoPE Derivations"
                 required
-                className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground font-semibold placeholder:font-normal outline-none focus:ring-1 focus:ring-primary"
+                className="h-9 w-full rounded-xl border border-border/60 bg-muted/40 px-3 text-xs font-semibold text-foreground outline-none placeholder:font-normal focus:ring-1 focus:ring-primary"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               <select
                 value={postCategory}
                 onChange={(e) => setPostCategory(e.target.value as CommunityPost["category"])}
-                className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary"
+                className="h-9 w-full rounded-xl border border-border/60 bg-muted/40 px-3 text-xs font-semibold text-foreground outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="Notes & Cheatsheets">Notes & Cheatsheets</option>
                 <option value="Study Groups">Study Groups</option>
@@ -337,7 +352,7 @@ export function CommunityFeed({}: Props) {
               <select
                 value={postCommunityId}
                 onChange={(e) => setPostCommunityId(e.target.value)}
-                className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground font-semibold outline-none focus:ring-1 focus:ring-primary"
+                className="h-9 w-full rounded-xl border border-border/60 bg-muted/40 px-3 text-xs font-semibold text-foreground outline-none focus:ring-1 focus:ring-primary"
               >
                 {communities.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -354,17 +369,17 @@ export function CommunityFeed({}: Props) {
                 placeholder="Describe key formulas, lecture notes, textbook references, or study questions..."
                 rows={3}
                 required
-                className="w-full p-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary resize-none"
+                className="w-full resize-none rounded-xl border border-border/60 bg-muted/40 p-3 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               <input
                 type="text"
                 value={postTags}
                 onChange={(e) => setPostTags(e.target.value)}
                 placeholder="Tags e.g. #Transformers, #Attention"
-                className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground font-mono outline-none focus:ring-1 focus:ring-primary"
+                className="h-9 w-full rounded-xl border border-border/60 bg-muted/40 px-3 font-mono text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
               />
 
               <input
@@ -372,7 +387,7 @@ export function CommunityFeed({}: Props) {
                 value={postAttachment}
                 onChange={(e) => setPostAttachment(e.target.value)}
                 placeholder="Attachment e.g. Lecture_Notes_v2.pdf"
-                className="w-full h-9 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
+                className="h-9 w-full rounded-xl border border-border/60 bg-muted/40 px-3 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
 
@@ -382,14 +397,14 @@ export function CommunityFeed({}: Props) {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowComposer(false)}
-                className="rounded-xl text-xs h-8"
+                className="h-8 rounded-xl text-xs"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 size="sm"
-                className="rounded-xl font-bold text-xs h-8 bg-primary text-primary-foreground shadow-sm"
+                className="h-8 rounded-xl bg-primary text-xs font-bold text-primary-foreground shadow-sm"
               >
                 Publish Note
               </Button>
@@ -400,20 +415,20 @@ export function CommunityFeed({}: Props) {
         {/* Stream of Discussion Cards */}
         <div className="space-y-3.5">
           {filteredPosts.length === 0 ? (
-            <div className="liquid-glass p-8 text-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-muted/40 text-muted-foreground flex items-center justify-center mx-auto">
+            <div className="liquid-glass space-y-3 p-8 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/40 text-muted-foreground">
                 <MessageSquare className="h-6 w-6" />
               </div>
               <h3 className="text-sm font-bold text-foreground">No Discussion Threads Found</h3>
-              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+              <p className="mx-auto max-w-sm text-xs text-muted-foreground">
                 Be the first scholar to share lecture summaries, formulas, or start a study circle!
               </p>
               <Button
                 size="sm"
                 onClick={() => setShowComposer(true)}
-                className="rounded-xl text-xs font-bold bg-primary text-primary-foreground"
+                className="rounded-xl bg-primary text-xs font-bold text-primary-foreground"
               >
-                <Plus className="h-3.5 w-3.5 mr-1" />
+                <Plus className="mr-1 h-3.5 w-3.5" />
                 <span>Create First Note</span>
               </Button>
             </div>
@@ -423,22 +438,23 @@ export function CommunityFeed({}: Props) {
               const isCommentsOpen = expandedCommentsPostId === post.id;
 
               return (
-                <div
-                  key={post.id}
-                  className="liquid-glass p-5 space-y-3.5 transition-all group"
-                >
+                <div key={post.id} className="liquid-glass group space-y-3.5 p-5 transition-all">
                   {/* Card Header: Author Line & Friend Action */}
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary/30 to-indigo-500/20 border border-primary/30 flex items-center justify-center font-bold text-xs text-primary shrink-0 shadow-xs">
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <div className="shadow-xs flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary/30 bg-gradient-to-tr from-primary/30 to-indigo-500/20 text-xs font-bold text-primary">
                         {post.authorAlias.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-xs text-foreground truncate">{post.authorAlias}</span>
-                          <span className="text-[10px] font-mono text-primary truncate">{post.authorUsername}</span>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="truncate text-xs font-bold text-foreground">
+                            {post.authorAlias}
+                          </span>
+                          <span className="truncate font-mono text-[10px] text-primary">
+                            {post.authorUsername}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono truncate mt-0.5">
+                        <div className="mt-0.5 flex items-center gap-1.5 truncate font-mono text-[10px] text-muted-foreground">
                           <span>{post.authorCollege}</span>
                           <span>•</span>
                           <span>{post.createdAt}</span>
@@ -461,17 +477,19 @@ export function CommunityFeed({}: Props) {
                             });
                             toast.success(`Connected with ${post.authorAlias}`);
                           } else {
-                            const friendObj = friends.find((f) => f.username === post.authorUsername);
+                            const friendObj = friends.find(
+                              (f) => f.username === post.authorUsername,
+                            );
                             if (friendObj) toggleFriendStatus(friendObj.id);
                           }
                         }}
                         className={cn(
-                          "px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold transition-all flex items-center gap-1 shrink-0",
+                          "flex shrink-0 items-center gap-1 rounded-xl px-2.5 py-1 font-mono text-[10px] font-bold transition-all",
                           friendState === "friends"
-                            ? "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
+                            ? "border border-emerald-500/30 bg-emerald-500/15 text-emerald-500"
                             : friendState === "pending_sent"
-                            ? "bg-amber-500/15 text-amber-500 border border-amber-500/30"
-                            : "bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-primary-foreground"
+                              ? "border border-amber-500/30 bg-amber-500/15 text-amber-500"
+                              : "border border-primary/20 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground",
                         )}
                       >
                         {friendState === "friends" ? (
@@ -494,33 +512,31 @@ export function CommunityFeed({}: Props) {
                   {/* Title & Description */}
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded-md text-[9px] font-mono font-bold bg-primary/10 text-primary border border-primary/20">
+                      <span className="rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[9px] font-bold text-primary">
                         {post.category}
                       </span>
-                      <span className="text-[10px] text-muted-foreground font-mono truncate">
+                      <span className="truncate font-mono text-[10px] text-muted-foreground">
                         {post.communityName}
                       </span>
                     </div>
 
-                    <h3 className="text-sm font-bold text-foreground leading-snug">
-                      {post.title}
-                    </h3>
+                    <h3 className="text-sm font-bold leading-snug text-foreground">{post.title}</h3>
 
-                    <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                    <p className="whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">
                       {post.description}
                     </p>
                   </div>
 
                   {/* Attachment Badge */}
                   {post.attachmentName && (
-                    <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50 flex items-center justify-between gap-2 text-xs">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <FileText className="h-4 w-4 text-primary shrink-0" />
-                        <span className="font-mono text-[11px] text-foreground truncate">
+                    <div className="flex items-center justify-between gap-2 rounded-xl border border-border/50 bg-muted/40 p-2.5 text-xs">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <FileText className="h-4 w-4 shrink-0 text-primary" />
+                        <span className="truncate font-mono text-[11px] text-foreground">
                           {post.attachmentName}
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono text-muted-foreground uppercase shrink-0">
+                      <span className="shrink-0 font-mono text-[10px] uppercase text-muted-foreground">
                         {post.attachmentType || "PDF Document"}
                       </span>
                     </div>
@@ -532,7 +548,7 @@ export function CommunityFeed({}: Props) {
                       {post.tags.map((t) => (
                         <span
                           key={t}
-                          className="px-2 py-0.5 rounded-md text-[9px] font-mono bg-muted/60 text-muted-foreground"
+                          className="rounded-md bg-muted/60 px-2 py-0.5 font-mono text-[9px] text-muted-foreground"
                         >
                           {t}
                         </span>
@@ -541,16 +557,16 @@ export function CommunityFeed({}: Props) {
                   )}
 
                   {/* Card Bottom Bar: Like, Comments & Actions */}
-                  <div className="pt-2.5 border-t border-border/40 flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between border-t border-border/40 pt-2.5 text-xs text-muted-foreground">
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
                         onClick={() => toggleLikePost(post.id)}
                         className={cn(
-                          "flex items-center gap-1.5 text-xs font-mono transition-all py-1 px-2 rounded-lg",
+                          "flex items-center gap-1.5 rounded-lg px-2 py-1 font-mono text-xs transition-all",
                           post.likedByUser
-                            ? "text-rose-500 font-bold bg-rose-500/10"
-                            : "hover:text-foreground hover:bg-muted/40"
+                            ? "bg-rose-500/10 font-bold text-rose-500"
+                            : "hover:bg-muted/40 hover:text-foreground",
                         )}
                       >
                         <Heart className={cn("h-3.5 w-3.5", post.likedByUser && "fill-rose-500")} />
@@ -561,10 +577,10 @@ export function CommunityFeed({}: Props) {
                         type="button"
                         onClick={() => setExpandedCommentsPostId(isCommentsOpen ? null : post.id)}
                         className={cn(
-                          "flex items-center gap-1.5 text-xs font-mono transition-all py-1 px-2 rounded-lg",
+                          "flex items-center gap-1.5 rounded-lg px-2 py-1 font-mono text-xs transition-all",
                           isCommentsOpen
-                            ? "text-primary font-bold bg-primary/10"
-                            : "hover:text-foreground hover:bg-muted/40"
+                            ? "bg-primary/10 font-bold text-primary"
+                            : "hover:bg-muted/40 hover:text-foreground",
                         )}
                       >
                         <MessageSquare className="h-3.5 w-3.5" />
@@ -578,7 +594,7 @@ export function CommunityFeed({}: Props) {
                         navigator.clipboard.writeText(window.location.href);
                         toast.success("Community link copied to clipboard!");
                       }}
-                      className="hover:text-foreground transition-colors p-1"
+                      className="p-1 transition-colors hover:text-foreground"
                     >
                       <Share2 className="h-3.5 w-3.5" />
                     </button>
@@ -586,14 +602,21 @@ export function CommunityFeed({}: Props) {
 
                   {/* Expandable Comments Thread */}
                   {isCommentsOpen && (
-                    <div className="pt-3 border-t border-border/30 space-y-2.5 animate-in fade-in duration-150">
+                    <div className="space-y-2.5 border-t border-border/30 pt-3 duration-150 animate-in fade-in">
                       {post.comments.map((c) => (
-                        <div key={c.id} className="p-2.5 rounded-xl bg-muted/30 border border-border/30 space-y-1">
-                          <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground">
-                            <span className="font-bold text-foreground">{c.authorAlias} ({c.authorUsername})</span>
+                        <div
+                          key={c.id}
+                          className="space-y-1 rounded-xl border border-border/30 bg-muted/30 p-2.5"
+                        >
+                          <div className="flex items-center justify-between font-mono text-[10px] text-muted-foreground">
+                            <span className="font-bold text-foreground">
+                              {c.authorAlias} ({c.authorUsername})
+                            </span>
                             <span>{c.createdAt}</span>
                           </div>
-                          <p className="text-xs text-muted-foreground leading-relaxed">{c.content}</p>
+                          <p className="text-xs leading-relaxed text-muted-foreground">
+                            {c.content}
+                          </p>
                         </div>
                       ))}
 
@@ -609,49 +632,47 @@ export function CommunityFeed({}: Props) {
                             if (e.key === "Enter") handleAddComment(post.id);
                           }}
                           placeholder="Write an academic response or explanation..."
-                          className="flex-1 h-8 px-3 rounded-xl bg-muted/40 border border-border/60 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary"
+                          className="h-8 flex-1 rounded-xl border border-border/60 bg-muted/40 px-3 text-xs text-foreground outline-none placeholder:text-muted-foreground focus:ring-1 focus:ring-primary"
                         />
                         <Button
                           size="sm"
                           onClick={() => handleAddComment(post.id)}
-                          className="h-8 px-3 rounded-xl text-xs font-bold bg-primary text-primary-foreground shadow-xs shrink-0"
+                          className="shadow-xs h-8 shrink-0 rounded-xl bg-primary px-3 text-xs font-bold text-primary-foreground"
                         >
                           <Send className="h-3 w-3" />
                         </Button>
                       </div>
                     </div>
                   )}
-
                 </div>
               );
             })
           )}
         </div>
-
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
           RIGHT COLUMN (Span 3): Classmates & Friends Circle + Telemetry Info
           ══════════════════════════════════════════════════════════════════════ */}
-      <div className="lg:col-span-3 space-y-4">
-        
+      <div className="space-y-4 lg:col-span-3">
         {/* 1. Study Circle (Connected Friends) */}
-        <div className="liquid-glass p-4 sm:p-5 space-y-3">
+        <div className="liquid-glass space-y-3 p-4 sm:p-5">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider font-mono flex items-center gap-1.5">
+            <h4 className="flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-foreground">
               <Users className="h-3.5 w-3.5 text-emerald-400" />
               <span>Study Circle</span>
             </h4>
-            <span className="text-[10px] font-mono text-emerald-500 font-bold">
+            <span className="font-mono text-[10px] font-bold text-emerald-500">
               {friends.filter((f) => f.status === "friends").length} Active
             </span>
           </div>
 
           {friends.length === 0 ? (
-            <div className="p-4 rounded-xl bg-muted/20 border border-border/30 text-center space-y-1.5">
+            <div className="space-y-1.5 rounded-xl border border-border/30 bg-muted/20 p-4 text-center">
               <p className="text-xs font-semibold text-foreground">No Peers Connected Yet</p>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                Click <span className="font-mono text-primary font-bold">Add Friend</span> on any post author to add them to your live study circle.
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                Click <span className="font-mono font-bold text-primary">Add Friend</span> on any
+                post author to add them to your live study circle.
               </p>
             </div>
           ) : (
@@ -659,22 +680,29 @@ export function CommunityFeed({}: Props) {
               {friends.map((f) => (
                 <div
                   key={f.id}
-                  className="p-2.5 rounded-xl bg-muted/30 border border-border/40 flex items-center justify-between gap-2"
+                  className="flex items-center justify-between gap-2 rounded-xl border border-border/40 bg-muted/30 p-2.5"
                 >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className={cn("w-7 h-7 rounded-lg text-white font-bold text-[10px] flex items-center justify-center shrink-0", f.avatarColor)}>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <div
+                      className={cn(
+                        "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold text-white",
+                        f.avatarColor,
+                      )}
+                    >
                       {f.alias.charAt(0)}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-bold text-xs text-foreground truncate">{f.alias}</div>
-                      <div className="text-[10px] text-muted-foreground font-mono truncate">{f.college}</div>
+                      <div className="truncate text-xs font-bold text-foreground">{f.alias}</div>
+                      <div className="truncate font-mono text-[10px] text-muted-foreground">
+                        {f.college}
+                      </div>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={() => router.push("/chat")}
-                    className="p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all shrink-0"
+                    className="shrink-0 rounded-lg bg-primary/10 p-1.5 text-primary transition-all hover:bg-primary hover:text-primary-foreground"
                     title="Launch Grounded RAG Chat"
                   >
                     <MessageSquare className="h-3 w-3" />
@@ -686,29 +714,28 @@ export function CommunityFeed({}: Props) {
         </div>
 
         {/* 2. RAG Study Guidelines & Engine Specs */}
-        <div className="liquid-glass p-4 sm:p-5 space-y-3 border-emerald-500/20">
-          <div className="flex items-center gap-2 text-emerald-500 font-bold text-xs font-mono">
+        <div className="liquid-glass space-y-3 border-emerald-500/20 p-4 sm:p-5">
+          <div className="flex items-center gap-2 font-mono text-xs font-bold text-emerald-500">
             <ShieldCheck className="h-4 w-4" />
             <span>Academic Verification</span>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            All shared notes and formulas are validated against grounded syllabus vectors indexed in Qdrant.
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            All shared notes and formulas are validated against grounded syllabus vectors indexed in
+            Qdrant.
           </p>
 
-          <div className="pt-2 border-t border-border/40 space-y-1.5 text-[11px] font-mono">
+          <div className="space-y-1.5 border-t border-border/40 pt-2 font-mono text-[11px]">
             <div className="flex items-center justify-between text-muted-foreground">
               <span>Vector Store:</span>
-              <span className="text-emerald-500 font-bold">Qdrant Active</span>
+              <span className="font-bold text-emerald-500">Qdrant Active</span>
             </div>
             <div className="flex items-center justify-between text-muted-foreground">
               <span>Egress:</span>
-              <span className="text-primary font-bold">Cloudflare R2</span>
+              <span className="font-bold text-primary">Cloudflare R2</span>
             </div>
           </div>
         </div>
-
       </div>
-
     </div>
   );
 }

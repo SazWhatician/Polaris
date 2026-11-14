@@ -40,18 +40,35 @@ const CATEGORIES: TodoCategory[] = [
 ];
 
 const PRIORITIES: { label: string; value: TodoPriority; color: string; badgeBg: string }[] = [
-  { label: "High", value: "high", color: "text-rose-400 border-rose-500/30", badgeBg: "bg-rose-500/10 text-rose-400" },
-  { label: "Medium", value: "medium", color: "text-amber-400 border-amber-500/30", badgeBg: "bg-amber-500/10 text-amber-400" },
-  { label: "Low", value: "low", color: "text-emerald-400 border-emerald-500/30", badgeBg: "bg-emerald-500/10 text-emerald-400" },
+  {
+    label: "High",
+    value: "high",
+    color: "text-rose-400 border-rose-500/30",
+    badgeBg: "bg-rose-500/10 text-rose-400",
+  },
+  {
+    label: "Medium",
+    value: "medium",
+    color: "text-amber-400 border-amber-500/30",
+    badgeBg: "bg-amber-500/10 text-amber-400",
+  },
+  {
+    label: "Low",
+    value: "low",
+    color: "text-emerald-400 border-emerald-500/30",
+    badgeBg: "bg-emerald-500/10 text-emerald-400",
+  },
 ];
 
 function getPriorityMeta(priority: TodoPriority) {
-  return PRIORITIES.find((p) => p.value === priority) || {
-    label: "Medium",
-    value: "medium" as TodoPriority,
-    color: "text-amber-400 border-amber-500/30",
-    badgeBg: "bg-amber-500/10 text-amber-400",
-  };
+  return (
+    PRIORITIES.find((p) => p.value === priority) || {
+      label: "Medium",
+      value: "medium" as TodoPriority,
+      color: "text-amber-400 border-amber-500/30",
+      badgeBg: "bg-amber-500/10 text-amber-400",
+    }
+  );
 }
 
 export function TodoDrawer() {
@@ -157,23 +174,23 @@ export function TodoDrawer() {
       {/* Todo Slide-Over Drawer Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm duration-200 animate-in fade-in"
           onClick={() => setIsOpen(false)}
         >
           <div
-            className="w-full max-w-lg bg-card/95 border-l border-border/80 h-full flex flex-col shadow-2xl backdrop-blur-2xl animate-in slide-in-from-right duration-300 relative text-foreground"
+            className="relative flex h-full w-full max-w-lg flex-col border-l border-border/80 bg-card/95 text-foreground shadow-2xl backdrop-blur-2xl duration-300 animate-in slide-in-from-right"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drawer Header */}
-            <div className="p-5 border-b border-border/60 flex items-center justify-between bg-muted/20">
+            <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 p-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-sm">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary shadow-sm">
                   <ListTodo className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="text-base font-extrabold tracking-tight text-foreground flex items-center gap-2">
+                  <h2 className="flex items-center gap-2 text-base font-extrabold tracking-tight text-foreground">
                     Academic Tasks & To-Do
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary">
+                    <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[10px] text-primary">
                       Storage Active
                     </span>
                   </h2>
@@ -184,7 +201,7 @@ export function TodoDrawer() {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                className="rounded-xl p-2 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
                 title="Close (Esc)"
               >
                 <X className="h-5 w-5" />
@@ -192,35 +209,35 @@ export function TodoDrawer() {
             </div>
 
             {/* Progress & Stats Bar */}
-            <div className="px-5 py-4 border-b border-border/40 bg-muted/10 space-y-2">
+            <div className="space-y-2 border-b border-border/40 bg-muted/10 px-5 py-4">
               <div className="flex items-center justify-between text-xs font-semibold">
-                <span className="text-muted-foreground flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 text-muted-foreground">
                   <Sparkles className="h-3.5 w-3.5 text-primary" />
                   Study Completion Progress
                 </span>
-                <span className="font-mono text-primary font-bold">
+                <span className="font-mono font-bold text-primary">
                   {completedCount}/{totalCount} completed ({progressPercent}%)
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full bg-muted/60 overflow-hidden relative">
+              <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted/60">
                 <div
-                  className="h-full bg-gradient-to-r from-primary to-indigo-400 transition-all duration-500 rounded-full"
+                  className="h-full rounded-full bg-gradient-to-r from-primary to-indigo-400 transition-all duration-500"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
             </div>
 
             {/* Search & Action Controls */}
-            <div className="p-4 border-b border-border/40 space-y-3">
+            <div className="space-y-3 border-b border-border/40 p-4">
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search tasks or categories..."
-                    className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-muted/40 border border-border/60 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="w-full rounded-xl border border-border/60 bg-muted/40 py-2 pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                   {searchQuery && (
                     <button
@@ -234,7 +251,7 @@ export function TodoDrawer() {
                 <Button
                   size="sm"
                   onClick={() => setShowAddForm(!showAddForm)}
-                  className="gap-1.5 text-xs font-bold rounded-xl"
+                  className="gap-1.5 rounded-xl text-xs font-bold"
                 >
                   <Plus className="h-4 w-4" />
                   <span>{showAddForm ? "Close" : "New Task"}</span>
@@ -245,26 +262,26 @@ export function TodoDrawer() {
               {showAddForm && (
                 <form
                   onSubmit={handleAdd}
-                  className="p-4 rounded-2xl bg-muted/40 border border-border/80 space-y-3 animate-in fade-in duration-200"
+                  className="space-y-3 rounded-2xl border border-border/80 bg-muted/40 p-4 duration-200 animate-in fade-in"
                 >
                   <input
                     type="text"
                     value={newTitle}
                     onChange={(e) => setNewTitle(e.target.value)}
                     placeholder="Task name (e.g. Study Heap Sort & Priority Queues)"
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-background border border-border/80 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    className="w-full rounded-xl border border-border/80 bg-background px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                     autoFocus
                   />
 
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                      <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                         Category
                       </label>
                       <select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value as TodoCategory)}
-                        className="w-full px-2.5 py-1.5 rounded-lg bg-background border border-border/80 text-xs text-foreground focus:outline-none"
+                        className="w-full rounded-lg border border-border/80 bg-background px-2.5 py-1.5 text-xs text-foreground focus:outline-none"
                       >
                         {CATEGORIES.map((c) => (
                           <option key={c} value={c}>
@@ -275,7 +292,7 @@ export function TodoDrawer() {
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                      <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                         Priority
                       </label>
                       <div className="flex gap-1">
@@ -285,10 +302,10 @@ export function TodoDrawer() {
                             key={p.value}
                             onClick={() => setSelectedPriority(p.value)}
                             className={cn(
-                              "flex-1 py-1 text-[10px] font-bold rounded-md border transition-all",
+                              "flex-1 rounded-md border py-1 text-[10px] font-bold transition-all",
                               selectedPriority === p.value
                                 ? p.badgeBg + " border-current shadow-sm"
-                                : "border-border/60 text-muted-foreground hover:bg-muted"
+                                : "border-border/60 text-muted-foreground hover:bg-muted",
                             )}
                           >
                             {p.label}
@@ -299,7 +316,7 @@ export function TodoDrawer() {
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block mb-1">
+                    <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Due Date / Note (Optional)
                     </label>
                     <input
@@ -307,7 +324,7 @@ export function TodoDrawer() {
                       value={newDueDate}
                       onChange={(e) => setNewDueDate(e.target.value)}
                       placeholder="e.g. Today, Friday, or Oct 24"
-                      className="w-full px-3 py-1.5 text-xs rounded-lg bg-background border border-border/80 text-foreground placeholder:text-muted-foreground focus:outline-none"
+                      className="w-full rounded-lg border border-border/80 bg-background px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none"
                     />
                   </div>
 
@@ -317,11 +334,11 @@ export function TodoDrawer() {
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowAddForm(false)}
-                      className="text-xs h-8"
+                      className="h-8 text-xs"
                     >
                       Cancel
                     </Button>
-                    <Button type="submit" size="sm" className="text-xs font-bold h-8 gap-1">
+                    <Button type="submit" size="sm" className="h-8 gap-1 text-xs font-bold">
                       <Check className="h-3.5 w-3.5" />
                       Save Task
                     </Button>
@@ -359,20 +376,20 @@ export function TodoDrawer() {
             </div>
 
             {/* Todo List Scrollable Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+            <div className="flex-1 space-y-2.5 overflow-y-auto p-4">
               {filteredTodos.length === 0 ? (
-                <div className="h-64 flex flex-col items-center justify-center text-center p-6 space-y-3">
-                  <div className="w-12 h-12 rounded-2xl bg-muted/40 border border-border/60 flex items-center justify-center text-muted-foreground">
+                <div className="flex h-64 flex-col items-center justify-center space-y-3 p-6 text-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border/60 bg-muted/40 text-muted-foreground">
                     <ListTodo className="h-6 w-6" />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-foreground">No tasks found</p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {searchQuery
                         ? "Try clearing your search query"
                         : filterTab === "completed"
-                        ? "No completed tasks yet. Finish some items to see them here!"
-                        : "Your study task queue is clear! Click '+ New Task' to add items."}
+                          ? "No completed tasks yet. Finish some items to see them here!"
+                          : "Your study task queue is clear! Click '+ New Task' to add items."}
                     </p>
                   </div>
                   {!searchQuery && filterTab === "all" && (
@@ -380,9 +397,9 @@ export function TodoDrawer() {
                       variant="outline"
                       size="sm"
                       onClick={() => setShowAddForm(true)}
-                      className="text-xs font-semibold rounded-xl"
+                      className="rounded-xl text-xs font-semibold"
                     >
-                      <Plus className="h-3.5 w-3.5 mr-1" />
+                      <Plus className="mr-1 h-3.5 w-3.5" />
                       Create First Task
                     </Button>
                   )}
@@ -396,62 +413,62 @@ export function TodoDrawer() {
                       key={item.id}
                       onClick={() => handleToggle(item.id, item.completed)}
                       className={cn(
-                        "group p-3.5 rounded-2xl border transition-all duration-200 cursor-pointer flex items-start gap-3 select-none",
+                        "group flex cursor-pointer select-none items-start gap-3 rounded-2xl border p-3.5 transition-all duration-200",
                         item.completed
-                          ? "bg-muted/20 border-border/40 opacity-70"
-                          : "bg-card/90 hover:bg-card border-border/80 hover:border-primary/40 shadow-sm"
+                          ? "border-border/40 bg-muted/20 opacity-70"
+                          : "border-border/80 bg-card/90 shadow-sm hover:border-primary/40 hover:bg-card",
                       )}
                     >
                       {/* Checkbox Trigger */}
                       <button
                         type="button"
-                        className="mt-0.5 flex-shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                        className="mt-0.5 flex-shrink-0 text-muted-foreground transition-colors hover:text-primary"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleToggle(item.id, item.completed);
                         }}
                       >
                         {item.completed ? (
-                          <CheckCircle2 className="h-5 w-5 text-emerald-500 fill-emerald-500/20" />
+                          <CheckCircle2 className="h-5 w-5 fill-emerald-500/20 text-emerald-500" />
                         ) : (
                           <Circle className="h-5 w-5 hover:text-primary" />
                         )}
                       </button>
 
                       {/* Content */}
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p
                           className={cn(
                             "text-xs font-semibold leading-relaxed transition-all",
                             item.completed
-                              ? "line-through text-muted-foreground"
-                              : "text-foreground font-medium"
+                              ? "text-muted-foreground line-through"
+                              : "font-medium text-foreground",
                           )}
                         >
                           {item.title}
                         </p>
 
-                        <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                        <div className="mt-2 flex flex-wrap items-center gap-1.5">
                           {/* Priority Badge */}
                           <span
                             className={cn(
-                              "text-[10px] font-bold px-2 py-0.5 rounded-md border",
+                              "rounded-md border px-2 py-0.5 text-[10px] font-bold",
                               priorityMeta.badgeBg,
-                              priorityMeta.color
+                              priorityMeta.color,
                             )}
                           >
                             {priorityMeta.label}
                           </span>
 
                           {/* Category Tag */}
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-muted/60 text-muted-foreground border border-border/50 flex items-center gap-1">
+                          <span className="flex items-center gap-1 rounded-md border border-border/50 bg-muted/60 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
                             <Tag className="h-2.5 w-2.5" />
                             {item.category}
                           </span>
 
                           {/* Due Date */}
                           {item.dueDate && (
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 flex items-center gap-1">
+                            <span className="flex items-center gap-1 rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[10px] text-primary">
                               <Calendar className="h-2.5 w-2.5" />
                               {item.dueDate}
                             </span>
@@ -463,7 +480,7 @@ export function TodoDrawer() {
                       <button
                         type="button"
                         onClick={(e) => handleDelete(item.id, e)}
-                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+                        className="rounded-lg p-1.5 text-muted-foreground opacity-0 transition-all hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
                         title="Delete task"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -475,18 +492,19 @@ export function TodoDrawer() {
             </div>
 
             {/* Drawer Footer */}
-            <div className="p-4 border-t border-border/60 bg-muted/20 flex items-center justify-between text-xs">
-              <div className="text-muted-foreground text-[11px] font-mono">
-                Press <kbd className="px-1.5 py-0.5 rounded bg-muted border font-bold">Alt+T</kbd> to toggle
+            <div className="flex items-center justify-between border-t border-border/60 bg-muted/20 p-4 text-xs">
+              <div className="font-mono text-[11px] text-muted-foreground">
+                Press <kbd className="rounded border bg-muted px-1.5 py-0.5 font-bold">Alt+T</kbd>{" "}
+                to toggle
               </div>
               {completedCount > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleClearCompleted}
-                  className="text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8"
+                  className="h-8 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                 >
-                  <Trash2 className="h-3.5 w-3.5 mr-1" />
+                  <Trash2 className="mr-1 h-3.5 w-3.5" />
                   Clear Completed ({completedCount})
                 </Button>
               )}
@@ -513,17 +531,19 @@ function FilterTabButton({
     <button
       onClick={onClick}
       className={cn(
-        "px-2.5 py-1 rounded-lg font-bold text-xs whitespace-nowrap transition-all flex items-center gap-1.5",
+        "flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-bold transition-all",
         active
           ? "bg-primary text-primary-foreground shadow-sm"
-          : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted"
+          : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground",
       )}
     >
       <span>{label}</span>
       <span
         className={cn(
-          "px-1.5 py-0.2 rounded-full text-[10px] font-mono",
-          active ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
+          "py-0.2 rounded-full px-1.5 font-mono text-[10px]",
+          active
+            ? "bg-primary-foreground/20 text-primary-foreground"
+            : "bg-muted text-muted-foreground",
         )}
       >
         {count}

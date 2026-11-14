@@ -8,7 +8,6 @@ from google.cloud.firestore_v1 import DocumentSnapshot
 
 from app.models.syllabus import Syllabus, SyllabusCoverage, Topic
 
-
 _mem_syllabi: dict[tuple[str, str], Syllabus] = {}
 _mem_coverages: dict[tuple[str, str], SyllabusCoverage] = {}
 

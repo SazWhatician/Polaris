@@ -11,7 +11,7 @@ export default function SignupPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground text-xs font-mono">
+    <div className="flex min-h-screen items-center justify-center bg-background font-mono text-xs text-muted-foreground">
       FORWARDING TO SCHOLAR REGISTRATION...
     </div>
   );

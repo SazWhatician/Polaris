@@ -20,7 +20,8 @@ class PlannerRunRequest(BaseModel):
     exam_date: str = Field(description="Target exam date in YYYY-MM-DD format")
     daily_hours: float = Field(default=2.0, description="Available study hours per day")
     topic_gaps: list[dict[str, Any]] = Field(
-        default_factory=list, description="List of topic gap objects (topic_id, topic_title, priority)"
+        default_factory=list,
+        description="List of topic gap objects (topic_id, topic_title, priority)",
     )
 
 
@@ -113,9 +114,7 @@ async def get_planner_run_status(
     next_nodes = snapshot.next
 
     if next_nodes:
-        raise HTTPException(
-            status.HTTP_202_ACCEPTED, detail="Revision plan generation in progress"
-        )
+        raise HTTPException(status.HTTP_202_ACCEPTED, detail="Revision plan generation in progress")
 
     if values.get("error"):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=values["error"])

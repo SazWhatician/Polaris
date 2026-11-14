@@ -105,9 +105,7 @@ class OcrService:
                     )
 
                 native_texts = (
-                    extract_pdf_page_texts(blob_bytes)
-                    if doc.mime_type == "application/pdf"
-                    else []
+                    extract_pdf_page_texts(blob_bytes) if doc.mime_type == "application/pdf" else []
                 )
 
                 pages = self._ocr_each(document_id, images, native_texts)
@@ -173,12 +171,18 @@ class OcrService:
                     span.set_attribute("page.number", i)
                     try:
                         result = self._engine.ocr_image(img)
-                        final_text = (native + "\n" + result.text).strip() if native else result.text
-                        conf = result.confidence if result.confidence > 0 else (1.0 if native else 0.9)
+                        final_text = (
+                            (native + "\n" + result.text).strip() if native else result.text
+                        )
+                        conf = (
+                            result.confidence if result.confidence > 0 else (1.0 if native else 0.9)
+                        )
                     except Exception as e:
+                        if not native.strip():
+                            raise
                         log.warning("ocr.page_fallback", page=i, error=str(e))
                         final_text = native
-                        conf = 1.0 if native else 0.0
+                        conf = 1.0
                     pages.append(
                         Page(
                             document_id=document_id,

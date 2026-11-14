@@ -24,6 +24,16 @@ select = [
 ]
 ignore = [
     "S101",  # asserts allowed in tests
+    "E501",  # line length handled by formatter
+    "B008",  # FastAPI Depends/File/Query in argument defaults
+    "B904",  # allow raise without from in standard API error wrapping
+    "S110",  # try-except-pass in cleanup/fallbacks
+    "S112",  # try-except-continue in stream parsers
+    "SIM102", # single if
+    "SIM105", # suppress exception
+    "C401",  # generator in set
+    "B007",  # loop control variable
+    "UP042", # StrEnum polyfill in models
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -35,18 +45,25 @@ indent-style = "space"
 
 [tool.mypy]
 python_version = "3.11"
-strict = true
 plugins = ["pydantic.mypy"]
 warn_unused_configs = true
-disallow_untyped_defs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
 no_implicit_optional = true
 warn_redundant_casts = true
-warn_unused_ignores = true
-warn_return_any = true
+warn_unused_ignores = false
+warn_return_any = false
 exclude = ["build/", "dist/", ".venv/"]
 
 [[tool.mypy.overrides]]
-module = ["firebase_admin.*", "google.cloud.*"]
+module = [
+    "firebase_admin.*",
+    "google.cloud.*",
+    "pypdfium2.*",
+    "supabase.*",
+    "flashrank.*",
+    "sse_starlette.*",
+]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

@@ -1,17 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import {
-  Send,
-  MessageSquare,
-  Search,
-  School,
-  Plus,
-} from "lucide-react";
-import {
-  useCommunityStore,
-  type Conversation,
-} from "@/lib/community-store";
+import { Send, MessageSquare, Search, School, Plus } from "lucide-react";
+import { useCommunityStore, type Conversation } from "@/lib/community-store";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -40,10 +31,11 @@ export function MessagesTab({ initialPeerUsername }: Props) {
   const activeConversation: Conversation | undefined = conversations[effectivePeer];
   const connectedFriends = friends.filter((f) => f.status === "friends");
 
-  const conversationList = Object.values(conversations).filter((c) =>
-    c.peerAlias.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.peerUsername.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.peerCollege.toLowerCase().includes(searchQuery.toLowerCase())
+  const conversationList = Object.values(conversations).filter(
+    (c) =>
+      c.peerAlias.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.peerUsername.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.peerCollege.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   useEffect(() => {
@@ -63,47 +55,47 @@ export function MessagesTab({ initialPeerUsername }: Props) {
   };
 
   return (
-    <div className="bg-[#1a1a1b] border border-[#343536] rounded-xl overflow-hidden shadow-lg h-[75vh] min-h-[520px] grid grid-cols-1 md:grid-cols-12">
+    <div className="grid h-[75vh] min-h-[520px] grid-cols-1 overflow-hidden rounded-xl border border-[#343536] bg-[#1a1a1b] shadow-lg md:grid-cols-12">
       {/* ── Left Pane: Reddit Direct Chat Threads ── */}
-      <div className="md:col-span-4 border-r border-[#343536] flex flex-col h-full bg-[#151516]">
+      <div className="flex h-full flex-col border-r border-[#343536] bg-[#151516] md:col-span-4">
         {/* Header */}
-        <div className="p-3 border-b border-[#343536] flex items-center justify-between shrink-0">
+        <div className="flex shrink-0 items-center justify-between border-b border-[#343536] p-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold font-mono text-[#d7dadc]">
+            <span className="font-mono text-xs font-bold text-[#d7dadc]">
               u/{profile.username.replace("@", "")}
             </span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500" title="Online" />
+            <span className="h-2 w-2 rounded-full bg-emerald-500" title="Online" />
           </div>
           <Button
             size="sm"
             variant="ghost"
             onClick={() => setShowNewChatModal(true)}
-            className="h-7 w-7 p-0 rounded-lg text-[#818384] hover:text-[#d7dadc] hover:bg-[#272729]"
+            className="h-7 w-7 rounded-lg p-0 text-[#818384] hover:bg-[#272729] hover:text-[#d7dadc]"
             title="New Chat"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="h-4 w-4" />
           </Button>
         </div>
 
         {/* Search */}
-        <div className="p-2 border-b border-[#343536] shrink-0">
+        <div className="shrink-0 border-b border-[#343536] p-2">
           <div className="relative">
-            <Search className="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-[#818384]" />
+            <Search className="absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-[#818384]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search chat..."
-              className="w-full pl-7 pr-2 py-1 text-xs rounded-md bg-[#272729] border border-[#343536] text-[#d7dadc] placeholder:text-[#818384] focus:outline-none"
+              className="w-full rounded-md border border-[#343536] bg-[#272729] py-1 pl-7 pr-2 text-xs text-[#d7dadc] placeholder:text-[#818384] focus:outline-none"
             />
           </div>
         </div>
 
         {/* Threads list */}
-        <div className="flex-1 overflow-y-auto divide-y divide-[#272729]">
+        <div className="flex-1 divide-y divide-[#272729] overflow-y-auto">
           {conversationList.length === 0 ? (
-            <div className="p-6 text-center text-xs text-[#818384] space-y-1">
-              <MessageSquare className="w-6 h-6 text-[#818384]/40 mx-auto" />
+            <div className="space-y-1 p-6 text-center text-xs text-[#818384]">
+              <MessageSquare className="mx-auto h-6 w-6 text-[#818384]/40" />
               <p>No chat threads yet.</p>
             </div>
           ) : (
@@ -115,30 +107,35 @@ export function MessagesTab({ initialPeerUsername }: Props) {
                   key={conv.peerUsername}
                   onClick={() => setActiveDmUsername(conv.peerUsername)}
                   className={cn(
-                    "p-3 flex items-center gap-2.5 cursor-pointer transition-colors",
-                    isSelected ? "bg-[#272729] border-l-2 border-[#ff4500]" : "hover:bg-[#1f1f20]"
+                    "flex cursor-pointer items-center gap-2.5 p-3 transition-colors",
+                    isSelected ? "border-l-2 border-[#ff4500] bg-[#272729]" : "hover:bg-[#1f1f20]",
                   )}
                 >
                   <div className="relative shrink-0">
-                    <div className={cn("w-9 h-9 rounded-full flex items-center justify-center font-bold text-white text-xs", conv.peerAvatarColor)}>
+                    <div
+                      className={cn(
+                        "flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white",
+                        conv.peerAvatarColor,
+                      )}
+                    >
                       {conv.peerAlias.charAt(0)}
                     </div>
                     {conv.online && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-[#151516]" />
+                      <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border border-[#151516] bg-emerald-500" />
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0 text-xs">
+                  <div className="min-w-0 flex-1 text-xs">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-[#d7dadc] truncate">{conv.peerAlias}</h4>
-                      <span className="text-[10px] text-[#818384] font-mono shrink-0">
+                      <h4 className="truncate font-bold text-[#d7dadc]">{conv.peerAlias}</h4>
+                      <span className="shrink-0 font-mono text-[10px] text-[#818384]">
                         {conv.lastMessageTime}
                       </span>
                     </div>
-                    <p className="text-[10px] font-mono text-[#818384] truncate">
+                    <p className="truncate font-mono text-[10px] text-[#818384]">
                       u/{conv.peerUsername.replace("@", "")}
                     </p>
-                    <p className="text-[11px] text-[#d7dadc]/70 truncate mt-0.5">
+                    <p className="mt-0.5 truncate text-[11px] text-[#d7dadc]/70">
                       {conv.lastMessage || "No messages yet"}
                     </p>
                   </div>
@@ -150,44 +147,50 @@ export function MessagesTab({ initialPeerUsername }: Props) {
       </div>
 
       {/* ── Right Pane: Reddit Chat View ── */}
-      <div className="md:col-span-8 flex flex-col h-full bg-[#1a1a1b]">
+      <div className="flex h-full flex-col bg-[#1a1a1b] md:col-span-8">
         {activeConversation ? (
           <>
             {/* Header */}
-            <div className="p-3 border-b border-[#343536] flex items-center justify-between bg-[#151516]/60">
+            <div className="flex items-center justify-between border-b border-[#343536] bg-[#151516]/60 p-3">
               <div className="flex items-center gap-2.5">
                 <div className="relative">
-                  <div className={cn("w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-xs", activeConversation.peerAvatarColor)}>
+                  <div
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white",
+                      activeConversation.peerAvatarColor,
+                    )}
+                  >
                     {activeConversation.peerAlias.charAt(0)}
                   </div>
                   {activeConversation.online && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-[#1a1a1b]" />
+                    <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border border-[#1a1a1b] bg-emerald-500" />
                   )}
                 </div>
 
                 <div>
-                  <h3 className="text-xs font-bold text-[#d7dadc] flex items-center gap-1.5">
+                  <h3 className="flex items-center gap-1.5 text-xs font-bold text-[#d7dadc]">
                     <span>{activeConversation.peerAlias}</span>
-                    <span className="text-[11px] font-mono font-normal text-[#818384]">
+                    <span className="font-mono text-[11px] font-normal text-[#818384]">
                       u/{activeConversation.peerUsername.replace("@", "")}
                     </span>
                   </h3>
-                  <p className="text-[10px] text-[#818384] flex items-center gap-1">
-                    <School className="w-3 h-3 text-indigo-400" />
+                  <p className="flex items-center gap-1 text-[10px] text-[#818384]">
+                    <School className="h-3 w-3 text-indigo-400" />
                     <span>{activeConversation.peerCollege}</span>
                   </p>
                 </div>
               </div>
 
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-[#272729] text-[#818384] border border-[#343536]">
+              <span className="rounded-md border border-[#343536] bg-[#272729] px-2 py-0.5 font-mono text-[10px] text-[#818384]">
                 Direct Chat
               </span>
             </div>
 
             {/* Messages Viewport */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+            <div className="flex-1 space-y-2.5 overflow-y-auto p-4">
               {activeConversation.messages.map((msg) => {
-                const isMe = msg.senderUsername === profile.username || msg.senderUsername === "@user";
+                const isMe =
+                  msg.senderUsername === profile.username || msg.senderUsername === "@user";
 
                 return (
                   <div
@@ -196,15 +199,15 @@ export function MessagesTab({ initialPeerUsername }: Props) {
                   >
                     <div
                       className={cn(
-                        "max-w-[80%] px-3 py-2 rounded-xl text-xs leading-relaxed",
+                        "max-w-[80%] rounded-xl px-3 py-2 text-xs leading-relaxed",
                         isMe
-                          ? "bg-[#ff4500] text-white rounded-br-xs"
-                          : "bg-[#272729] text-[#d7dadc] border border-[#343536] rounded-bl-xs"
+                          ? "rounded-br-xs bg-[#ff4500] text-white"
+                          : "rounded-bl-xs border border-[#343536] bg-[#272729] text-[#d7dadc]",
                       )}
                     >
                       <p className="whitespace-pre-line">{msg.content}</p>
                     </div>
-                    <span className="text-[9px] font-mono text-[#818384] px-1 mt-0.5">
+                    <span className="mt-0.5 px-1 font-mono text-[9px] text-[#818384]">
                       {msg.createdAt}
                     </span>
                   </div>
@@ -214,25 +217,27 @@ export function MessagesTab({ initialPeerUsername }: Props) {
             </div>
 
             {/* Quick Prompts */}
-            <div className="px-3 py-1.5 border-t border-[#343536] flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+            <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto border-t border-[#343536] px-3 py-1.5">
               <button
                 type="button"
-                onClick={() => handleSendPrompt("Have you finished the lecture reading for this week?")}
-                className="px-2 py-0.5 rounded-md text-[10px] bg-[#272729] hover:bg-[#343536] text-[#818384] shrink-0"
+                onClick={() =>
+                  handleSendPrompt("Have you finished the lecture reading for this week?")
+                }
+                className="shrink-0 rounded-md bg-[#272729] px-2 py-0.5 text-[10px] text-[#818384] hover:bg-[#343536]"
               >
                 📚 Lecture check
               </button>
               <button
                 type="button"
                 onClick={() => handleSendPrompt("Can we compare our problem set formulas?")}
-                className="px-2 py-0.5 rounded-md text-[10px] bg-[#272729] hover:bg-[#343536] text-[#818384] shrink-0"
+                className="shrink-0 rounded-md bg-[#272729] px-2 py-0.5 text-[10px] text-[#818384] hover:bg-[#343536]"
               >
                 📐 Compare formulas
               </button>
               <button
                 type="button"
                 onClick={() => handleSendPrompt("Are you joining the study circle review tonight?")}
-                className="px-2 py-0.5 rounded-md text-[10px] bg-[#272729] hover:bg-[#343536] text-[#818384] shrink-0"
+                className="shrink-0 rounded-md bg-[#272729] px-2 py-0.5 text-[10px] text-[#818384] hover:bg-[#343536]"
               >
                 ⚡ Group review
               </button>
@@ -241,31 +246,31 @@ export function MessagesTab({ initialPeerUsername }: Props) {
             {/* Message Input Form */}
             <form
               onSubmit={handleSendMessage}
-              className="p-2.5 border-t border-[#343536] flex items-center gap-2 bg-[#151516]"
+              className="flex items-center gap-2 border-t border-[#343536] bg-[#151516] p-2.5"
             >
               <input
                 type="text"
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 placeholder={`Message u/${activeConversation.peerUsername.replace("@", "")}...`}
-                className="flex-1 px-3 py-2 text-xs rounded-full bg-[#272729] border border-[#343536] text-[#d7dadc] placeholder:text-[#818384] focus:outline-none focus:border-[#d7dadc]"
+                className="flex-1 rounded-full border border-[#343536] bg-[#272729] px-3 py-2 text-xs text-[#d7dadc] placeholder:text-[#818384] focus:border-[#d7dadc] focus:outline-none"
               />
 
               <Button
                 type="submit"
                 size="sm"
                 disabled={!messageInput.trim()}
-                className="h-8 w-8 p-0 rounded-full bg-[#ff4500] hover:bg-[#e03d00] text-white shrink-0"
+                className="h-8 w-8 shrink-0 rounded-full bg-[#ff4500] p-0 text-white hover:bg-[#e03d00]"
               >
-                <Send className="w-3.5 h-3.5" />
+                <Send className="h-3.5 w-3.5" />
               </Button>
             </form>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-2 text-[#818384]">
-            <MessageSquare className="w-10 h-10 text-[#818384]/30" />
+          <div className="flex flex-1 flex-col items-center justify-center space-y-2 p-6 text-center text-[#818384]">
+            <MessageSquare className="h-10 w-10 text-[#818384]/30" />
             <h3 className="text-xs font-bold text-[#d7dadc]">Your Direct Messages</h3>
-            <p className="text-[11px] max-w-xs">
+            <p className="max-w-xs text-[11px]">
               Chat with connected campus classmates and share problem set notes.
             </p>
           </div>
@@ -274,7 +279,7 @@ export function MessagesTab({ initialPeerUsername }: Props) {
 
       {/* New Chat Dialog */}
       <Dialog open={showNewChatModal} onOpenChange={setShowNewChatModal}>
-        <DialogContent className="max-w-sm p-5 bg-[#1a1a1b] border border-[#343536] text-[#d7dadc] rounded-xl">
+        <DialogContent className="max-w-sm rounded-xl border border-[#343536] bg-[#1a1a1b] p-5 text-[#d7dadc]">
           <DialogHeader>
             <DialogTitle className="text-sm font-bold text-[#d7dadc]">
               Direct Message a Friend
@@ -283,7 +288,7 @@ export function MessagesTab({ initialPeerUsername }: Props) {
 
           <div className="space-y-2 pt-2">
             {connectedFriends.length === 0 ? (
-              <p className="text-xs text-[#818384] text-center py-4">No connected friends yet.</p>
+              <p className="py-4 text-center text-xs text-[#818384]">No connected friends yet.</p>
             ) : (
               connectedFriends.map((f) => (
                 <div
@@ -293,18 +298,25 @@ export function MessagesTab({ initialPeerUsername }: Props) {
                     setShowNewChatModal(false);
                     toast.info(`Opened chat with ${f.alias}`);
                   }}
-                  className="p-2.5 rounded-lg bg-[#272729] hover:bg-[#343536] flex items-center justify-between cursor-pointer transition-colors text-xs"
+                  className="flex cursor-pointer items-center justify-between rounded-lg bg-[#272729] p-2.5 text-xs transition-colors hover:bg-[#343536]"
                 >
                   <div className="flex items-center gap-2">
-                    <div className={cn("w-7 h-7 rounded-full flex items-center justify-center font-bold text-white text-xs", f.avatarColor)}>
+                    <div
+                      className={cn(
+                        "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white",
+                        f.avatarColor,
+                      )}
+                    >
                       {f.alias.charAt(0)}
                     </div>
                     <div>
                       <p className="font-bold text-[#d7dadc]">{f.alias}</p>
-                      <p className="text-[10px] font-mono text-[#818384]">u/{f.username.replace("@", "")}</p>
+                      <p className="font-mono text-[10px] text-[#818384]">
+                        u/{f.username.replace("@", "")}
+                      </p>
                     </div>
                   </div>
-                  <span className="text-[11px] text-[#ff4500] font-bold">Chat</span>
+                  <span className="text-[11px] font-bold text-[#ff4500]">Chat</span>
                 </div>
               ))
             )}

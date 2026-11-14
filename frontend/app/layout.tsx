@@ -31,9 +31,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  ),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   title: {
     default: "Polaris — Grounded AI Academic Platform",
     template: "%s | Polaris Academic",
@@ -94,12 +92,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning className="dark">
       <body
         suppressHydrationWarning
-        className={`${inter.variable} ${jakarta.variable} ${syncopate.variable} font-sans relative text-foreground min-h-screen antialiased selection:bg-primary/30 selection:text-foreground`}
+        className={`${inter.variable} ${jakarta.variable} ${syncopate.variable} relative min-h-screen font-sans text-foreground antialiased selection:bg-primary/30 selection:text-foreground`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <AuthProvider>
             <SmoothScrollProvider>
-              <div className="relative z-10 pointer-events-auto min-h-screen flex flex-col">{children}</div>
+              <div className="pointer-events-auto relative z-10 flex min-h-screen flex-col">
+                {children}
+              </div>
               <NavDrawer />
               <TodoDrawer />
               <AgentCopilot />

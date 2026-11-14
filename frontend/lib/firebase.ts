@@ -53,7 +53,11 @@ export function getFirebaseAuth() {
   const app = getFirebaseApp();
   cachedAuth = getAuth(app);
 
-  if (typeof window !== "undefined" && process.env.NODE_ENV === "development" && !emulatorAttempted) {
+  if (
+    typeof window !== "undefined" &&
+    process.env.NODE_ENV === "development" &&
+    !emulatorAttempted
+  ) {
     emulatorAttempted = true;
     try {
       if (process.env.NEXT_PUBLIC_USE_AUTH_EMULATOR === "true") {
@@ -94,7 +98,7 @@ export async function syncUserProfileToFirestore(user: {
     const db = getFirebaseFirestore();
     const userRef = doc(db, "users", user.uid);
     const nowIso = new Date().toISOString();
-    
+
     await setDoc(
       userRef,
       {
@@ -105,7 +109,7 @@ export async function syncUserProfileToFirestore(user: {
         lastLoginAt: nowIso,
         role: "student",
       },
-      { merge: true }
+      { merge: true },
     );
   } catch (err) {
     // Non-blocking fallback for offline/demo/uninitialized firebase credentials
@@ -134,7 +138,7 @@ export async function signInWithGoogle(): Promise<User> {
   provider.setCustomParameters({
     prompt: "select_account",
   });
-  
+
   try {
     const result = await signInWithPopup(auth, provider);
     if (result.user) {
@@ -221,4 +225,3 @@ export async function getIdToken(): Promise<string | null> {
 }
 
 export type { User };
-

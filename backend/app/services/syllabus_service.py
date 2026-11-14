@@ -103,17 +103,15 @@ ADMIN_TOPIC_KEYWORDS = (
 )
 
 ADMIN_SECTION_REGEX = re.compile(
-    r'(?i)\b(?:essential\s+reading|text\s*books?|reference\s*books?|suggested\s*readings?|recommended\s*reading|reading\s*list|references?|bibliography|evaluation|grading\s*scheme|marks\s*distribution|academic\s*calendar)\b.*$',
+    r"(?i)\b(?:essential\s+reading|text\s*books?|reference\s*books?|suggested\s*readings?|recommended\s*reading|reading\s*list|references?|bibliography|evaluation|grading\s*scheme|marks\s*distribution|academic\s*calendar)\b.*$",
     re.DOTALL,
 )
 
 MODULE_SPLIT_REGEX = re.compile(
-    r'(?i)(?:^|\s+)((?:module|unit|chapter|part)\s+(?:[0-9ivxlcdm]+|[a-z]))[:\-\s]*'
+    r"(?i)(?:^|\s+)((?:module|unit|chapter|part)\s+(?:[0-9ivxlcdm]+|[a-z]))[:\-\s]*"
 )
 
-HOURS_CLEAN_REGEX = re.compile(
-    r'(?i)\b\d+\s*(?:hours?|hrs?|periods?|lectures?)\b'
-)
+HOURS_CLEAN_REGEX = re.compile(r"(?i)\b\d+\s*(?:hours?|hrs?|periods?|lectures?)\b")
 
 
 def _is_administrative_topic(title: str) -> bool:
@@ -138,12 +136,12 @@ def _parse_syllabus_deterministic(text: str) -> list[Topic]:
     if matches:
         first_m = matches[0]
         if first_m.start() > 0:
-            pre_text = cleaned_full[:first_m.start()].strip()
+            pre_text = cleaned_full[: first_m.start()].strip()
             pre_text = HOURS_CLEAN_REGEX.sub("", pre_text).strip()
             if len(pre_text) > 10:
                 first_tag = first_m.group(1).strip()
-                if re.search(r'(?i)\b(?:ii|2)\b', first_tag):
-                    mod1_tag = re.sub(r'(?i)\b(?:ii|2)\b', 'I', first_tag)
+                if re.search(r"(?i)\b(?:ii|2)\b", first_tag):
+                    mod1_tag = re.sub(r"(?i)\b(?:ii|2)\b", "I", first_tag)
                 else:
                     mod1_tag = "Module I"
                 module_chunks.append((mod1_tag, pre_text))
@@ -169,7 +167,7 @@ def _parse_syllabus_deterministic(text: str) -> list[Topic]:
 
     result_modules: list[Topic] = []
     for mod_idx, (tag, body) in enumerate(module_chunks, start=1):
-        raw_items = re.split(r'(?<=[.?!;])\s+|\n+|(?:,\s+(?=[A-Z][a-z]))', body)
+        raw_items = re.split(r"(?<=[.?!;])\s+|\n+|(?:,\s+(?=[A-Z][a-z]))", body)
         subtopics: list[Topic] = []
         for raw in raw_items:
             s = raw.strip(" -–—\t.,:;")
@@ -188,10 +186,12 @@ def _parse_syllabus_deterministic(text: str) -> list[Topic]:
 
         first_concept = subtopics[0].title if subtopics else ""
         if first_concept:
-            concept_head = re.split(r':|\s+[-–—]\s+', first_concept)[0].strip()
+            concept_head = re.split(r":|\s+[-–—]\s+", first_concept)[0].strip()
             if len(concept_head) > 65:
                 concept_head = concept_head[:65].strip() + "..."
-            mod_title = f"{tag}: {concept_head}" if not tag.lower().endswith(concept_head.lower()) else tag
+            mod_title = (
+                f"{tag}: {concept_head}" if not tag.lower().endswith(concept_head.lower()) else tag
+            )
         else:
             mod_title = tag
 
@@ -531,7 +531,8 @@ class SyllabusService:
                 continue
 
             cleaned_subtopics = [
-                s for s in self._map_llm_topics(t.subtopics)
+                s
+                for s in self._map_llm_topics(t.subtopics)
                 if not _is_administrative_topic(s.title)
             ]
 

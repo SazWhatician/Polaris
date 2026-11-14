@@ -1,8 +1,7 @@
-import uuid
 import re
-from typing import List, Dict, Tuple, Set
-from app.models.graph import ConceptNode, ConceptRelationship, ConceptCluster, KnowledgeGraph
+import uuid
 
+from app.models.graph import ConceptCluster, ConceptNode, ConceptRelationship, KnowledgeGraph
 
 # Curated palette for graph cluster visualization
 CLUSTER_COLORS = [
@@ -27,13 +26,13 @@ class ConceptExtractionService:
     def extract_from_texts(
         self,
         user_id: str,
-        texts: List[Dict[str, str]],  # List of {"doc_id": ..., "page": ..., "text": ...}
-        syllabus_topics: List[str] = None,
+        texts: list[dict[str, str]],  # List of {"doc_id": ..., "page": ..., "text": ...}
+        syllabus_topics: list[str] = None,
     ) -> KnowledgeGraph:
         """Extract concept triples and nodes from input text passages and syllabus topics."""
 
-        raw_nodes: Dict[str, ConceptNode] = {}
-        raw_edges: List[ConceptRelationship] = []
+        raw_nodes: dict[str, ConceptNode] = {}
+        raw_edges: list[ConceptRelationship] = []
 
         # 1. Process syllabus topics first as core foundational nodes
         if syllabus_topics:
@@ -73,9 +72,9 @@ class ConceptExtractionService:
     def _parse_llm_extraction(
         self,
         llm_response: str,
-        nodes: Dict[str, ConceptNode],
-        edges: List[ConceptRelationship],
-        texts: List[Dict[str, str]],
+        nodes: dict[str, ConceptNode],
+        edges: list[ConceptRelationship],
+        texts: list[dict[str, str]],
     ):
         """Parse structured CONCEPT and RELATION lines from LLM response."""
         doc_ids = list(set(item.get("doc_id", "doc1") for item in texts if item.get("doc_id")))
@@ -104,7 +103,11 @@ class ConceptExtractionService:
                 rel_str = line.replace("RELATION:", "").strip()
                 match = re.search(r"(.+?)\s*->\s*(.+?)\s*->\s*(.+)", rel_str)
                 if match:
-                    src_name, rel_type, tgt_name = match.group(1).strip(), match.group(2).strip(), match.group(3).strip()
+                    src_name, rel_type, tgt_name = (
+                        match.group(1).strip(),
+                        match.group(2).strip(),
+                        match.group(3).strip(),
+                    )
                     src_id = slugify(src_name)
                     tgt_id = slugify(tgt_name)
 
@@ -124,8 +127,8 @@ class ConceptExtractionService:
     def _fallback_parse_text(
         self,
         text: str,
-        nodes: Dict[str, ConceptNode],
-        edges: List[ConceptRelationship],
+        nodes: dict[str, ConceptNode],
+        edges: list[ConceptRelationship],
     ):
         """Rule-based fallback parser for capitalized academic key phrases."""
         words = re.findall(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b", text)
@@ -156,25 +159,25 @@ class ConceptExtractionService:
 
     def _compute_clusters(
         self,
-        nodes: Dict[str, ConceptNode],
-        edges: List[ConceptRelationship],
-    ) -> List[ConceptCluster]:
+        nodes: dict[str, ConceptNode],
+        edges: list[ConceptRelationship],
+    ) -> list[ConceptCluster]:
         """Compute community clusters across graph nodes."""
-        adjacency: Dict[str, Set[str]] = {nid: set() for nid in nodes.keys()}
+        adjacency: dict[str, set[str]] = {nid: set() for nid in nodes}
         for edge in edges:
             if edge.source_concept_id in adjacency and edge.target_concept_id in adjacency:
                 adjacency[edge.source_concept_id].add(edge.target_concept_id)
                 adjacency[edge.target_concept_id].add(edge.source_concept_id)
 
-        visited: Set[str] = set()
-        clusters: List[ConceptCluster] = []
+        visited: set[str] = set()
+        clusters: list[ConceptCluster] = []
 
         for idx, (node_id, node) in enumerate(nodes.items()):
             if node_id in visited:
                 continue
 
             # Breadth-first search for connected component
-            component: List[str] = []
+            component: list[str] = []
             queue = [node_id]
             visited.add(node_id)
 
@@ -201,22 +204,100 @@ class ConceptExtractionService:
     def generate_demo_graph(self, user_id: str) -> KnowledgeGraph:
         """Generate a rich demonstration knowledge graph for initial state."""
         demo_nodes = [
-            ConceptNode(id="linear_algebra", name="Linear Algebra", category="math", description="Vector spaces, matrices, linear transformations.", importance_score=0.95),
-            ConceptNode(id="calculus", name="Multivariable Calculus", category="math", description="Partial derivatives, gradients, backprop math.", importance_score=0.9),
-            ConceptNode(id="neural_networks", name="Neural Networks", category="architecture", description="Perceptrons, activation functions, loss curves.", importance_score=0.85),
-            ConceptNode(id="gradient_descent", name="Gradient Descent", category="algorithm", description="Optimization algorithms, Adam, learning rate schedules.", importance_score=0.88),
-            ConceptNode(id="transformers", name="Transformer Architecture", category="architecture", description="Self-attention mechanisms, multi-head attention, encoders/decoders.", importance_score=0.98),
-            ConceptNode(id="rag_retrieval", name="RAG Vector Search", category="system", description="Dense embeddings, Qdrant hybrid retrieval, vector similarity.", importance_score=0.92),
-            ConceptNode(id="langgraph_agents", name="LangGraph Agent Control", category="system", description="Stateful agentic graphs, checkpointing, node workflows.", importance_score=0.89),
+            ConceptNode(
+                id="linear_algebra",
+                name="Linear Algebra",
+                category="math",
+                description="Vector spaces, matrices, linear transformations.",
+                importance_score=0.95,
+            ),
+            ConceptNode(
+                id="calculus",
+                name="Multivariable Calculus",
+                category="math",
+                description="Partial derivatives, gradients, backprop math.",
+                importance_score=0.9,
+            ),
+            ConceptNode(
+                id="neural_networks",
+                name="Neural Networks",
+                category="architecture",
+                description="Perceptrons, activation functions, loss curves.",
+                importance_score=0.85,
+            ),
+            ConceptNode(
+                id="gradient_descent",
+                name="Gradient Descent",
+                category="algorithm",
+                description="Optimization algorithms, Adam, learning rate schedules.",
+                importance_score=0.88,
+            ),
+            ConceptNode(
+                id="transformers",
+                name="Transformer Architecture",
+                category="architecture",
+                description="Self-attention mechanisms, multi-head attention, encoders/decoders.",
+                importance_score=0.98,
+            ),
+            ConceptNode(
+                id="rag_retrieval",
+                name="RAG Vector Search",
+                category="system",
+                description="Dense embeddings, Qdrant hybrid retrieval, vector similarity.",
+                importance_score=0.92,
+            ),
+            ConceptNode(
+                id="langgraph_agents",
+                name="LangGraph Agent Control",
+                category="system",
+                description="Stateful agentic graphs, checkpointing, node workflows.",
+                importance_score=0.89,
+            ),
         ]
 
         demo_edges = [
-            ConceptRelationship(id="e1", source_concept_id="linear_algebra", target_concept_id="neural_networks", relation_type="prerequisite_of", description="Matrix multiplications form dense layers."),
-            ConceptRelationship(id="e2", source_concept_id="calculus", target_concept_id="gradient_descent", relation_type="prerequisite_of", description="Partial derivatives compute gradients."),
-            ConceptRelationship(id="e3", source_concept_id="gradient_descent", target_concept_id="neural_networks", relation_type="optimizes", description="Gradient descent updates weight parameters."),
-            ConceptRelationship(id="e4", source_concept_id="neural_networks", target_concept_id="transformers", relation_type="extends", description="Transformers generalize deep neural architectures."),
-            ConceptRelationship(id="e5", source_concept_id="transformers", target_concept_id="rag_retrieval", relation_type="enables", description="Transformer embeddings power vector search RAG."),
-            ConceptRelationship(id="e6", source_concept_id="rag_retrieval", target_concept_id="langgraph_agents", relation_type="integrates_with", description="RAG context feeds deterministic agent state graphs."),
+            ConceptRelationship(
+                id="e1",
+                source_concept_id="linear_algebra",
+                target_concept_id="neural_networks",
+                relation_type="prerequisite_of",
+                description="Matrix multiplications form dense layers.",
+            ),
+            ConceptRelationship(
+                id="e2",
+                source_concept_id="calculus",
+                target_concept_id="gradient_descent",
+                relation_type="prerequisite_of",
+                description="Partial derivatives compute gradients.",
+            ),
+            ConceptRelationship(
+                id="e3",
+                source_concept_id="gradient_descent",
+                target_concept_id="neural_networks",
+                relation_type="optimizes",
+                description="Gradient descent updates weight parameters.",
+            ),
+            ConceptRelationship(
+                id="e4",
+                source_concept_id="neural_networks",
+                target_concept_id="transformers",
+                relation_type="extends",
+                description="Transformers generalize deep neural architectures.",
+            ),
+            ConceptRelationship(
+                id="e5",
+                source_concept_id="transformers",
+                target_concept_id="rag_retrieval",
+                relation_type="enables",
+                description="Transformer embeddings power vector search RAG.",
+            ),
+            ConceptRelationship(
+                id="e6",
+                source_concept_id="rag_retrieval",
+                target_concept_id="langgraph_agents",
+                relation_type="integrates_with",
+                description="RAG context feeds deterministic agent state graphs.",
+            ),
         ]
 
         nodes_dict = {n.id: n for n in demo_nodes}

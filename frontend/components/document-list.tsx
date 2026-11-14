@@ -85,10 +85,7 @@ export function DocumentList({ docs, onChange }: Props) {
         </CardHeader>
         <CardContent className="space-y-2">
           {docs.map((d) => (
-            <div
-              key={d.id}
-              className="flex items-center justify-between rounded-md border p-3"
-            >
+            <div key={d.id} className="flex items-center justify-between rounded-md border p-3">
               <div className="flex min-w-0 items-center gap-3">
                 <IconForMime mime={d.mime_type} />
                 <div className="min-w-0">
@@ -96,15 +93,12 @@ export function DocumentList({ docs, onChange }: Props) {
                     {d.filename}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {formatBytes(d.size_bytes)} ·{" "}
-                    {new Date(d.created_at).toLocaleString()}
-                    {d.page_count != null && ` · ${d.page_count} page${d.page_count === 1 ? "" : "s"}`}
+                    {formatBytes(d.size_bytes)} · {new Date(d.created_at).toLocaleString()}
+                    {d.page_count != null &&
+                      ` · ${d.page_count} page${d.page_count === 1 ? "" : "s"}`}
                   </div>
                   {d.error && (
-                    <div
-                      className="mt-1 truncate text-xs text-destructive"
-                      title={d.error}
-                    >
+                    <div className="mt-1 truncate text-xs text-destructive" title={d.error}>
                       {d.error}
                     </div>
                   )}
@@ -122,7 +116,9 @@ export function DocumentList({ docs, onChange }: Props) {
                     <Eye className="h-4 w-4" />
                   </Button>
                 )}
-                {(d.status === "failed" || d.status === "ocr_complete" || d.status === "indexed") && (
+                {(d.status === "failed" ||
+                  d.status === "ocr_complete" ||
+                  d.status === "indexed") && (
                   <Button
                     variant="ghost"
                     size="icon"
@@ -146,7 +142,10 @@ export function DocumentList({ docs, onChange }: Props) {
         </CardContent>
       </Card>
 
-      <AlertDialog open={pendingDeleteId !== null} onOpenChange={(o) => !o && setPendingDeleteId(null)}>
+      <AlertDialog
+        open={pendingDeleteId !== null}
+        onOpenChange={(o) => !o && setPendingDeleteId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this document?</AlertDialogTitle>

@@ -35,7 +35,9 @@ class PageRepository:
             try:
                 # Delete existing pages for this document first
                 await asyncio.to_thread(
-                    lambda: tbl.delete().eq("user_id", user_id).eq("document_id", document_id).execute()
+                    lambda: (
+                        tbl.delete().eq("user_id", user_id).eq("document_id", document_id).execute()
+                    )
                 )
                 if pages:
                     rows = [_to_supabase_page(p, user_id) for p in pages]
@@ -48,11 +50,13 @@ class PageRepository:
         if tbl is not None:
             try:
                 res = await asyncio.to_thread(
-                    lambda: tbl.select("*")
-                    .eq("user_id", user_id)
-                    .eq("document_id", document_id)
-                    .order("page_number")
-                    .execute()
+                    lambda: (
+                        tbl.select("*")
+                        .eq("user_id", user_id)
+                        .eq("document_id", document_id)
+                        .order("page_number")
+                        .execute()
+                    )
                 )
                 if res.data is not None and len(res.data) > 0:
                     pages = [_from_supabase_page(row) for row in res.data]
@@ -69,7 +73,9 @@ class PageRepository:
         if tbl is not None:
             try:
                 await asyncio.to_thread(
-                    lambda: tbl.delete().eq("user_id", user_id).eq("document_id", document_id).execute()
+                    lambda: (
+                        tbl.delete().eq("user_id", user_id).eq("document_id", document_id).execute()
+                    )
                 )
             except Exception as exc:
                 log.warning("supabase.page_delete_fallback", error=str(exc))
@@ -84,7 +90,9 @@ def _to_supabase_page(page: Page, user_id: str) -> dict[str, Any]:
         "text": page.text,
         "confidence": page.confidence,
         "ocr_engine": page.ocr_engine,
-        "processed_at": page.processed_at.isoformat() if isinstance(page.processed_at, datetime) else str(page.processed_at),
+        "processed_at": page.processed_at.isoformat()
+        if isinstance(page.processed_at, datetime)
+        else str(page.processed_at),
     }
 
 
@@ -103,4 +111,3 @@ def _from_supabase_page(data: dict[str, Any]) -> Page:
         ocr_engine=data.get("ocr_engine", "paddleocr"),
         processed_at=proc_dt,
     )
-

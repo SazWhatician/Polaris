@@ -1,4 +1,5 @@
 from datetime import datetime
+
 try:
     from enum import StrEnum
 except ImportError:
@@ -6,6 +7,7 @@ except ImportError:
 
     class StrEnum(str, Enum):  # type: ignore[no-redef]
         pass
+
 
 from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 

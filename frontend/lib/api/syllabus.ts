@@ -49,10 +49,7 @@ export async function createSyllabus(
   });
 }
 
-export async function uploadSyllabusFile(
-  name: string,
-  file: File,
-): Promise<SyllabusResponse> {
+export async function uploadSyllabusFile(name: string, file: File): Promise<SyllabusResponse> {
   const formData = new FormData();
   formData.append("name", name);
   formData.append("file", file);

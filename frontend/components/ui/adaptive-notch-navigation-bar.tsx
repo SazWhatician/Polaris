@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { LayoutGroup, motion } from "framer-motion";
 
@@ -41,10 +33,7 @@ export interface NotchWingProps {
   className?: string;
 }
 
-export function NotchLeftWing({
-  position = "top",
-  className,
-}: NotchWingProps) {
+export function NotchLeftWing({ position = "top", className }: NotchWingProps) {
   const isBottom = position === "bottom";
 
   return (
@@ -56,9 +45,9 @@ export function NotchLeftWing({
       fill="none"
       shapeRendering="geometricPrecision"
       className={cn(
-        "pointer-events-none absolute right-full size-2.5 md:size-4 overflow-visible select-none text-zinc-950 transition-colors duration-200 dark:text-zinc-200",
+        "pointer-events-none absolute right-full size-2.5 select-none overflow-visible text-zinc-950 transition-colors duration-200 dark:text-zinc-200 md:size-4",
         isBottom ? "bottom-0" : "top-0",
-        className
+        className,
       )}
     >
       <path
@@ -73,10 +62,7 @@ export function NotchLeftWing({
   );
 }
 
-export function NotchRightWing({
-  position = "top",
-  className,
-}: NotchWingProps) {
+export function NotchRightWing({ position = "top", className }: NotchWingProps) {
   const isBottom = position === "bottom";
 
   return (
@@ -88,9 +74,9 @@ export function NotchRightWing({
       fill="none"
       shapeRendering="geometricPrecision"
       className={cn(
-        "pointer-events-none absolute left-full size-2.5 md:size-4 overflow-visible select-none text-zinc-950 transition-colors duration-200 dark:text-zinc-200",
+        "pointer-events-none absolute left-full size-2.5 select-none overflow-visible text-zinc-950 transition-colors duration-200 dark:text-zinc-200 md:size-4",
         isBottom ? "bottom-0" : "top-0",
-        className
+        className,
       )}
     >
       <path
@@ -105,10 +91,7 @@ export function NotchRightWing({
   );
 }
 
-export function NotchCornerLeftWing({
-  position = "top",
-  className,
-}: NotchWingProps) {
+export function NotchCornerLeftWing({ position = "top", className }: NotchWingProps) {
   const isBottom = position === "bottom";
 
   return (
@@ -120,9 +103,9 @@ export function NotchCornerLeftWing({
       fill="none"
       shapeRendering="geometricPrecision"
       className={cn(
-        "pointer-events-none absolute left-0 size-2.5 md:size-4 overflow-visible select-none text-zinc-950 transition-colors duration-200 dark:text-zinc-200",
+        "pointer-events-none absolute left-0 size-2.5 select-none overflow-visible text-zinc-950 transition-colors duration-200 dark:text-zinc-200 md:size-4",
         isBottom ? "bottom-full" : "top-full",
-        className
+        className,
       )}
     >
       <path
@@ -137,10 +120,7 @@ export function NotchCornerLeftWing({
   );
 }
 
-export function NotchCornerRightWing({
-  position = "top",
-  className,
-}: NotchWingProps) {
+export function NotchCornerRightWing({ position = "top", className }: NotchWingProps) {
   const isBottom = position === "bottom";
 
   return (
@@ -152,9 +132,9 @@ export function NotchCornerRightWing({
       fill="none"
       shapeRendering="geometricPrecision"
       className={cn(
-        "pointer-events-none absolute right-0 size-2.5 md:size-4 overflow-visible select-none text-zinc-950 transition-colors duration-200 dark:text-zinc-200",
+        "pointer-events-none absolute right-0 size-2.5 select-none overflow-visible text-zinc-950 transition-colors duration-200 dark:text-zinc-200 md:size-4",
         isBottom ? "bottom-full" : "top-full",
-        className
+        className,
       )}
     >
       <path
@@ -169,8 +149,7 @@ export function NotchCornerRightWing({
   );
 }
 
-export interface NotchItemProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onSelect"> {
+export interface NotchItemProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onSelect"> {
   id: string;
   label: string;
   isActive: boolean;
@@ -182,19 +161,8 @@ export interface NotchItemProps
 
 export const NotchItem = forwardRef<HTMLButtonElement, NotchItemProps>(
   (
-    {
-      id,
-      label,
-      isActive,
-      icon: Icon,
-      badge,
-      disabled,
-      className,
-      onClick,
-      onSelect,
-      ...props
-    },
-    ref
+    { id, label, isActive, icon: Icon, badge, disabled, className, onClick, onSelect, ...props },
+    ref,
   ) => {
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
       if (disabled) {
@@ -226,13 +194,13 @@ export const NotchItem = forwardRef<HTMLButtonElement, NotchItemProps>(
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         className={cn(
-          "relative flex h-9 cursor-pointer items-center gap-2 rounded-full px-3.5 text-sm font-medium transition-colors outline-none select-none",
+          "relative flex h-9 cursor-pointer select-none items-center gap-2 rounded-full px-3.5 text-sm font-medium outline-none transition-colors",
           "focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-1 dark:focus-visible:ring-zinc-500",
           isActive
             ? "font-semibold text-zinc-50 dark:text-zinc-950"
             : "text-zinc-400 hover:text-zinc-200 dark:text-zinc-600 dark:hover:text-zinc-900",
-          disabled && "cursor-not-allowed pointer-events-none opacity-40",
-          className
+          disabled && "pointer-events-none cursor-not-allowed opacity-40",
+          className,
         )}
         {...props}
       >
@@ -255,7 +223,7 @@ export const NotchItem = forwardRef<HTMLButtonElement, NotchItemProps>(
                 "size-4 shrink-0 transition-colors",
                 isActive
                   ? "text-zinc-50 dark:text-zinc-950"
-                  : "text-zinc-400 group-hover:text-zinc-200 dark:text-zinc-600 dark:group-hover:text-zinc-900"
+                  : "text-zinc-400 group-hover:text-zinc-200 dark:text-zinc-600 dark:group-hover:text-zinc-900",
               )}
             />
           )}
@@ -263,14 +231,14 @@ export const NotchItem = forwardRef<HTMLButtonElement, NotchItemProps>(
           <span className="leading-none">{label}</span>
 
           {badge && (
-            <span className="rounded-full bg-zinc-800 px-1.5 py-0.5 text-[10px] font-bold tracking-tight uppercase text-zinc-300 dark:bg-zinc-300 dark:text-zinc-800">
+            <span className="rounded-full bg-zinc-800 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-tight text-zinc-300 dark:bg-zinc-300 dark:text-zinc-800">
               {badge}
             </span>
           )}
         </span>
       </button>
     );
-  }
+  },
 );
 
 NotchItem.displayName = "NotchItem";
@@ -281,11 +249,7 @@ interface NotchDropdownItemProps {
   onSelect: (id: string) => void;
 }
 
-function NotchDropdownItem({
-  item,
-  isSelected,
-  onSelect,
-}: NotchDropdownItemProps) {
+function NotchDropdownItem({ item, isSelected, onSelect }: NotchDropdownItemProps) {
   const Icon = item.icon;
 
   const handleClick = () => {
@@ -300,12 +264,12 @@ function NotchDropdownItem({
       disabled={item.disabled}
       onClick={handleClick}
       className={cn(
-        "flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-xl px-3 py-2 text-left text-sm outline-none transition-colors select-none",
+        "flex w-full cursor-pointer select-none items-center justify-between gap-2.5 rounded-xl px-3 py-2 text-left text-sm outline-none transition-colors",
         "focus-visible:ring-2 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-500",
         isSelected
           ? "bg-zinc-800 font-semibold text-zinc-50 dark:bg-zinc-300 dark:text-zinc-950"
           : "text-zinc-400 hover:bg-zinc-900 hover:text-zinc-200 active:bg-zinc-800 dark:text-zinc-600 dark:hover:bg-zinc-300/60 dark:hover:text-zinc-950 dark:active:bg-zinc-300",
-        item.disabled && "cursor-not-allowed pointer-events-none opacity-40"
+        item.disabled && "pointer-events-none cursor-not-allowed opacity-40",
       )}
     >
       <div className="flex items-center gap-2.5">
@@ -313,9 +277,7 @@ function NotchDropdownItem({
           <Icon
             className={cn(
               "size-4 shrink-0",
-              isSelected
-                ? "text-zinc-50 dark:text-zinc-950"
-                : "text-zinc-400 dark:text-zinc-600"
+              isSelected ? "text-zinc-50 dark:text-zinc-950" : "text-zinc-400 dark:text-zinc-600",
             )}
           />
         )}
@@ -323,9 +285,7 @@ function NotchDropdownItem({
         <span>{item.label}</span>
       </div>
 
-      {isSelected && (
-        <Check className="size-3.5 text-zinc-50 dark:text-zinc-950" />
-      )}
+      {isSelected && <Check className="size-3.5 text-zinc-50 dark:text-zinc-950" />}
     </button>
   );
 }
@@ -362,17 +322,14 @@ export function NotchNav({
   const layoutGroupId = useId();
 
   const [internalActiveId, setInternalActiveId] = useState<string>(
-    defaultActiveId || items[0]?.id || ""
+    defaultActiveId || items[0]?.id || "",
   );
 
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
   const isBottom = position === "bottom";
 
-  const activeId =
-    controlledActiveId !== undefined
-      ? controlledActiveId
-      : internalActiveId;
+  const activeId = controlledActiveId !== undefined ? controlledActiveId : internalActiveId;
 
   const activeIndex = useMemo(() => {
     const index = items.findIndex((item) => item.id === activeId);
@@ -389,7 +346,7 @@ export function NotchNav({
       setIsDropdownOpen(false);
       onActiveChange?.(id);
     },
-    [controlledActiveId, onActiveChange]
+    [controlledActiveId, onActiveChange],
   );
 
   const handleToggleDropdown = useCallback(() => {
@@ -402,10 +359,7 @@ export function NotchNav({
 
   useEffect(() => {
     const handleClickOutside = (event: globalThis.MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
@@ -422,20 +376,20 @@ export function NotchNav({
   return (
     <div
       className={cn(
-        "fixed inset-0 h-screen w-screen overflow-hidden bg-zinc-950 p-0 md:p-2 transition-colors duration-200 dark:bg-zinc-200",
-        className
+        "fixed inset-0 h-screen w-screen overflow-hidden bg-zinc-950 p-0 transition-colors duration-200 dark:bg-zinc-200 md:p-2",
+        className,
       )}
       {...props}
     >
-      <div className="relative flex h-full w-full flex-col rounded-none md:rounded-2xl bg-background text-foreground antialiased transition-colors duration-200">
+      <div className="relative flex h-full w-full flex-col rounded-none bg-background text-foreground antialiased transition-colors duration-200 md:rounded-2xl">
         <div
           aria-hidden="true"
           onClick={handleCloseDropdown}
           className={cn(
-            "absolute inset-0 z-40 rounded-none md:rounded-2xl transition-opacity duration-200 ease-out xl:hidden",
+            "absolute inset-0 z-40 rounded-none transition-opacity duration-200 ease-out md:rounded-2xl xl:hidden",
             isDropdownOpen
-              ? "pointer-events-auto bg-black/20 backdrop-blur-[2px] opacity-100 dark:bg-black/40"
-              : "pointer-events-none opacity-0"
+              ? "pointer-events-auto bg-black/20 opacity-100 backdrop-blur-[2px] dark:bg-black/40"
+              : "pointer-events-none opacity-0",
           )}
         />
 
@@ -444,15 +398,13 @@ export function NotchNav({
           <aside
             aria-label="Brand logo notch"
             className={cn(
-              "hidden xl:flex absolute left-0 z-50 h-10 px-5 select-none transition-colors duration-200 bg-zinc-950 dark:bg-zinc-200 dark:text-zinc-950",
+              "absolute left-0 z-50 hidden h-10 select-none bg-zinc-950 px-5 transition-colors duration-200 dark:bg-zinc-200 dark:text-zinc-950 xl:flex",
               isBottom
                 ? "bottom-0 rounded-tr-[24px] md:items-end"
-                : "top-0 rounded-br-[24px] md:items-baseline"
+                : "top-0 rounded-br-[24px] md:items-baseline",
             )}
           >
-            <div className="flex items-center text-zinc-50 dark:text-zinc-950">
-              {logo}
-            </div>
+            <div className="flex items-center text-zinc-50 dark:text-zinc-950">{logo}</div>
 
             <NotchRightWing position={position} />
 
@@ -465,10 +417,10 @@ export function NotchNav({
           role="tablist"
           aria-orientation="horizontal"
           className={cn(
-            "hidden xl:flex absolute left-1/2 -translate-x-1/2 z-50 h-11 px-4 bg-zinc-950 text-zinc-50 select-none transition-colors duration-200 dark:bg-zinc-200 dark:text-zinc-950",
+            "absolute left-1/2 z-50 hidden h-11 -translate-x-1/2 select-none bg-zinc-950 px-4 text-zinc-50 transition-colors duration-200 dark:bg-zinc-200 dark:text-zinc-950 xl:flex",
             isBottom
               ? "bottom-0 rounded-t-[24px] md:items-end"
-              : "top-0 rounded-b-[24px] md:items-start"
+              : "top-0 rounded-b-[24px] md:items-start",
           )}
         >
           <NotchLeftWing position={position} />
@@ -498,19 +450,17 @@ export function NotchNav({
           <aside
             aria-label="User actions notch"
             className={cn(
-              "hidden xl:flex absolute right-0 z-50 h-10 px-5 select-none transition-colors duration-200 bg-zinc-950 dark:bg-zinc-200 dark:text-zinc-950",
+              "absolute right-0 z-50 hidden h-10 select-none bg-zinc-950 px-5 transition-colors duration-200 dark:bg-zinc-200 dark:text-zinc-950 xl:flex",
               isBottom
                 ? "bottom-0 rounded-tl-[24px] md:items-end"
-                : "top-0 rounded-bl-[24px] md:items-start"
+                : "top-0 rounded-bl-[24px] md:items-start",
             )}
           >
             <NotchLeftWing position={position} />
 
             <NotchCornerRightWing position={position} />
 
-            <div className="flex items-center text-zinc-50 dark:text-zinc-950">
-              {rightContent}
-            </div>
+            <div className="flex items-center text-zinc-50 dark:text-zinc-950">{rightContent}</div>
           </aside>
         )}
 
@@ -520,11 +470,9 @@ export function NotchNav({
         <div
           ref={containerRef}
           className={cn(
-            "xl:hidden absolute z-50 flex flex-col bg-zinc-950 text-zinc-50 select-none transition-colors duration-200 dark:bg-zinc-200 dark:text-zinc-950",
-            "w-auto left-1/2 -translate-x-1/2 px-4",
-            isBottom
-              ? "bottom-0 rounded-t-[24px]"
-              : "top-0 rounded-b-[24px]"
+            "absolute z-50 flex select-none flex-col bg-zinc-950 text-zinc-50 transition-colors duration-200 dark:bg-zinc-200 dark:text-zinc-950 xl:hidden",
+            "left-1/2 w-auto -translate-x-1/2 px-4",
+            isBottom ? "bottom-0 rounded-t-[24px]" : "top-0 rounded-b-[24px]",
           )}
         >
           <NotchLeftWing position={position} />
@@ -534,8 +482,8 @@ export function NotchNav({
           {/* Unified Horizontal Bar */}
           <div
             className={cn(
-              "w-auto xl:w-max lg:w-full flex h-10 sm:h-10 items-center justify-between gap-3 sm:gap-5",
-              isBottom ? "sm:items-baseline md:items-end" : "sm:items-baseline md:items-start"
+              "flex h-10 w-auto items-center justify-between gap-3 sm:h-10 sm:gap-5 lg:w-full xl:w-max",
+              isBottom ? "sm:items-baseline md:items-end" : "sm:items-baseline md:items-start",
             )}
           >
             {/* Left Logo Slot */}
@@ -552,10 +500,10 @@ export function NotchNav({
               aria-haspopup="listbox"
               aria-label="Toggle navigation menu"
               onClick={handleToggleDropdown}
-              className="group flex h-8 sm:h-8.5 w-full cursor-pointer items-center justify-center gap-1.5 rounded-full px-2.5 py-2.5 sm:p-2.5 text-xs sm:text-sm font-semibold text-zinc-50 outline-none transition-colors sm:hover:bg-zinc-850/60 focus-visible:ring-2 focus-visible:ring-zinc-400 dark:text-zinc-950 dark:sm:hover:bg-zinc-300/60 dark:focus-visible:ring-zinc-500"
+              className="sm:h-8.5 sm:hover:bg-zinc-850/60 group flex h-8 w-full cursor-pointer items-center justify-center gap-1.5 rounded-full px-2.5 py-2.5 text-xs font-semibold text-zinc-50 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-zinc-400 dark:text-zinc-950 dark:focus-visible:ring-zinc-500 sm:p-2.5 sm:text-sm dark:sm:hover:bg-zinc-300/60"
             >
               {activeItem?.icon && (
-                <activeItem.icon className="size-3.5 sm:size-4 shrink-0 text-zinc-400 dark:text-zinc-600" />
+                <activeItem.icon className="size-3.5 shrink-0 text-zinc-400 dark:text-zinc-600 sm:size-4" />
               )}
 
               <span className="leading-none">{activeItem?.label}</span>
@@ -564,14 +512,14 @@ export function NotchNav({
                 <ChevronUp
                   className={cn(
                     "size-3.5 text-zinc-400 transition-transform duration-200 dark:text-zinc-600",
-                    isDropdownOpen && "rotate-180"
+                    isDropdownOpen && "rotate-180",
                   )}
                 />
               ) : (
                 <ChevronDown
                   className={cn(
                     "size-3.5 text-zinc-400 transition-transform duration-200 dark:text-zinc-600",
-                    isDropdownOpen && "rotate-180"
+                    isDropdownOpen && "rotate-180",
                   )}
                 />
               )}
@@ -579,7 +527,7 @@ export function NotchNav({
 
             {/* Right Action Slot */}
             {showRightContent && rightContent && (
-              <div className="flex shrink-0 items-center justify-end text-zinc-50 dark:text-zinc-950 w-max">
+              <div className="flex w-max shrink-0 items-center justify-end text-zinc-50 dark:text-zinc-950">
                 {rightContent}
               </div>
             )}
@@ -590,17 +538,17 @@ export function NotchNav({
             role="listbox"
             aria-label="Navigation options"
             className={cn(
-              "grid transition-[grid-template-rows,opacity] duration-200 ease-out w-full",
+              "grid w-full transition-[grid-template-rows,opacity] duration-200 ease-out",
               isDropdownOpen
                 ? "grid-rows-[1fr] opacity-100"
-                : "grid-rows-[0fr] opacity-0 pointer-events-none"
+                : "pointer-events-none grid-rows-[0fr] opacity-0",
             )}
           >
             <div className="overflow-hidden">
               <div
                 className={cn(
                   "flex w-full flex-col gap-0.5 px-0.5",
-                  isBottom ? "pb-2 pt-1.5" : "pt-1.5 pb-2.5"
+                  isBottom ? "pb-2 pt-1.5" : "pb-2.5 pt-1.5",
                 )}
               >
                 {items.map((item) => (
@@ -619,8 +567,8 @@ export function NotchNav({
         {/* Scrollable Content Viewport */}
         <div
           className={cn(
-            "relative flex w-full items-center h-full justify-center overflow-y-auto overflow-x-hidden px-3 sm:px-4 md:px-6",
-            isBottom ? "pt-3 pb-17.5" : "pt-17.5 pb-3"
+            "relative flex h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden px-3 sm:px-4 md:px-6",
+            isBottom ? "pb-17.5 pt-3" : "pt-17.5 pb-3",
           )}
         >
           {children}

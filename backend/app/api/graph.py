@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+
 from app.core.deps import get_current_user_id
 from app.models.graph import (
-    KnowledgeGraph,
     GraphExtractionRequest,
     GraphExtractionResponse,
+    KnowledgeGraph,
 )
-from app.services.concept_extraction_service import ConceptExtractionService
 from app.repositories.graph_repo import GraphRepository
+from app.services.concept_extraction_service import ConceptExtractionService
 
 router = APIRouter(prefix="/api/graph", tags=["Knowledge Graph Engine"])
 

@@ -4,16 +4,7 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Mail,
-  Lock,
-  Sparkles,
-  ArrowRight,
-  UserPlus,
-  LogIn,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Mail, Lock, Sparkles, ArrowRight, UserPlus, LogIn, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAuth } from "@/lib/auth-context";
@@ -64,7 +55,10 @@ function LoginContent() {
       try {
         await video.play();
       } catch (err) {
-        console.warn("Autoplay with audio blocked by browser policy, unmuting on first interaction:", err);
+        console.warn(
+          "Autoplay with audio blocked by browser policy, unmuting on first interaction:",
+          err,
+        );
         video.muted = true;
         try {
           await video.play();
@@ -150,24 +144,24 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-background text-foreground overflow-hidden">
+    <div className="flex min-h-screen w-full overflow-hidden bg-background text-foreground">
       {/* LEFT COLUMN: Clean Video Showcase */}
-      <div className="hidden lg:flex lg:w-7/12 relative bg-black overflow-hidden flex-col justify-between p-8 xl:p-12 select-none">
+      <div className="relative hidden select-none flex-col justify-between overflow-hidden bg-black p-8 lg:flex lg:w-7/12 xl:p-12">
         {/* Background Looping Video with Sound */}
         <video
           ref={videoRef}
           autoPlay
           loop
           playsInline
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         >
           <source src="/login-video.mp4" type="video/mp4" />
         </video>
 
         {/* Minimal Polaris branding on top */}
         <div className="relative z-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-black/40 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform overflow-hidden">
+          <Link href="/" className="group flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-black/40 shadow-2xl backdrop-blur-md transition-transform group-hover:scale-105">
               <Image
                 src="/polaris-standalone.png"
                 alt="Polaris Logo"
@@ -177,8 +171,10 @@ function LoginContent() {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-xl tracking-wider text-white drop-shadow-md">POLARIS</span>
-              <span className="text-[10px] font-mono tracking-widest text-purple-300 uppercase drop-shadow-sm">
+              <span className="text-xl font-black tracking-wider text-white drop-shadow-md">
+                POLARIS
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-purple-300 drop-shadow-sm">
                 Academic Knowledge Engine
               </span>
             </div>
@@ -189,13 +185,18 @@ function LoginContent() {
       </div>
 
       {/* RIGHT COLUMN: Modern Split Login & Sign-up Form */}
-      <div className="w-full lg:w-5/12 flex flex-col justify-between p-6 sm:p-12 bg-background relative z-20 overflow-y-auto">
-
+      <div className="relative z-20 flex w-full flex-col justify-between overflow-y-auto bg-background p-6 sm:p-12 lg:w-5/12">
         {/* Top Action Bar */}
-        <div className="flex items-center justify-between w-full">
-          <Link href="/" className="lg:hidden flex items-center gap-2">
-            <Image src="/polaris-standalone.png" alt="Logo" width={28} height={28} className="object-contain" />
-            <span className="font-bold text-base tracking-wider">POLARIS</span>
+        <div className="flex w-full items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 lg:hidden">
+            <Image
+              src="/polaris-standalone.png"
+              alt="Logo"
+              width={28}
+              height={28}
+              className="object-contain"
+            />
+            <span className="text-base font-bold tracking-wider">POLARIS</span>
           </Link>
           <div className="ml-auto">
             <ThemeToggle />
@@ -203,14 +204,13 @@ function LoginContent() {
         </div>
 
         {/* Form Container */}
-        <div className="max-w-md w-full mx-auto my-auto space-y-8 py-8">
-
+        <div className="mx-auto my-auto w-full max-w-md space-y-8 py-8">
           {/* Header Title */}
           <div className="space-y-2 text-center lg:text-left">
             <h1 className="text-3xl font-black tracking-tight text-foreground">
               {mode === "login" ? "Welcome Back to Polaris" : "Create Your Account"}
             </h1>
-            <p className="text-muted-foreground text-xs sm:text-sm">
+            <p className="text-xs text-muted-foreground sm:text-sm">
               {mode === "login"
                 ? "Enter your credentials to access your grounded knowledge workspace."
                 : "Sign up to start indexing course notes, PDFs, and generating revision plans."}
@@ -218,14 +218,15 @@ function LoginContent() {
           </div>
 
           {/* Mode Switcher Tabs */}
-          <div className="p-1 rounded-xl bg-muted/60 flex items-center border border-border/40 text-xs font-semibold">
+          <div className="flex items-center rounded-xl border border-border/40 bg-muted/60 p-1 text-xs font-semibold">
             <button
               type="button"
               onClick={() => setMode("login")}
-              className={`flex-1 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${mode === "login"
-                  ? "bg-background text-foreground shadow-sm font-bold border border-border/50"
+              className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 transition-all duration-200 ${
+                mode === "login"
+                  ? "border border-border/50 bg-background font-bold text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
-                }`}
+              }`}
             >
               <LogIn className="h-3.5 w-3.5" />
               <span>Log In</span>
@@ -233,10 +234,11 @@ function LoginContent() {
             <button
               type="button"
               onClick={() => setMode("signup")}
-              className={`flex-1 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 ${mode === "signup"
-                  ? "bg-background text-foreground shadow-sm font-bold border border-border/50"
+              className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 transition-all duration-200 ${
+                mode === "signup"
+                  ? "border border-border/50 bg-background font-bold text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
-                }`}
+              }`}
             >
               <UserPlus className="h-3.5 w-3.5" />
               <span>Sign Up</span>
@@ -250,9 +252,9 @@ function LoginContent() {
               type="button"
               disabled={isSubmitting}
               onClick={handleGoogleSignIn}
-              className="w-full h-11 px-4 rounded-xl border border-border/60 bg-card hover:bg-muted/60 text-foreground text-xs font-bold transition-all duration-200 flex items-center justify-center gap-3 shadow-sm hover:scale-[1.01] disabled:opacity-50"
+              className="flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-border/60 bg-card px-4 text-xs font-bold text-foreground shadow-sm transition-all duration-200 hover:scale-[1.01] hover:bg-muted/60 disabled:opacity-50"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24">
+              <svg className="h-4 w-4" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -278,16 +280,16 @@ function LoginContent() {
               type="button"
               disabled={isSubmitting}
               onClick={handleDemoSignIn}
-              className="w-full h-11 px-4 rounded-xl bg-primary/10 hover:bg-primary/20 border border-primary/30 text-primary text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:scale-[1.01] disabled:opacity-50"
+              className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 text-xs font-bold text-primary shadow-sm transition-all duration-200 hover:scale-[1.01] hover:bg-primary/20 disabled:opacity-50"
             >
               <Sparkles className="h-4 w-4 text-primary" />
               <span>Instant Demo Mode — Skip Credentials</span>
             </button>
           </div>
 
-          <div className="relative flex items-center justify-center my-4">
-            <div className="border-t border-border/60 w-full" />
-            <span className="bg-background px-3 text-[11px] text-muted-foreground uppercase font-mono tracking-wider absolute">
+          <div className="relative my-4 flex items-center justify-center">
+            <div className="w-full border-t border-border/60" />
+            <span className="absolute bg-background px-3 font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
               Or continue with email
             </span>
           </div>
@@ -297,7 +299,7 @@ function LoginContent() {
             {mode === "signup" && (
               <>
                 {/* Full Name & Username */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-foreground">Scholar Name</label>
                     <input
@@ -306,21 +308,23 @@ function LoginContent() {
                       onChange={(e) => setAlias(e.target.value)}
                       placeholder="e.g. Alex Vance"
                       required
-                      className="w-full h-10 px-3.5 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
+                      className="h-10 w-full rounded-xl border border-border/60 bg-muted/30 px-3.5 text-xs text-foreground outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/40"
                     />
                   </div>
 
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-foreground">Unique Username</label>
                     <div className="relative flex items-center">
-                      <span className="absolute left-3 text-muted-foreground text-xs font-mono">@</span>
+                      <span className="absolute left-3 font-mono text-xs text-muted-foreground">
+                        @
+                      </span>
                       <input
                         type="text"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         placeholder="alex_vance"
                         required
-                        className="w-full h-10 pl-7 pr-3 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs font-mono outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
+                        className="h-10 w-full rounded-xl border border-border/60 bg-muted/30 pl-7 pr-3 font-mono text-xs text-foreground outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/40"
                       />
                     </div>
                   </div>
@@ -332,39 +336,57 @@ function LoginContent() {
                   <select
                     value={college}
                     onChange={(e) => setCollege(e.target.value)}
-                    className="w-full h-10 px-3 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50"
+                    className="h-10 w-full rounded-xl border border-border/60 bg-muted/30 px-3 text-xs font-semibold text-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/40"
                   >
                     <option value="Stanford University">Stanford University</option>
-                    <option value="Massachusetts Institute of Technology (MIT)">Massachusetts Institute of Technology (MIT)</option>
+                    <option value="Massachusetts Institute of Technology (MIT)">
+                      Massachusetts Institute of Technology (MIT)
+                    </option>
                     <option value="UC Berkeley">UC Berkeley</option>
-                    <option value="Carnegie Mellon University (CMU)">Carnegie Mellon University (CMU)</option>
+                    <option value="Carnegie Mellon University (CMU)">
+                      Carnegie Mellon University (CMU)
+                    </option>
                     <option value="IIT Bombay">IIT Bombay</option>
                     <option value="IIT Delhi">IIT Delhi</option>
                     <option value="Oxford University">Oxford University</option>
                     <option value="Harvard University">Harvard University</option>
                     <option value="Georgia Tech">Georgia Tech</option>
                     <option value="University of Washington">University of Washington</option>
-                    <option value="National University of Singapore (NUS)">National University of Singapore (NUS)</option>
+                    <option value="National University of Singapore (NUS)">
+                      National University of Singapore (NUS)
+                    </option>
                     <option value="Other / Global Academy">Other / Global Academy</option>
                   </select>
                 </div>
 
                 {/* Branch & Year */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-foreground">Branch / Major</label>
                     <select
                       value={course}
                       onChange={(e) => setCourse(e.target.value)}
-                      className="w-full h-10 px-3 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50"
+                      className="h-10 w-full rounded-xl border border-border/60 bg-muted/30 px-3 text-xs font-semibold text-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/40"
                     >
                       <option value="B.S. Computer Science & AI">B.S. Computer Science & AI</option>
-                      <option value="M.S. Artificial Intelligence & ML">M.S. Artificial Intelligence & ML</option>
-                      <option value="B.Tech Electrical & Computer Engineering">B.Tech Electrical & Computer Engineering</option>
-                      <option value="Data Science & Applied Statistics">Data Science & Applied Statistics</option>
-                      <option value="Software Engineering & Systems">Software Engineering & Systems</option>
-                      <option value="Mathematics & Quantum Computing">Mathematics & Quantum Computing</option>
-                      <option value="Mechanical & Robotics Engineering">Mechanical & Robotics Engineering</option>
+                      <option value="M.S. Artificial Intelligence & ML">
+                        M.S. Artificial Intelligence & ML
+                      </option>
+                      <option value="B.Tech Electrical & Computer Engineering">
+                        B.Tech Electrical & Computer Engineering
+                      </option>
+                      <option value="Data Science & Applied Statistics">
+                        Data Science & Applied Statistics
+                      </option>
+                      <option value="Software Engineering & Systems">
+                        Software Engineering & Systems
+                      </option>
+                      <option value="Mathematics & Quantum Computing">
+                        Mathematics & Quantum Computing
+                      </option>
+                      <option value="Mechanical & Robotics Engineering">
+                        Mechanical & Robotics Engineering
+                      </option>
                       <option value="Biomedical Engineering">Biomedical Engineering</option>
                     </select>
                   </div>
@@ -374,7 +396,7 @@ function LoginContent() {
                     <select
                       value={year}
                       onChange={(e) => setYear(e.target.value)}
-                      className="w-full h-10 px-3 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs font-semibold outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50"
+                      className="h-10 w-full rounded-xl border border-border/60 bg-muted/30 px-3 text-xs font-semibold text-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/40"
                     >
                       <option value="1st Year (Freshman)">1st Year (Freshman)</option>
                       <option value="2nd Year (Sophomore)">2nd Year (Sophomore)</option>
@@ -391,14 +413,14 @@ function LoginContent() {
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-foreground">Email Address</label>
               <div className="relative flex items-center">
-                <Mail className="absolute left-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Mail className="pointer-events-none absolute left-3.5 h-4 w-4 text-muted-foreground" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="student@polaris.edu"
                   required
-                  className="w-full h-10 pl-10 pr-4 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
+                  className="h-10 w-full rounded-xl border border-border/60 bg-muted/30 pl-10 pr-4 text-xs text-foreground outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/40"
                 />
               </div>
             </div>
@@ -407,20 +429,20 @@ function LoginContent() {
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-foreground">Password</label>
                 {mode === "login" && (
-                  <span className="text-[11px] text-primary hover:underline cursor-pointer">
+                  <span className="cursor-pointer text-[11px] text-primary hover:underline">
                     Forgot password?
                   </span>
                 )}
               </div>
               <div className="relative flex items-center">
-                <Lock className="absolute left-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Lock className="pointer-events-none absolute left-3.5 h-4 w-4 text-muted-foreground" />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full h-10 pl-10 pr-10 rounded-xl border border-border/60 bg-muted/30 text-foreground text-xs outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"
+                  className="h-10 w-full rounded-xl border border-border/60 bg-muted/30 pl-10 pr-10 text-xs text-foreground outline-none transition-all focus:border-primary/50 focus:ring-2 focus:ring-primary/40"
                 />
                 <button
                   type="button"
@@ -436,9 +458,11 @@ function LoginContent() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-11 mt-1 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white font-black text-xs sm:text-sm tracking-wide shadow-xl shadow-purple-500/25 transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 border border-purple-400/30"
+              className="mt-1 flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-purple-400/30 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-xs font-black tracking-wide text-white shadow-xl shadow-purple-500/25 transition-all duration-300 hover:scale-[1.01] hover:from-indigo-700 hover:to-pink-700 active:scale-[0.99] sm:text-sm"
             >
-              <span>{mode === "login" ? "Sign In to Polaris Workspace" : "Register Scholar Account"}</span>
+              <span>
+                {mode === "login" ? "Sign In to Polaris Workspace" : "Register Scholar Account"}
+              </span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </form>
@@ -449,7 +473,7 @@ function LoginContent() {
             <button
               type="button"
               onClick={() => setMode(mode === "login" ? "signup" : "login")}
-              className="text-primary font-bold hover:underline ml-1"
+              className="ml-1 font-bold text-primary hover:underline"
             >
               {mode === "login" ? "Sign Up Free" : "Log In"}
             </button>
@@ -457,7 +481,7 @@ function LoginContent() {
         </div>
 
         {/* Footer info */}
-        <div className="text-center text-[11px] text-muted-foreground pt-4 border-t border-border/40">
+        <div className="border-t border-border/40 pt-4 text-center text-[11px] text-muted-foreground">
           Polaris RAG Intelligence Platform • Secured by Firebase Auth & Qdrant Engine
         </div>
       </div>
@@ -469,7 +493,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground text-xs font-mono">
+        <div className="flex min-h-screen items-center justify-center bg-background font-mono text-xs text-muted-foreground">
           INITIALIZING SECURE PORTAL...
         </div>
       }

@@ -52,8 +52,15 @@ export async function fetchNodeDetail(nodeId: string): Promise<NodeDetailRespons
 
 export async function extractKnowledgeGraph(
   documentIds?: string[],
-  syllabusId?: string
-): Promise<{ success: boolean; graph_id: string; node_count: number; edge_count: number; cluster_count: number; message: string }> {
+  syllabusId?: string,
+): Promise<{
+  success: boolean;
+  graph_id: string;
+  node_count: number;
+  edge_count: number;
+  cluster_count: number;
+  message: string;
+}> {
   return api("/api/graph/extract", {
     method: "POST",
     body: JSON.stringify({

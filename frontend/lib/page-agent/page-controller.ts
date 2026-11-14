@@ -71,7 +71,9 @@ export class PageController {
       const clean = target.trim();
 
       // 1. Direct data-agent-target check
-      const cleanTargetName = clean.replace(/^\[data-agent-target=['"]?/, "").replace(/['"]?\]$/, "");
+      const cleanTargetName = clean
+        .replace(/^\[data-agent-target=['"]?/, "")
+        .replace(/['"]?\]$/, "");
       const byTarget =
         document.querySelector<HTMLElement>(`[data-agent-target="${cleanTargetName}"]`) ||
         document.querySelector<HTMLElement>(`[data-agent-target="${clean}"]`);
@@ -98,7 +100,7 @@ export class PageController {
         (e) =>
           e.dataAgentTarget?.toLowerCase() === targetLower ||
           e.text.toLowerCase() === targetLower ||
-          e.ariaLabel?.toLowerCase() === targetLower
+          e.ariaLabel?.toLowerCase() === targetLower,
       );
       if (exactMatch) return exactMatch.element;
 
@@ -108,7 +110,7 @@ export class PageController {
           (e.dataAgentTarget && e.dataAgentTarget.toLowerCase().includes(targetLower)) ||
           e.text.toLowerCase().includes(targetLower) ||
           (e.ariaLabel && e.ariaLabel.toLowerCase().includes(targetLower)) ||
-          (e.placeholder && e.placeholder.toLowerCase().includes(targetLower))
+          (e.placeholder && e.placeholder.toLowerCase().includes(targetLower)),
       );
       if (partialMatch) return partialMatch.element;
     }
@@ -121,7 +123,7 @@ export class PageController {
    */
   public async waitForElement(
     target: number | string | HTMLElement,
-    timeoutMs = 1200
+    timeoutMs = 1200,
   ): Promise<HTMLElement | null> {
     const startTime = Date.now();
     while (Date.now() - startTime < timeoutMs) {
@@ -139,7 +141,7 @@ export class PageController {
    */
   public async clickElementWithCursor(
     target: number | string | HTMLElement,
-    options?: { label?: string; speedMultiplier?: number }
+    options?: { label?: string; speedMultiplier?: number },
   ): Promise<ActionResult> {
     const element = await this.waitForElement(target, 1200);
     if (!element) {
@@ -175,7 +177,7 @@ export class PageController {
   public async inputTextWithCursor(
     target: number | string | HTMLElement,
     text: string,
-    options?: { label?: string; speedMultiplier?: number }
+    options?: { label?: string; speedMultiplier?: number },
   ): Promise<ActionResult> {
     const element = await this.waitForElement(target, 1200);
     if (!element) {

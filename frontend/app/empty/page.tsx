@@ -2,27 +2,19 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import {
-  BookOpen,
-  FileText,
-  Layers,
-  Compass,
-  Search,
-  FolderOpen,
-  ArrowLeft,
-} from "lucide-react";
+import { BookOpen, FileText, Layers, Compass, Search, FolderOpen, ArrowLeft } from "lucide-react";
 import { EmptyState, EmptyStateVariant } from "@/components/ui/empty-state";
 import { CrystalGlow } from "@/components/ui/crystal-glow";
 import { SiteHeader } from "@/components/site-header";
 import { cn } from "@/lib/utils";
 
 const VARIANTS: { id: EmptyStateVariant; label: string; icon: React.ReactNode }[] = [
-  { id: "syllabus", label: "Syllabus Empty", icon: <BookOpen className="w-3.5 h-3.5" /> },
-  { id: "documents", label: "Documents Empty", icon: <FileText className="w-3.5 h-3.5" /> },
-  { id: "graph", label: "Topology Empty", icon: <Layers className="w-3.5 h-3.5" /> },
-  { id: "gaps", label: "Gap Matrix Empty", icon: <Compass className="w-3.5 h-3.5" /> },
-  { id: "search", label: "Search Zero Results", icon: <Search className="w-3.5 h-3.5" /> },
-  { id: "general", label: "General Fallback", icon: <FolderOpen className="w-3.5 h-3.5" /> },
+  { id: "syllabus", label: "Syllabus Empty", icon: <BookOpen className="h-3.5 w-3.5" /> },
+  { id: "documents", label: "Documents Empty", icon: <FileText className="h-3.5 w-3.5" /> },
+  { id: "graph", label: "Topology Empty", icon: <Layers className="h-3.5 w-3.5" /> },
+  { id: "gaps", label: "Gap Matrix Empty", icon: <Compass className="h-3.5 w-3.5" /> },
+  { id: "search", label: "Search Zero Results", icon: <Search className="h-3.5 w-3.5" /> },
+  { id: "general", label: "General Fallback", icon: <FolderOpen className="h-3.5 w-3.5" /> },
 ];
 
 export default function EmptyStatePage() {
@@ -32,15 +24,15 @@ export default function EmptyStatePage() {
     <div className="min-h-screen bg-black text-foreground selection:bg-primary/30 selection:text-foreground">
       <SiteHeader />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-12">
+      <main className="mx-auto max-w-6xl space-y-12 px-4 py-12 sm:px-6 sm:py-20">
         {/* Top Breadcrumb & Page Info */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-8">
+        <div className="flex flex-col justify-between gap-4 border-b border-white/10 pb-8 sm:flex-row sm:items-center">
           <div className="space-y-2">
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 text-xs font-mono text-muted-foreground hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 font-mono text-xs text-muted-foreground transition-colors hover:text-white"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
+              <ArrowLeft className="h-3.5 w-3.5" />
               <span>Back to Workspace</span>
             </Link>
 
@@ -48,29 +40,30 @@ export default function EmptyStatePage() {
               <CrystalGlow as="h1" fontSize={28} fontWeight={900} className="tracking-tight">
                 Academic Empty State Matrix
               </CrystalGlow>
-              <span className="px-2.5 py-1 rounded-full bg-primary/20 text-primary border border-primary/30 text-[10px] font-mono uppercase tracking-wider">
+              <span className="rounded-full border border-primary/30 bg-primary/20 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-primary">
                 Interactive State View
               </span>
             </div>
 
-            <p className="text-muted-foreground text-xs sm:text-sm max-w-xl font-light">
-              Preview and verify Polaris zero-data states across vector retrieval, syllabus parsing, concept topologies, and search matrices.
+            <p className="max-w-xl text-xs font-light text-muted-foreground sm:text-sm">
+              Preview and verify Polaris zero-data states across vector retrieval, syllabus parsing,
+              concept topologies, and search matrices.
             </p>
           </div>
         </div>
 
         {/* Variant Selectors */}
-        <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-xl w-fit">
+        <div className="flex w-fit flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur-xl">
           {VARIANTS.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveVariant(tab.id)}
               className={cn(
-                "flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer",
+                "flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all",
                 activeVariant === tab.id
-                  ? "bg-white text-black font-bold shadow-md scale-102"
-                  : "text-muted-foreground hover:text-white hover:bg-white/[0.06]"
+                  ? "scale-102 bg-white font-bold text-black shadow-md"
+                  : "text-muted-foreground hover:bg-white/[0.06] hover:text-white",
               )}
             >
               {tab.icon}
@@ -80,7 +73,7 @@ export default function EmptyStatePage() {
         </div>
 
         {/* Dynamic Empty State Display Container */}
-        <div className="py-12 px-4 rounded-3xl border border-white/5 bg-radial from-white/[0.02] to-transparent min-h-[440px] flex items-center justify-center">
+        <div className="bg-radial flex min-h-[440px] items-center justify-center rounded-3xl border border-white/5 from-white/[0.02] to-transparent px-4 py-12">
           {activeVariant === "syllabus" && (
             <EmptyState
               variant="syllabus"

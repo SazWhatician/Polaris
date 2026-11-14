@@ -113,7 +113,10 @@ export async function uploadDocument(
     }),
   });
 
-  if (create.upload_url && (create.upload_url.startsWith("http://") || create.upload_url.startsWith("https://"))) {
+  if (
+    create.upload_url &&
+    (create.upload_url.startsWith("http://") || create.upload_url.startsWith("https://"))
+  ) {
     try {
       await putWithProgress(
         create.upload_url,
@@ -173,4 +176,3 @@ function putWithProgress(
     xhr.send(file);
   });
 }
-

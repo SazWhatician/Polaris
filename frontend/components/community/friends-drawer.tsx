@@ -10,17 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  useCommunityStore,
-} from "@/lib/community-store";
-import {
-  Users,
-  UserCheck,
-  Clock,
-  Search,
-  School,
-  MessageSquare,
-} from "lucide-react";
+import { useCommunityStore } from "@/lib/community-store";
+import { Users, UserCheck, Clock, Search, School, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -52,37 +43,41 @@ export function FriendsDrawer({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl liquid-glass border-white/20 dark:border-white/10 p-6 sm:p-7 rounded-3xl">
+      <DialogContent className="liquid-glass max-w-xl rounded-3xl border-white/20 p-6 dark:border-white/10 sm:p-7">
         <DialogHeader className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-primary">
-              <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
-                <Users className="w-5 h-5" />
+              <div className="rounded-xl border border-primary/20 bg-primary/10 p-2">
+                <Users className="h-5 w-5" />
               </div>
               <DialogTitle className="text-xl font-black text-foreground">
                 Scholar Study Circle & Friends
               </DialogTitle>
             </div>
-            <Badge variant="outline" className="text-[10px] font-mono border-white/20 bg-white/5 text-foreground">
+            <Badge
+              variant="outline"
+              className="border-white/20 bg-white/5 font-mono text-[10px] text-foreground"
+            >
               {friendsCount} Connected
             </Badge>
           </div>
           <DialogDescription className="text-xs text-muted-foreground">
-            Connect with classmates from {profile.college} ({profile.course}) for shared RAG queries and group study.
+            Connect with classmates from {profile.college} ({profile.course}) for shared RAG queries
+            and group study.
           </DialogDescription>
         </DialogHeader>
 
         {/* Tab Controls & Search Bar */}
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center p-1 rounded-2xl bg-white/5 border border-white/10 text-xs">
+            <div className="flex items-center rounded-2xl border border-white/10 bg-white/5 p-1 text-xs">
               <button
                 onClick={() => setActiveTab("all")}
                 className={cn(
-                  "px-3 py-1 rounded-xl font-bold transition-all",
+                  "rounded-xl px-3 py-1 font-bold transition-all",
                   activeTab === "all"
-                    ? "bg-primary text-primary-foreground shadow-xs"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "shadow-xs bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 Friends ({friendsCount})
@@ -90,10 +85,10 @@ export function FriendsDrawer({ open, onOpenChange }: Props) {
               <button
                 onClick={() => setActiveTab("requests")}
                 className={cn(
-                  "px-3 py-1 rounded-xl font-bold transition-all",
+                  "rounded-xl px-3 py-1 font-bold transition-all",
                   activeTab === "requests"
-                    ? "bg-primary text-primary-foreground shadow-xs"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "shadow-xs bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 Pending Requests ({pendingCount})
@@ -101,48 +96,66 @@ export function FriendsDrawer({ open, onOpenChange }: Props) {
             </div>
 
             <div className="relative flex-1">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by name, college..."
-                className="w-full pl-8.5 pr-3 py-1.5 text-xs rounded-xl bg-white/5 border border-white/10 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                className="pl-8.5 w-full rounded-xl border border-white/10 bg-white/5 py-1.5 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
           </div>
 
           {/* Friends List */}
-          <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+          <div className="max-h-80 space-y-2 overflow-y-auto pr-1">
             {filteredFriends.length === 0 ? (
-              <div className="p-8 text-center text-xs text-muted-foreground space-y-2">
-                <Users className="w-8 h-8 text-muted-foreground/40 mx-auto" />
-                <p>{activeTab === "all" ? "No friends connected yet." : "No pending friend requests."}</p>
-                <p className="text-[11px]">Discover peers in the Community Feed below and click "Add Friend"!</p>
+              <div className="space-y-2 p-8 text-center text-xs text-muted-foreground">
+                <Users className="mx-auto h-8 w-8 text-muted-foreground/40" />
+                <p>
+                  {activeTab === "all"
+                    ? "No friends connected yet."
+                    : "No pending friend requests."}
+                </p>
+                <p className="text-[11px]">
+                  Discover peers in the Community Feed below and click "Add Friend"!
+                </p>
               </div>
             ) : (
               filteredFriends.map((f) => (
                 <div
                   key={f.id}
-                  className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between gap-3 hover:border-primary/40 transition-colors"
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 transition-colors hover:border-primary/40"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex min-w-0 items-center gap-3">
                     <div className="relative shrink-0">
-                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-xs", f.avatarColor)}>
+                      <div
+                        className={cn(
+                          "shadow-xs flex h-10 w-10 items-center justify-center rounded-xl font-bold text-white",
+                          f.avatarColor,
+                        )}
+                      >
                         {f.alias.charAt(0)}
                       </div>
                       {f.online && (
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-background" title="Online" />
+                        <div
+                          className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-background bg-emerald-500"
+                          title="Online"
+                        />
                       )}
                     </div>
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-foreground truncate">{f.alias}</span>
-                        <span className="text-[10px] font-mono text-muted-foreground">{f.username}</span>
+                        <span className="truncate text-xs font-bold text-foreground">
+                          {f.alias}
+                        </span>
+                        <span className="font-mono text-[10px] text-muted-foreground">
+                          {f.username}
+                        </span>
                       </div>
-                      <p className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
-                        <School className="w-3 h-3 text-indigo-400 shrink-0" />
+                      <p className="flex items-center gap-1 truncate text-[10px] text-muted-foreground">
+                        <School className="h-3 w-3 shrink-0 text-indigo-400" />
                         <span>{f.college}</span>
                         <span>•</span>
                         <span>{f.year}</span>
@@ -150,7 +163,7 @@ export function FriendsDrawer({ open, onOpenChange }: Props) {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex shrink-0 items-center gap-2">
                     {f.status === "friends" ? (
                       <>
                         <Button
@@ -158,11 +171,13 @@ export function FriendsDrawer({ open, onOpenChange }: Props) {
                           size="sm"
                           onClick={() => {
                             onOpenChange(false);
-                            router.push(`/chat?q=Collaborate%20with%20${encodeURIComponent(f.alias)}%20on%20coursework`);
+                            router.push(
+                              `/chat?q=Collaborate%20with%20${encodeURIComponent(f.alias)}%20on%20coursework`,
+                            );
                           }}
-                          className="h-8 px-2.5 text-xs font-bold text-primary hover:bg-white/10 rounded-xl gap-1"
+                          className="h-8 gap-1 rounded-xl px-2.5 text-xs font-bold text-primary hover:bg-white/10"
                         >
-                          <MessageSquare className="w-3.5 h-3.5" />
+                          <MessageSquare className="h-3.5 w-3.5" />
                           <span>Chat</span>
                         </Button>
                         <Button
@@ -172,7 +187,7 @@ export function FriendsDrawer({ open, onOpenChange }: Props) {
                             toggleFriendStatus(f.id);
                             toast.info(`Removed ${f.alias} from friends`);
                           }}
-                          className="h-8 px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-destructive border-white/15 rounded-xl"
+                          className="h-8 rounded-xl border-white/15 px-2.5 text-[11px] font-semibold text-muted-foreground hover:text-destructive"
                         >
                           Friends
                         </Button>
@@ -185,9 +200,9 @@ export function FriendsDrawer({ open, onOpenChange }: Props) {
                           toggleFriendStatus(f.id);
                           toast.success(`Connected with ${f.alias}!`);
                         }}
-                        className="h-8 px-2.5 text-xs font-bold border-amber-500/30 text-amber-500 bg-amber-500/10 rounded-xl gap-1"
+                        className="h-8 gap-1 rounded-xl border-amber-500/30 bg-amber-500/10 px-2.5 text-xs font-bold text-amber-500"
                       >
-                        <Clock className="w-3 h-3" />
+                        <Clock className="h-3 w-3" />
                         <span>Pending</span>
                       </Button>
                     ) : (
@@ -197,9 +212,9 @@ export function FriendsDrawer({ open, onOpenChange }: Props) {
                           toggleFriendStatus(f.id);
                           toast.success(`Accepted friend request from ${f.alias}!`);
                         }}
-                        className="h-8 px-3 text-xs font-bold bg-primary text-primary-foreground rounded-xl gap-1"
+                        className="h-8 gap-1 rounded-xl bg-primary px-3 text-xs font-bold text-primary-foreground"
                       >
-                        <UserCheck className="w-3.5 h-3.5" />
+                        <UserCheck className="h-3.5 w-3.5" />
                         <span>Accept</span>
                       </Button>
                     )}

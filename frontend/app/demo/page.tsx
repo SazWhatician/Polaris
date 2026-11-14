@@ -8,11 +8,13 @@ export default function DemoPage() {
 
   const handlePromptSubmit = (promptText: string) => {
     if (!promptText.trim()) return;
-    router.push(`/chat?prompt=${encodeURIComponent(promptText)}` as Parameters<typeof router.push>[0]);
+    router.push(
+      `/chat?prompt=${encodeURIComponent(promptText)}` as Parameters<typeof router.push>[0],
+    );
   };
 
   return (
-    <main className="w-full min-h-screen bg-black overflow-hidden">
+    <main className="min-h-screen w-full overflow-hidden bg-black">
       <HeroWave
         title="Polaris AI Assistant."
         subtitle="Grounded RAG AI Assistant. Ask questions, analyze gaps, and build study plans."

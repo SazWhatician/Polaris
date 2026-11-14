@@ -1,4 +1,3 @@
-import pytest
 from app.models.rag import RetrievedChunk
 from app.services.rerank_service import RerankService
 

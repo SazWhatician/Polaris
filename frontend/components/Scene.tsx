@@ -18,7 +18,10 @@ export function Scene() {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === "POLARIS_NAVIGATE" && typeof event.data?.url === "string") {
         router.push(event.data.url);
-      } else if (event.data?.type === "POLARIS_SCROLL_RELAY" && typeof event.data?.deltaY === "number") {
+      } else if (
+        event.data?.type === "POLARIS_SCROLL_RELAY" &&
+        typeof event.data?.deltaY === "number"
+      ) {
         window.scrollBy({ top: event.data.deltaY, left: 0, behavior: "instant" });
       } else if (event.data?.type === "POLARIS_SCROLL_TO_NEXT") {
         const nextEl = document.getElementById("cascade-section");
@@ -44,13 +47,10 @@ export function Scene() {
         const isVisible = entry?.isIntersecting ?? true;
         const iframe = container.querySelector("iframe");
         if (iframe?.contentWindow) {
-          iframe.contentWindow.postMessage(
-            { type: "POLARIS_PAUSE_HERO", paused: !isVisible },
-            "*"
-          );
+          iframe.contentWindow.postMessage({ type: "POLARIS_PAUSE_HERO", paused: !isVisible }, "*");
         }
       },
-      { rootMargin: "250px" }
+      { rootMargin: "250px" },
     );
     observer.observe(container);
     return () => observer.disconnect();
@@ -72,7 +72,7 @@ export function Scene() {
 
       {/* Crisp Cinematic Transition to Next Section (No premature dark fog) */}
       <div
-        className="absolute inset-x-0 bottom-0 h-16 sm:h-24 pointer-events-none z-20 bg-gradient-to-b from-transparent via-black/40 to-black"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-b from-transparent via-black/40 to-black sm:h-24"
         aria-hidden="true"
       />
     </div>

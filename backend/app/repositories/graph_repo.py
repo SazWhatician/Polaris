@@ -1,16 +1,18 @@
-from typing import Optional, Dict, Any
+from typing import Any
+
 from google.cloud.firestore import Client
+
 from app.core.firebase import get_firestore
-from app.models.graph import KnowledgeGraph, ConceptNode, ConceptRelationship
+from app.models.graph import ConceptNode, KnowledgeGraph
 
 # In-memory LRU-style cache for active user knowledge graphs
-_graph_cache: Dict[str, KnowledgeGraph] = {}
+_graph_cache: dict[str, KnowledgeGraph] = {}
 
 
 class GraphRepository:
     """Repository for persisting and querying user Knowledge Graphs in Firestore."""
 
-    def __init__(self, db: Optional[Client] = None):
+    def __init__(self, db: Client | None = None):
         self._db = db
 
     @property
@@ -24,19 +26,29 @@ class GraphRepository:
         _graph_cache[user_id] = graph
 
         try:
-            doc_ref = self.db.collection("users").document(user_id).collection("knowledge_graph").document("latest")
+            doc_ref = (
+                self.db.collection("users")
+                .document(user_id)
+                .collection("knowledge_graph")
+                .document("latest")
+            )
             doc_ref.set(graph.model_dump())
         except Exception:
             # Best-effort persistence; in-memory cache serves as fallback
             pass
 
-    def get_latest_graph(self, user_id: str) -> Optional[KnowledgeGraph]:
+    def get_latest_graph(self, user_id: str) -> KnowledgeGraph | None:
         """Fetch the latest KnowledgeGraph for a user."""
         if user_id in _graph_cache:
             return _graph_cache[user_id]
 
         try:
-            doc_ref = self.db.collection("users").document(user_id).collection("knowledge_graph").document("latest")
+            doc_ref = (
+                self.db.collection("users")
+                .document(user_id)
+                .collection("knowledge_graph")
+                .document("latest")
+            )
             snapshot = doc_ref.get()
             if snapshot.exists:
                 data = snapshot.to_dict()
@@ -48,13 +60,13 @@ class GraphRepository:
 
         return None
 
-    def get_node_detail(self, user_id: str, node_id: str) -> Optional[Dict[str, Any]]:
+    def get_node_detail(self, user_id: str, node_id: str) -> dict[str, Any] | None:
         """Get detail for a specific node including direct connected prerequisites and dependents."""
         graph = self.get_latest_graph(user_id)
         if not graph:
             return None
 
-        target_node: Optional[ConceptNode] = None
+        target_node: ConceptNode | None = None
         for n in graph.nodes:
             if n.id == node_id:
                 target_node = n

@@ -35,9 +35,7 @@ class DocumentRepository:
         tbl = self._get_sb_table()
         if tbl is not None:
             try:
-                await asyncio.to_thread(
-                    lambda: tbl.insert(_to_supabase_dict(doc)).execute()
-                )
+                await asyncio.to_thread(lambda: tbl.insert(_to_supabase_dict(doc)).execute())
             except Exception as exc:
                 log.warning("supabase.document_insert_fallback", error=str(exc))
         return doc
@@ -62,11 +60,13 @@ class DocumentRepository:
         if tbl is not None:
             try:
                 res = await asyncio.to_thread(
-                    lambda: tbl.select("*")
-                    .eq("user_id", user_id)
-                    .order("created_at", desc=True)
-                    .limit(limit)
-                    .execute()
+                    lambda: (
+                        tbl.select("*")
+                        .eq("user_id", user_id)
+                        .order("created_at", desc=True)
+                        .limit(limit)
+                        .execute()
+                    )
                 )
                 if res.data is not None:
                     docs = [_from_supabase_dict(row) for row in res.data]
@@ -74,7 +74,9 @@ class DocumentRepository:
                         _mem_docs[(d.user_id, d.id)] = d
                     return docs
             except Exception:
-                import app.core.supabase; app.core.supabase._supabase_client = None
+                from app.core import supabase as sb_module
+
+                sb_module._supabase_client = None
 
         items = [d for (uid, _), d in _mem_docs.items() if uid == user_id]
         items.sort(key=lambda d: d.created_at, reverse=True)
@@ -177,7 +179,9 @@ def _from_supabase_dict(data: dict[str, Any]) -> Document:
         updated_dt = updated or created_dt
 
     ocr_at = data.get("ocr_completed_at")
-    ocr_dt = datetime.fromisoformat(ocr_at.replace("Z", "+00:00")) if isinstance(ocr_at, str) else ocr_at
+    ocr_dt = (
+        datetime.fromisoformat(ocr_at.replace("Z", "+00:00")) if isinstance(ocr_at, str) else ocr_at
+    )
 
     return Document(
         id=data["id"],
@@ -194,4 +198,3 @@ def _from_supabase_dict(data: dict[str, Any]) -> Document:
         created_at=created_dt,
         updated_at=updated_dt,
     )
-

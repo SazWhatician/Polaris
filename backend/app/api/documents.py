@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 
 from app.core.config import get_settings
 from app.core.deps import CurrentUser
-from app.core.supabase import get_supabase_client, is_initialized
 from app.models.document import (
     DocumentCreateRequest,
     DocumentCreateResponse,
@@ -28,6 +27,7 @@ def get_task_queue(request: Request) -> TaskQueue:
     queue = getattr(request.app.state, "task_queue", None)
     if queue is None:
         from app.services.task_queue import NoopTaskQueue
+
         return NoopTaskQueue()
     return queue
 

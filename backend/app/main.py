@@ -5,7 +5,22 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from qdrant_client import AsyncQdrantClient
 
-from app.api import agent_llm, agents, chat, documents, graph, graph_embeddings, health, me, pages, pathfinder, planner_agent, resource_agent, syllabus, twin
+from app.api import (
+    agent_llm,
+    agents,
+    chat,
+    documents,
+    graph,
+    graph_embeddings,
+    health,
+    me,
+    pages,
+    pathfinder,
+    planner_agent,
+    resource_agent,
+    syllabus,
+    twin,
+)
 from app.core.config import Settings, get_settings
 from app.core.firebase import initialize_firebase
 from app.core.logging import RequestIdMiddleware, configure_logging, get_logger
@@ -57,7 +72,7 @@ def _build_app(settings: Settings) -> FastAPI:
                 batch_size=settings.embedding_batch_size,
             )
             embedder.warm_up()
- 
+
             groq_keys = settings.parsed_groq_api_keys
             if not groq_keys:
                 raise RuntimeError("No Groq API keys configured")

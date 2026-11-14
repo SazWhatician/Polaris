@@ -1,7 +1,9 @@
-from typing import AsyncIterator, List, Type, TypeVar, Optional
-from pydantic import BaseModel
-from app.services.llm.base import BaseLLMProvider
+from collections.abc import AsyncIterator
+from typing import TypeVar
+
 from app.core.logging import get_logger
+from app.services.llm.base import BaseLLMProvider
+from pydantic import BaseModel
 
 log = get_logger(__name__)
 T = TypeVar("T", bound=BaseModel)
@@ -10,13 +12,13 @@ T = TypeVar("T", bound=BaseModel)
 class LLMRouter:
     """Multi-LLM provider router supporting ordered fallback chain execution."""
 
-    def __init__(self, providers: List[BaseLLMProvider]):
+    def __init__(self, providers: list[BaseLLMProvider]):
         if not providers:
             raise ValueError("LLMRouter requires at least one BaseLLMProvider instance")
         self._providers = providers
 
     @property
-    def providers(self) -> List[BaseLLMProvider]:
+    def providers(self) -> list[BaseLLMProvider]:
         return self._providers
 
     async def stream_completion(
@@ -27,7 +29,7 @@ class LLMRouter:
         max_tokens: int = 1024,
     ) -> AsyncIterator[str]:
         """Try providers in fallback chain order until streaming completion succeeds."""
-        last_exception: Optional[Exception] = None
+        last_exception: Exception | None = None
 
         for provider in self._providers:
             try:
@@ -56,7 +58,7 @@ class LLMRouter:
         max_tokens: int = 1024,
     ) -> str:
         """Try providers in fallback chain order until completion succeeds."""
-        last_exception: Optional[Exception] = None
+        last_exception: Exception | None = None
 
         for provider in self._providers:
             try:
@@ -77,12 +79,12 @@ class LLMRouter:
     async def structured_complete(
         self,
         prompt: str,
-        schema_class: Type[T],
+        schema_class: type[T],
         *,
         temperature: float = 0.1,
     ) -> T:
         """Try providers in fallback chain order until structured completion succeeds."""
-        last_exception: Optional[Exception] = None
+        last_exception: Exception | None = None
 
         for provider in self._providers:
             try:
@@ -98,22 +100,24 @@ class LLMRouter:
                 )
                 last_exception = exc
 
-        raise last_exception or RuntimeError("All LLM providers in structured fallback chain failed")
+        raise last_exception or RuntimeError(
+            "All LLM providers in structured fallback chain failed"
+        )
 
 
 def create_default_llm_router(
-    groq_api_key: Optional[str] = None,
-    nvidia_api_key: Optional[str] = None,
-    gemini_api_key: Optional[str] = None,
+    groq_api_key: str | None = None,
+    nvidia_api_key: str | None = None,
+    gemini_api_key: str | None = None,
     task: str = "chat",
 ) -> LLMRouter:
     """Builds task-specialized LLMRouter distributing load across NVIDIA DeepSeek, Groq, and Gemini with key rotation."""
     from app.core.config import get_settings
-    from app.services.groq_client import GroqClient
     from app.services.gemini_client import GeminiClient
-    from app.services.llm.nvidia_provider import NvidiaLLMProvider
-    from app.services.llm.groq_provider import GroqLLMProvider
+    from app.services.groq_client import GroqClient
     from app.services.llm.gemini_provider import GeminiLLMProvider
+    from app.services.llm.groq_provider import GroqLLMProvider
+    from app.services.llm.nvidia_provider import NvidiaLLMProvider
 
     settings = get_settings()
 
@@ -128,9 +132,7 @@ def create_default_llm_router(
         else None
     )
     gq_provider = (
-        GroqLLMProvider(
-            groq_client=GroqClient(api_keys=groq_keys, model=settings.groq_model)
-        )
+        GroqLLMProvider(groq_client=GroqClient(api_keys=groq_keys, model=settings.groq_model))
         if groq_keys
         else None
     )
@@ -173,6 +175,3 @@ def create_default_llm_router(
         providers.append(GroqLLMProvider(groq_client=dummy_groq))
 
     return LLMRouter(providers)
-
-
-

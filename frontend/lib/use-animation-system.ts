@@ -33,7 +33,7 @@ export function useGsapEntrance(selector = ".gsap-reveal", delay = 0.05) {
           delay,
           ease: "power3.out",
           clearProps: "transform,opacity",
-        }
+        },
       );
     }, containerRef);
 
@@ -55,7 +55,7 @@ export function useGsapPulse(trigger = true) {
     gsap.fromTo(
       ref.current,
       { scale: 0.97 },
-      { scale: 1, duration: 0.4, ease: "elastic.out(1, 0.4)" }
+      { scale: 1, duration: 0.4, ease: "elastic.out(1, 0.4)" },
     );
   }, [trigger]);
 
@@ -66,7 +66,11 @@ export function useGsapPulse(trigger = true) {
  * Animated Number Counter Hook
  * Smoothly animates a numeric value from 0 to targetValue using high-performance requestAnimationFrame.
  */
-export function useAnimeCounter(targetValue: number, duration = 1000, formatFn?: (val: number) => string) {
+export function useAnimeCounter(
+  targetValue: number,
+  duration = 1000,
+  formatFn?: (val: number) => string,
+) {
   const [displayValue, setDisplayValue] = useState<string>(formatFn ? formatFn(0) : "0");
   const prevValueRef = useRef(0);
 

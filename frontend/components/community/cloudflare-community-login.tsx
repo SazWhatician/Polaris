@@ -54,7 +54,12 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
     }, 900);
   };
 
-  const handleQuickFill = (presetCollege: string, presetUsername: string, presetAlias: string, presetCourse: string) => {
+  const handleQuickFill = (
+    presetCollege: string,
+    presetUsername: string,
+    presetAlias: string,
+    presetCourse: string,
+  ) => {
     setCollege(presetCollege);
     setUsername(presetUsername);
     setAlias(presetAlias);
@@ -71,13 +76,18 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
       return;
     }
 
-    const cleanUsername = username.trim().replace(/^@/, "").toLowerCase().replace(/[^a-z0-9_]/g, "");
+    const cleanUsername = username
+      .trim()
+      .replace(/^@/, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "");
     if (!cleanUsername) {
       toast.error("Please provide a valid unique username");
       return;
     }
 
-    const effectiveCollege = college === "Other / Global Academy" && customCollege.trim() ? customCollege.trim() : college;
+    const effectiveCollege =
+      college === "Other / Global Academy" && customCollege.trim() ? customCollege.trim() : college;
     if (!effectiveCollege) {
       toast.error("Please select or enter your college / university");
       return;
@@ -92,7 +102,8 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
         college: effectiveCollege,
         course,
         year,
-        bio: bio.trim() || `Scholar from ${effectiveCollege} exploring AI, systems, and coursework.`,
+        bio:
+          bio.trim() || `Scholar from ${effectiveCollege} exploring AI, systems, and coursework.`,
         cfRayId: rayId,
       });
 
@@ -105,50 +116,51 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
   };
 
   return (
-    <div className="relative min-h-[85vh] flex items-center justify-center py-10 px-4 sm:px-6">
+    <div className="relative flex min-h-[85vh] items-center justify-center px-4 py-10 sm:px-6">
       {/* Ambient orange-indigo security aura */}
-      <div className="ambient-liquid-glow -top-20 -left-20 w-[450px] h-[450px] bg-[#F6821F]/15 blur-3xl pointer-events-none" />
-      <div className="ambient-liquid-glow -bottom-20 -right-20 w-[450px] h-[450px] bg-indigo-500/15 blur-3xl pointer-events-none" />
+      <div className="ambient-liquid-glow pointer-events-none -left-20 -top-20 h-[450px] w-[450px] bg-[#F6821F]/15 blur-3xl" />
+      <div className="ambient-liquid-glow pointer-events-none -bottom-20 -right-20 h-[450px] w-[450px] bg-indigo-500/15 blur-3xl" />
 
       <div className="relative z-10 w-full max-w-xl">
         {/* Cloudflare Header Card */}
-        <div className="overflow-hidden rounded-3xl border border-white/15 dark:border-white/10 bg-black/40 backdrop-blur-2xl shadow-2xl shadow-black/40">
+        <div className="overflow-hidden rounded-3xl border border-white/15 bg-black/40 shadow-2xl shadow-black/40 backdrop-blur-2xl dark:border-white/10">
           {/* Top Banner: Cloudflare Security Gateway */}
-          <div className="border-b border-white/10 bg-gradient-to-r from-[#F6821F]/15 via-black/40 to-indigo-950/20 px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#F6821F]/15 via-black/40 to-indigo-950/20 px-6 py-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#F6821F]/20 border border-[#F6821F]/40 flex items-center justify-center text-[#F6821F] shadow-sm">
-                <ShieldCheck className="w-5 h-5" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#F6821F]/40 bg-[#F6821F]/20 text-[#F6821F] shadow-sm">
+                <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-sm font-black tracking-tight text-foreground flex items-center gap-1.5">
+                  <h2 className="flex items-center gap-1.5 text-sm font-black tracking-tight text-foreground">
                     <span>Cloudflare Zero Trust</span>
-                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full bg-[#F6821F]/20 text-[#F6821F] border border-[#F6821F]/30">
+                    <span className="rounded-full border border-[#F6821F]/30 bg-[#F6821F]/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#F6821F]">
                       Community Gateway
                     </span>
                   </h2>
                 </div>
-                <p className="text-[11px] text-muted-foreground font-mono">
+                <p className="font-mono text-[11px] text-muted-foreground">
                   Verified Edge Access • Ray ID: <span className="text-foreground/80">{rayId}</span>
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-[11px] font-mono text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
-              <Radio className="w-3 h-3 animate-pulse" />
+            <div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 font-mono text-[11px] font-semibold text-emerald-400">
+              <Radio className="h-3 w-3 animate-pulse" />
               <span>Edge Active</span>
             </div>
           </div>
 
-          <div className="p-6 sm:p-8 space-y-6">
+          <div className="space-y-6 p-6 sm:p-8">
             {/* Title & Introduction */}
             <div className="space-y-1.5 text-center sm:text-left">
-              <h1 className="text-2xl font-black text-foreground tracking-tight flex items-center gap-2 justify-center sm:justify-start">
+              <h1 className="flex items-center justify-center gap-2 text-2xl font-black tracking-tight text-foreground sm:justify-start">
                 <span>Join Scholar Community</span>
-                <Sparkles className="w-5 h-5 text-primary" />
+                <Sparkles className="h-5 w-5 text-primary" />
               </h1>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                A separate, peer-verified network. Authenticate with Cloudflare, select your university and handle, and connect with fellow scholars.
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                A separate, peer-verified network. Authenticate with Cloudflare, select your
+                university and handle, and connect with fellow scholars.
               </p>
             </div>
 
@@ -158,27 +170,27 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
               id="cloudflare-turnstile-btn"
               onClick={handleTurnstileClick}
               className={cn(
-                "w-full p-3.5 rounded-2xl border transition-all cursor-pointer select-none flex items-center justify-between gap-4 text-left",
+                "flex w-full cursor-pointer select-none items-center justify-between gap-4 rounded-2xl border p-3.5 text-left transition-all",
                 turnstileVerified
-                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
-                  : "bg-white/5 border-white/10 hover:border-[#F6821F]/50 hover:bg-[#F6821F]/5"
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                  : "border-white/10 bg-white/5 hover:border-[#F6821F]/50 hover:bg-[#F6821F]/5",
               )}
             >
               <div className="flex items-center gap-3">
                 <div
                   className={cn(
-                    "w-6 h-6 rounded-lg border flex items-center justify-center transition-all shrink-0",
+                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border transition-all",
                     turnstileVerified
-                      ? "bg-emerald-500 border-emerald-400 text-black"
+                      ? "border-emerald-400 bg-emerald-500 text-black"
                       : turnstileChecking
-                      ? "border-[#F6821F] bg-[#F6821F]/10"
-                      : "border-white/30 bg-white/5"
+                        ? "border-[#F6821F] bg-[#F6821F]/10"
+                        : "border-white/30 bg-white/5",
                   )}
                 >
                   {turnstileVerified ? (
-                    <CheckCircle2 className="w-4 h-4 stroke-[3]" />
+                    <CheckCircle2 className="h-4 w-4 stroke-[3]" />
                   ) : turnstileChecking ? (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-[#F6821F]" />
+                    <RefreshCw className="h-3.5 w-3.5 animate-spin text-[#F6821F]" />
                   ) : null}
                 </div>
                 <div>
@@ -186,38 +198,42 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
                     {turnstileVerified
                       ? "Success! Human verification verified by Cloudflare"
                       : turnstileChecking
-                      ? "Verifying browser and connection security..."
-                      : "Verify you are human (Cloudflare Turnstile)"}
+                        ? "Verifying browser and connection security..."
+                        : "Verify you are human (Cloudflare Turnstile)"}
                   </p>
-                  <p className="text-[10px] text-muted-foreground font-mono">
-                    {turnstileVerified ? "Encrypted token: sha256:cf_edge_ok" : "Click the box to complete security check"}
+                  <p className="font-mono text-[10px] text-muted-foreground">
+                    {turnstileVerified
+                      ? "Encrypted token: sha256:cf_edge_ok"
+                      : "Click the box to complete security check"}
                   </p>
                 </div>
               </div>
 
               {/* Cloudflare Badge Logo */}
-              <div className="flex flex-col items-end shrink-0">
+              <div className="flex shrink-0 flex-col items-end">
                 <div className="flex items-center gap-1 text-[11px] font-bold text-[#F6821F]">
-                  <Globe className="w-3.5 h-3.5" />
+                  <Globe className="h-3.5 w-3.5" />
                   <span>CLOUDFLARE</span>
                 </div>
-                <span className="text-[9px] font-mono text-muted-foreground">Turnstile Privacy</span>
+                <span className="font-mono text-[9px] text-muted-foreground">
+                  Turnstile Privacy
+                </span>
               </div>
             </button>
 
             {/* Registration / Login Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* College & Username inputs */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                 {/* Username */}
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                    <AtSign className="w-3.5 h-3.5 text-primary" />
+                  <label className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-muted-foreground">
+                    <AtSign className="h-3.5 w-3.5 text-primary" />
                     <span>Unique Handle</span>
                     <span className="text-destructive">*</span>
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground font-mono text-xs">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono text-xs text-muted-foreground">
                       @
                     </span>
                     <input
@@ -227,15 +243,15 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="saz_polaris"
-                      className="w-full pl-8 pr-3 py-2.5 text-xs font-mono font-bold rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground/60 transition-colors"
+                      className="w-full rounded-xl border border-white/15 bg-white/5 py-2.5 pl-8 pr-3 font-mono text-xs font-bold text-foreground transition-colors placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                   </div>
                 </div>
 
                 {/* Scholar Alias */}
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                    <User className="w-3.5 h-3.5 text-indigo-400" />
+                  <label className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-muted-foreground">
+                    <User className="h-3.5 w-3.5 text-indigo-400" />
                     <span>Full Name / Alias</span>
                   </label>
                   <input
@@ -244,26 +260,26 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
                     value={alias}
                     onChange={(e) => setAlias(e.target.value)}
                     placeholder="e.g. Saz Vance"
-                    className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-foreground placeholder:text-muted-foreground/60 transition-colors"
+                    className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-xs font-semibold text-foreground transition-colors placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
               </div>
 
               {/* College Selection */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase flex items-center justify-between">
+                <label className="flex items-center justify-between font-mono text-[11px] font-bold uppercase text-muted-foreground">
                   <span className="flex items-center gap-1.5">
-                    <School className="w-3.5 h-3.5 text-emerald-400" />
+                    <School className="h-3.5 w-3.5 text-emerald-400" />
                     <span>University / College</span>
                     <span className="text-destructive">*</span>
                   </span>
-                  <span className="text-[10px] text-muted-foreground font-mono">Academic Hub</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">Academic Hub</span>
                 </label>
                 <select
                   id="community-college-select"
                   value={college}
                   onChange={(e) => setCollege(e.target.value)}
-                  className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-foreground transition-colors"
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-xs font-semibold text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   {COLLEGES.map((col) => (
                     <option key={col} value={col} className="bg-zinc-900 text-foreground">
@@ -278,22 +294,22 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
                     value={customCollege}
                     onChange={(e) => setCustomCollege(e.target.value)}
                     placeholder="Type your university name..."
-                    className="mt-2 w-full px-3 py-2 text-xs rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:border-primary text-foreground"
+                    className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs text-foreground focus:border-primary focus:outline-none"
                   />
                 )}
               </div>
 
               {/* Course & Year */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                    <GraduationCap className="w-3.5 h-3.5 text-purple-400" />
+                  <label className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-muted-foreground">
+                    <GraduationCap className="h-3.5 w-3.5 text-purple-400" />
                     <span>Major / Department</span>
                   </label>
                   <select
                     value={course}
                     onChange={(e) => setCourse(e.target.value)}
-                    className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:border-primary text-foreground"
+                    className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-xs font-semibold text-foreground focus:border-primary focus:outline-none"
                   >
                     {COURSES.map((c) => (
                       <option key={c} value={c} className="bg-zinc-900 text-foreground">
@@ -304,14 +320,14 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                  <label className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-muted-foreground">
+                    <Calendar className="h-3.5 w-3.5 text-amber-400" />
                     <span>Academic Year</span>
                   </label>
                   <select
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
-                    className="w-full px-3 py-2.5 text-xs font-semibold rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:border-primary text-foreground"
+                    className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-xs font-semibold text-foreground focus:border-primary focus:outline-none"
                   >
                     {YEARS.map((y) => (
                       <option key={y} value={y} className="bg-zinc-900 text-foreground">
@@ -324,7 +340,7 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
 
               {/* Bio / Tagline */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase">
+                <label className="font-mono text-[11px] font-bold uppercase text-muted-foreground">
                   Scholar Bio / Focus
                 </label>
                 <input
@@ -332,7 +348,7 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
                   placeholder="e.g. Distributed systems researcher & Pintos hacker."
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:border-primary text-foreground placeholder:text-muted-foreground/60"
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none"
                 />
               </div>
 
@@ -342,69 +358,97 @@ export function CloudflareCommunityLogin({ onSuccess }: Props) {
                 type="submit"
                 disabled={isSubmitting || !turnstileVerified}
                 className={cn(
-                  "w-full h-11 rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg",
+                  "flex h-11 w-full items-center justify-center gap-2 rounded-2xl text-xs font-black uppercase tracking-wider shadow-lg transition-all",
                   turnstileVerified
-                    ? "bg-gradient-to-r from-[#F6821F] to-orange-500 hover:brightness-110 text-white shadow-orange-500/25 cursor-pointer"
-                    : "bg-white/10 text-muted-foreground cursor-not-allowed"
+                    ? "cursor-pointer bg-gradient-to-r from-[#F6821F] to-orange-500 text-white shadow-orange-500/25 hover:brightness-110"
+                    : "cursor-not-allowed bg-white/10 text-muted-foreground",
                 )}
               >
                 {isSubmitting ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <RefreshCw className="h-4 w-4 animate-spin" />
                     <span>Authorizing Cloudflare Session...</span>
                   </>
                 ) : (
                   <>
-                    <Lock className="w-3.5 h-3.5" />
+                    <Lock className="h-3.5 w-3.5" />
                     <span>Enter Community with Cloudflare</span>
-                    <ArrowRight className="w-4 h-4 ml-1" />
+                    <ArrowRight className="ml-1 h-4 w-4" />
                   </>
                 )}
               </Button>
             </form>
 
             {/* Quick-fill presets for test convenience */}
-            <div className="pt-3 border-t border-white/10 space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
+            <div className="space-y-2 border-t border-white/10 pt-3">
+              <div className="flex items-center justify-between font-mono text-[11px] text-muted-foreground">
                 <span>Instant Scholar Presets:</span>
                 <span className="text-[10px] text-primary">1-Click Test</span>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 <button
                   id="preset-stanford-btn"
                   type="button"
-                  onClick={() => handleQuickFill("Stanford University", "alex_stanford", "Alex Vance", "M.S. Artificial Intelligence & ML")}
-                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors"
+                  onClick={() =>
+                    handleQuickFill(
+                      "Stanford University",
+                      "alex_stanford",
+                      "Alex Vance",
+                      "M.S. Artificial Intelligence & ML",
+                    )
+                  }
+                  className="rounded-xl border border-white/10 bg-white/5 p-2 text-left transition-colors hover:bg-white/10"
                 >
-                  <p className="text-[11px] font-bold text-foreground truncate">Stanford</p>
-                  <p className="text-[10px] font-mono text-muted-foreground">@alex_stanford</p>
+                  <p className="truncate text-[11px] font-bold text-foreground">Stanford</p>
+                  <p className="font-mono text-[10px] text-muted-foreground">@alex_stanford</p>
                 </button>
                 <button
                   id="preset-mit-btn"
                   type="button"
-                  onClick={() => handleQuickFill("Massachusetts Institute of Technology (MIT)", "elena_mit", "Elena Vance", "B.Tech Electrical & Computer Engineering")}
-                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors"
+                  onClick={() =>
+                    handleQuickFill(
+                      "Massachusetts Institute of Technology (MIT)",
+                      "elena_mit",
+                      "Elena Vance",
+                      "B.Tech Electrical & Computer Engineering",
+                    )
+                  }
+                  className="rounded-xl border border-white/10 bg-white/5 p-2 text-left transition-colors hover:bg-white/10"
                 >
-                  <p className="text-[11px] font-bold text-foreground truncate">MIT EECS</p>
-                  <p className="text-[10px] font-mono text-muted-foreground">@elena_mit</p>
+                  <p className="truncate text-[11px] font-bold text-foreground">MIT EECS</p>
+                  <p className="font-mono text-[10px] text-muted-foreground">@elena_mit</p>
                 </button>
                 <button
                   id="preset-berkeley-btn"
                   type="button"
-                  onClick={() => handleQuickFill("UC Berkeley", "kai_cal", "Kai Tanaka", "B.S. Computer Science & AI")}
-                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors"
+                  onClick={() =>
+                    handleQuickFill(
+                      "UC Berkeley",
+                      "kai_cal",
+                      "Kai Tanaka",
+                      "B.S. Computer Science & AI",
+                    )
+                  }
+                  className="rounded-xl border border-white/10 bg-white/5 p-2 text-left transition-colors hover:bg-white/10"
                 >
-                  <p className="text-[11px] font-bold text-foreground truncate">UC Berkeley</p>
-                  <p className="text-[10px] font-mono text-muted-foreground">@kai_cal</p>
+                  <p className="truncate text-[11px] font-bold text-foreground">UC Berkeley</p>
+                  <p className="font-mono text-[10px] text-muted-foreground">@kai_cal</p>
                 </button>
                 <button
                   id="preset-iitb-btn"
                   type="button"
-                  onClick={() => handleQuickFill("IIT Bombay", "arjun_iitb", "Arjun Roy", "Mathematics & Quantum Computing")}
-                  className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-colors"
+                  onClick={() =>
+                    handleQuickFill(
+                      "IIT Bombay",
+                      "arjun_iitb",
+                      "Arjun Roy",
+                      "Mathematics & Quantum Computing",
+                    )
+                  }
+                  className="rounded-xl border border-white/10 bg-white/5 p-2 text-left transition-colors hover:bg-white/10"
                 >
-                  <p className="text-[11px] font-bold text-foreground truncate">IIT Bombay</p>
-                  <p className="text-[10px] font-mono text-muted-foreground">@arjun_iitb</p>
+                  <p className="truncate text-[11px] font-bold text-foreground">IIT Bombay</p>
+                  <p className="font-mono text-[10px] text-muted-foreground">@arjun_iitb</p>
                 </button>
               </div>
             </div>

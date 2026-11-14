@@ -9,12 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  useCommunityStore,
-  COLLEGES,
-  COURSES,
-  YEARS,
-} from "@/lib/community-store";
+import { useCommunityStore, COLLEGES, COURSES, YEARS } from "@/lib/community-store";
 import { Sparkles, User, GraduationCap, School, Calendar, AtSign } from "lucide-react";
 import { toast } from "sonner";
 
@@ -43,7 +38,10 @@ export function CommunityOnboardingModal({ open, onOpenChange }: Props) {
       return;
     }
 
-    const cleanHandle = `@${username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "")}`;
+    const cleanHandle = `@${username
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "")}`;
 
     updateProfile({
       alias: alias.trim(),
@@ -64,27 +62,28 @@ export function CommunityOnboardingModal({ open, onOpenChange }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg liquid-glass border-white/20 dark:border-white/10 p-6 sm:p-8 rounded-3xl">
+      <DialogContent className="liquid-glass max-w-lg rounded-3xl border-white/20 p-6 dark:border-white/10 sm:p-8">
         <DialogHeader className="space-y-2">
           <div className="flex items-center gap-2 text-primary">
-            <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
-              <Sparkles className="w-5 h-5" />
+            <div className="rounded-xl border border-primary/20 bg-primary/10 p-2">
+              <Sparkles className="h-5 w-5" />
             </div>
             <DialogTitle className="text-xl font-black text-foreground">
               Scholar Community Identity
             </DialogTitle>
           </div>
-          <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-            Customize your unique scholar alias, handle, college, course, and academic year to join verified peer communities.
+          <DialogDescription className="text-xs leading-relaxed text-muted-foreground">
+            Customize your unique scholar alias, handle, college, course, and academic year to join
+            verified peer communities.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 pt-2">
           {/* Alias & Unique Handle */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-primary" />
+              <label className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-muted-foreground">
+                <User className="h-3.5 w-3.5 text-primary" />
                 <span>Scholar Alias / Name</span>
               </label>
               <input
@@ -92,17 +91,17 @@ export function CommunityOnboardingModal({ open, onOpenChange }: Props) {
                 value={alias}
                 onChange={(e) => setAlias(e.target.value)}
                 placeholder="e.g. Quantum Sage"
-                className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+                className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                <AtSign className="w-3.5 h-3.5 text-primary" />
+              <label className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-muted-foreground">
+                <AtSign className="h-3.5 w-3.5 text-primary" />
                 <span>Unique Username</span>
               </label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-mono">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-xs text-muted-foreground">
                   @
                 </span>
                 <input
@@ -110,7 +109,7 @@ export function CommunityOnboardingModal({ open, onOpenChange }: Props) {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="quantum_sage"
-                  className="w-full text-xs font-mono font-semibold pl-7 pr-3 py-2.5 rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+                  className="w-full rounded-xl border border-white/15 bg-white/5 py-2.5 pl-7 pr-3 font-mono text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
             </div>
@@ -118,14 +117,14 @@ export function CommunityOnboardingModal({ open, onOpenChange }: Props) {
 
           {/* College Selection */}
           <div className="space-y-1.5">
-            <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-              <School className="w-3.5 h-3.5 text-indigo-400" />
+            <label className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-muted-foreground">
+              <School className="h-3.5 w-3.5 text-indigo-400" />
               <span>University / College</span>
             </label>
             <select
               value={college}
               onChange={(e) => setCollege(e.target.value)}
-              className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+              className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             >
               {COLLEGES.map((c) => (
                 <option key={c} value={c} className="bg-background text-foreground">
@@ -136,16 +135,16 @@ export function CommunityOnboardingModal({ open, onOpenChange }: Props) {
           </div>
 
           {/* Course & Year */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                <GraduationCap className="w-3.5 h-3.5 text-emerald-400" />
+              <label className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-muted-foreground">
+                <GraduationCap className="h-3.5 w-3.5 text-emerald-400" />
                 <span>Degree & Major</span>
               </label>
               <select
                 value={course}
                 onChange={(e) => setCourse(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+                className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 {COURSES.map((c) => (
                   <option key={c} value={c} className="bg-background text-foreground">
@@ -156,14 +155,14 @@ export function CommunityOnboardingModal({ open, onOpenChange }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-amber-400" />
+              <label className="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-muted-foreground">
+                <Calendar className="h-3.5 w-3.5 text-amber-400" />
                 <span>Academic Year</span>
               </label>
               <select
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:ring-1 focus:ring-primary text-foreground"
+                className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 {YEARS.map((y) => (
                   <option key={y} value={y} className="bg-background text-foreground">
@@ -176,7 +175,7 @@ export function CommunityOnboardingModal({ open, onOpenChange }: Props) {
 
           {/* Bio */}
           <div className="space-y-1.5">
-            <label className="text-[11px] font-mono font-bold text-muted-foreground uppercase">
+            <label className="font-mono text-[11px] font-bold uppercase text-muted-foreground">
               Academic Bio & Research Interests
             </label>
             <textarea
@@ -184,23 +183,23 @@ export function CommunityOnboardingModal({ open, onOpenChange }: Props) {
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               placeholder="e.g. Studying Transformers, Graph Theory, and Distributed Systems..."
-              className="w-full text-xs px-3 py-2 rounded-xl bg-white/5 border border-white/15 focus:outline-none focus:ring-1 focus:ring-primary text-foreground resize-none"
+              className="w-full resize-none rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
-          <div className="pt-2 flex items-center justify-end gap-2.5">
+          <div className="flex items-center justify-end gap-2.5 pt-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => onOpenChange(false)}
-              className="rounded-2xl text-xs font-bold border-white/20 bg-white/5"
+              className="rounded-2xl border-white/20 bg-white/5 text-xs font-bold"
             >
               Cancel
             </Button>
             <Button
               size="sm"
               onClick={handleSave}
-              className="rounded-2xl text-xs font-bold px-5 bg-primary text-primary-foreground shadow-md hover:bg-primary/90"
+              className="rounded-2xl bg-primary px-5 text-xs font-bold text-primary-foreground shadow-md hover:bg-primary/90"
             >
               Save Scholar Profile
             </Button>

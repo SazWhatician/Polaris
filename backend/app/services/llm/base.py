@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import AsyncIterator, Type, TypeVar, Optional, Any
+from collections.abc import AsyncIterator
+from typing import TypeVar
+
 from pydantic import BaseModel
 
 T = TypeVar("T", bound=BaseModel)
@@ -40,7 +42,7 @@ class BaseLLMProvider(ABC):
     async def structured_complete(
         self,
         prompt: str,
-        schema_class: Type[T],
+        schema_class: type[T],
         *,
         temperature: float = 0.1,
     ) -> T:

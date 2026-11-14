@@ -53,7 +53,7 @@ export function CrystalGlow({
     setMounted(true);
   }, []);
 
-  const activeTheme = mounted ? (resolvedTheme || theme || "dark") : "dark";
+  const activeTheme = mounted ? resolvedTheme || theme || "dark" : "dark";
 
   // Auto-derived theme palette defaults
   const defaults = React.useMemo(() => {

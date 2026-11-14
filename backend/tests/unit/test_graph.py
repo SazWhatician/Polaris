@@ -1,7 +1,6 @@
-import pytest
-from app.models.graph import KnowledgeGraph, ConceptNode, ConceptRelationship
-from app.services.concept_extraction_service import ConceptExtractionService
+from app.models.graph import KnowledgeGraph
 from app.repositories.graph_repo import GraphRepository
+from app.services.concept_extraction_service import ConceptExtractionService
 
 
 def test_concept_extraction_service_demo_graph():
@@ -17,7 +16,13 @@ def test_concept_extraction_service_demo_graph():
 
 def test_concept_extraction_service_fallback_parsing():
     service = ConceptExtractionService()
-    texts = [{"doc_id": "d1", "page": 1, "text": "Linear Algebra is fundamental for Neural Networks and Transformers."}]
+    texts = [
+        {
+            "doc_id": "d1",
+            "page": 1,
+            "text": "Linear Algebra is fundamental for Neural Networks and Transformers.",
+        }
+    ]
 
     graph = service.extract_from_texts(user_id="user_test_123", texts=texts)
 

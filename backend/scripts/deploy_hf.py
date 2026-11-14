@@ -32,6 +32,7 @@ def deploy() -> None:
             ".ruff_cache/**",
             ".coverage",
             "coverage.xml",
+            "tests/**",
         ],
         commit_message=os.environ.get("HF_COMMIT_MESSAGE", "Sync backend from GitHub"),
     )

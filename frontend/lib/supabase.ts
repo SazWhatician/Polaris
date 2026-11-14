@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-polaris.supabase.co";
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-polaris.supabase.co";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
 
 let cachedSupabase: SupabaseClient | null = null;
@@ -37,7 +38,13 @@ export async function syncUserProfileToSupabase(user: {
     picture?: string;
   };
 }): Promise<void> {
-  if (!user || !user.id || supabaseUrl.includes("sbumoqtswbsekmdchbyn") || supabaseUrl.includes("placeholder")) return;
+  if (
+    !user ||
+    !user.id ||
+    supabaseUrl.includes("sbumoqtswbsekmdchbyn") ||
+    supabaseUrl.includes("placeholder")
+  )
+    return;
   try {
     const supabase = getSupabase();
     const displayName =
@@ -47,9 +54,8 @@ export async function syncUserProfileToSupabase(user: {
     const photoURL = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
     const nowIso = new Date().toISOString();
 
-    const normalizedId = user.id.startsWith("user-") || user.id.startsWith("demo-")
-      ? user.id
-      : `user-${user.id}`;
+    const normalizedId =
+      user.id.startsWith("user-") || user.id.startsWith("demo-") ? user.id : `user-${user.id}`;
 
     const { error } = await supabase.from("user_profiles").upsert(
       {
@@ -60,7 +66,7 @@ export async function syncUserProfileToSupabase(user: {
         last_login_at: nowIso,
         role: "student",
       },
-      { onConflict: "id" }
+      { onConflict: "id" },
     );
     if (error && error.code !== "42501" && !error.message?.includes("Failed to fetch")) {
       console.warn("Supabase user profile sync note:", error.message);
@@ -74,11 +80,7 @@ export async function getUserProfileFromSupabase(uid: string): Promise<UserProfi
   if (!uid) return null;
   try {
     const supabase = getSupabase();
-    const { data, error } = await supabase
-      .from("user_profiles")
-      .select("*")
-      .eq("id", uid)
-      .single();
+    const { data, error } = await supabase.from("user_profiles").select("*").eq("id", uid).single();
 
     if (!error && data) {
       return {
@@ -100,7 +102,8 @@ export async function getUserProfileFromSupabase(uid: string): Promise<UserProfi
 export async function signInWithGoogle(): Promise<{ url?: string | null; error: Error | null }> {
   try {
     const supabase = getSupabase();
-    const redirectUrl = typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
+    const redirectUrl =
+      typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -117,7 +120,10 @@ export async function signInWithGoogle(): Promise<{ url?: string | null; error: 
   }
 }
 
-export async function signInWithEmail(email: string, pass: string): Promise<{ user: User | null; error: Error | null }> {
+export async function signInWithEmail(
+  email: string,
+  pass: string,
+): Promise<{ user: User | null; error: Error | null }> {
   try {
     const supabase = getSupabase();
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -133,7 +139,10 @@ export async function signInWithEmail(email: string, pass: string): Promise<{ us
   }
 }
 
-export async function signUpWithEmail(email: string, pass: string): Promise<{ user: User | null; error: Error | null }> {
+export async function signUpWithEmail(
+  email: string,
+  pass: string,
+): Promise<{ user: User | null; error: Error | null }> {
   try {
     const supabase = getSupabase();
     const { data, error } = await supabase.auth.signUp({

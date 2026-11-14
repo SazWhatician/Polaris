@@ -296,7 +296,9 @@ class FirestoreCheckpointSaver(BaseCheckpointSaver):
                 checkpoint_ = self.serde.loads_typed((checkpoint_type, checkpoint_bytes))
 
                 channel_versions = checkpoint_["channel_versions"]
-                channel_values = self._load_blobs(thread_id, checkpoint_ns, channel_versions, user_id)
+                channel_values = self._load_blobs(
+                    thread_id, checkpoint_ns, channel_versions, user_id
+                )
                 writes = self._load_writes(thread_id, checkpoint_ns, checkpoint_id, user_id)
                 parent_checkpoint_id = data.get("parent_checkpoint_id")
 

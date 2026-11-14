@@ -1,6 +1,6 @@
-import jwt
 from typing import Annotated
 
+import jwt
 from fastapi import Depends, HTTPException, Request, status
 
 from app.core.config import get_settings
@@ -61,7 +61,9 @@ async def verify_id_token(request: Request) -> AuthenticatedUser:
                     uid=str(sb_user.id),
                     email=sb_user.email,
                     email_verified=sb_user.email_confirmed_at is not None,
-                    name=metadata.get("full_name") or metadata.get("name") or (sb_user.email.split("@")[0] if sb_user.email else "User"),
+                    name=metadata.get("full_name")
+                    or metadata.get("name")
+                    or (sb_user.email.split("@")[0] if sb_user.email else "User"),
                     picture=metadata.get("avatar_url") or metadata.get("picture"),
                 )
         except Exception as exc:
@@ -86,7 +88,9 @@ async def verify_id_token(request: Request) -> AuthenticatedUser:
             uid=uid,
             email=decoded.get("email"),
             email_verified=decoded.get("email_verified", False),
-            name=user_meta.get("full_name") or decoded.get("name") or (decoded.get("email", "").split("@")[0] if decoded.get("email") else "User"),
+            name=user_meta.get("full_name")
+            or decoded.get("name")
+            or (decoded.get("email", "").split("@")[0] if decoded.get("email") else "User"),
             picture=user_meta.get("avatar_url") or decoded.get("picture"),
         )
     except Exception as exc:
@@ -99,4 +103,3 @@ CurrentUser = Annotated[AuthenticatedUser, Depends(verify_id_token)]
 
 async def get_current_user_id(user: CurrentUser) -> str:
     return user.uid
-

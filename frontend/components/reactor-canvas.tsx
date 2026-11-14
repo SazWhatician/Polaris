@@ -6,13 +6,7 @@ import { OrbitControls, useGLTF, Center } from "@react-three/drei";
 import * as THREE from "three";
 
 export type ModelColorway =
-  | "emerald"
-  | "amethyst"
-  | "cyan"
-  | "gold"
-  | "crimson"
-  | "chrome"
-  | "aurora";
+  "emerald" | "amethyst" | "cyan" | "gold" | "crimson" | "chrome" | "aurora";
 
 export interface ColorwayConfig {
   id: ModelColorway;
@@ -153,17 +147,9 @@ function StardustParticles({ color }: { color: number }) {
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-        />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial
-        size={0.022}
-        color={color}
-        transparent
-        opacity={0.65}
-      />
+      <pointsMaterial size={0.022} color={color} transparent opacity={0.65} />
     </points>
   );
 }
@@ -198,12 +184,7 @@ function DefaultCrystal({ config }: { config: ColorwayConfig }) {
       </mesh>
       <mesh ref={cageRef}>
         <icosahedronGeometry args={[1.6, 0]} />
-        <meshBasicMaterial
-          color={config.rimColor}
-          wireframe
-          transparent
-          opacity={0.35}
-        />
+        <meshBasicMaterial color={config.rimColor} wireframe transparent opacity={0.35} />
       </mesh>
     </group>
   );
@@ -310,7 +291,7 @@ export function ReactorCanvas({
         toneMappingExposure: 1.2,
       }}
       dpr={[1, 1.5]}
-      className="w-full h-full"
+      className="h-full w-full"
     >
       <fogExp2 attach="fog" args={[0x000000, 0.025]} />
 
@@ -320,7 +301,12 @@ export function ReactorCanvas({
       <directionalLight position={[-4, 2, 3]} intensity={1.5} color={0x94a3b8} />
       <directionalLight position={[0, 4, -4]} intensity={3.4} color={config.rimColor} />
       <directionalLight position={[0, -3, 2]} intensity={1.6} color={config.bottomColor} />
-      <pointLight position={[0, 0, 0]} intensity={2.0} distance={15} color={config.coreLightColor} />
+      <pointLight
+        position={[0, 0, 0]}
+        intensity={2.0}
+        distance={15}
+        color={config.coreLightColor}
+      />
 
       {/* Model & Floating Particles */}
       <Suspense fallback={<DefaultCrystal config={config} />}>

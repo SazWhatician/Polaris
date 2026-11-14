@@ -99,12 +99,17 @@ class ResourceAgent:
             return {"ranked_resources": []}
 
         if not self.groq_client:
-            logger.info("No Groq client provided. Using heuristic ranking for topic '%s'", state["topic_title"])
+            logger.info(
+                "No Groq client provided. Using heuristic ranking for topic '%s'",
+                state["topic_title"],
+            )
             fallback_results: list[dict[str, Any]] = []
             for idx, c in enumerate(candidates[:5]):
                 c_copy = dict(c)
                 c_copy["rank_score"] = round(0.95 - idx * 0.08, 2)
-                c_copy["why_recommended"] = f"Top-rated educational tutorial covering core principles of {state['topic_title']}."
+                c_copy["why_recommended"] = (
+                    f"Top-rated educational tutorial covering core principles of {state['topic_title']}."
+                )
                 fallback_results.append(c_copy)
             return {"ranked_resources": fallback_results}
 

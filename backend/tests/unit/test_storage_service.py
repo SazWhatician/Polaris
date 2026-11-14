@@ -1,5 +1,6 @@
 from pathlib import Path
 from unittest.mock import patch
+
 import pytest
 from app.services.storage_service import StorageService
 
@@ -25,4 +26,3 @@ def test_storage_dir_custom_path(tmp_path: Path) -> None:
     service = StorageService(storage_dir=target)
     assert service._storage_dir == target
     assert target.is_dir()
-

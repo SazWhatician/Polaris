@@ -21,8 +21,8 @@ import { type KnowledgeGraph, type ConceptNode } from "@/lib/api/graph";
 const ForceGraph2D = dynamic(() => import("react-force-graph-2d"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[560px] flex items-center justify-center text-xs text-muted-foreground gap-3">
-      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+    <div className="flex h-[560px] w-full items-center justify-center gap-3 text-xs text-muted-foreground">
+      <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
       <span>Loading Physics Concept Graph...</span>
     </div>
   ),
@@ -100,7 +100,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
 
     const links: GraphLink[] = graph.edges
       .filter(
-        (e) => activeNodeIds.has(e.source_concept_id) && activeNodeIds.has(e.target_concept_id)
+        (e) => activeNodeIds.has(e.source_concept_id) && activeNodeIds.has(e.target_concept_id),
       )
       .map((e) => ({
         source: e.source_concept_id,
@@ -148,8 +148,8 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
         ctx.fillStyle = matchesSearch
           ? "rgba(250, 204, 21, 0.4)"
           : isSelected
-          ? "rgba(99, 102, 241, 0.5)"
-          : "rgba(168, 85, 247, 0.4)";
+            ? "rgba(99, 102, 241, 0.5)"
+            : "rgba(168, 85, 247, 0.4)";
         ctx.fill();
       }
 
@@ -164,24 +164,24 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
       // Node Body Circle
       ctx.beginPath();
       ctx.arc(x, y, r, 0, 2 * Math.PI, false);
-      ctx.fillStyle = isDimmed
-        ? "rgba(100, 116, 139, 0.3)"
-        : node.color || "#6366f1";
+      ctx.fillStyle = isDimmed ? "rgba(100, 116, 139, 0.3)" : node.color || "#6366f1";
       ctx.fill();
 
       // Border outline
-      ctx.strokeStyle = isSelected || isHovered
-        ? "#ffffff"
-        : matchesSearch
-        ? "#facc15"
-        : isDimmed
-        ? "rgba(255, 255, 255, 0.1)"
-        : "rgba(255, 255, 255, 0.6)";
+      ctx.strokeStyle =
+        isSelected || isHovered
+          ? "#ffffff"
+          : matchesSearch
+            ? "#facc15"
+            : isDimmed
+              ? "rgba(255, 255, 255, 0.1)"
+              : "rgba(255, 255, 255, 0.6)";
       ctx.lineWidth = isSelected ? 2.5 / globalScale : 1.2 / globalScale;
       ctx.stroke();
 
       // Label (Only show when zoomed in or if selected/hovered/searched)
-      const shouldShowLabel = globalScale > 1.2 || isSelected || isHovered || matchesSearch || node.val > 14;
+      const shouldShowLabel =
+        globalScale > 1.2 || isSelected || isHovered || matchesSearch || node.val > 14;
       if (shouldShowLabel) {
         const fontSize = Math.max(9, Math.min(13, 11 / Math.sqrt(globalScale)));
         ctx.font = `600 ${fontSize}px sans-serif`;
@@ -200,7 +200,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
           textY - fontSize / 2 - 2,
           textWidth + 8,
           fontSize + 4,
-          4
+          4,
         );
         ctx.fill();
 
@@ -209,7 +209,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
         ctx.fillText(labelText, x, textY);
       }
     },
-    [selectedNodeId, hoverNodeId, highlightNodes, searchQuery]
+    [selectedNodeId, hoverNodeId, highlightNodes, searchQuery],
   );
 
   // Link Canvas Painter
@@ -228,7 +228,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
       }
       return "rgba(255, 255, 255, 0.15)";
     },
-    [hoverNodeId, selectedNodeId]
+    [hoverNodeId, selectedNodeId],
   );
 
   const handleNodeClick = useCallback(
@@ -246,12 +246,12 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
         fgRef.current.zoom(2.2, 600);
       }
     },
-    [graph.nodes, onSelectNode]
+    [graph.nodes, onSelectNode],
   );
 
   const selectedNodeObj = useMemo(
     () => graph.nodes.find((n) => n.id === selectedNodeId) || null,
-    [graph, selectedNodeId]
+    [graph, selectedNodeId],
   );
 
   // Connected prerequisites and dependents of the selected node
@@ -271,55 +271,55 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
   }, [selectedNodeId, graph]);
 
   return (
-    <div className="relative w-full flex flex-col lg:flex-row gap-4 select-none">
+    <div className="relative flex w-full select-none flex-col gap-4 lg:flex-row">
       {/* Interactive 2D Physics Force Graph Canvas */}
-      <div className="flex-1 glass-card relative overflow-hidden flex flex-col items-center justify-center min-h-[560px] rounded-3xl border border-border/80 bg-black/40 shadow-2xl">
+      <div className="glass-card relative flex min-h-[560px] flex-1 flex-col items-center justify-center overflow-hidden rounded-3xl border border-border/80 bg-black/40 shadow-2xl">
         {/* Top Control Overlay */}
-        <div className="absolute top-4 left-4 right-4 z-20 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
+        <div className="pointer-events-none absolute left-4 right-4 top-4 z-20 flex flex-wrap items-center justify-between gap-3">
           {/* Search bar */}
-          <div className="flex items-center gap-2 glass-inset p-1.5 pointer-events-auto rounded-2xl bg-card/80 border border-border/80 backdrop-blur-xl shadow-lg">
-            <Search className="h-4 w-4 text-muted-foreground ml-1.5" />
+          <div className="glass-inset pointer-events-auto flex items-center gap-2 rounded-2xl border border-border/80 bg-card/80 p-1.5 shadow-lg backdrop-blur-xl">
+            <Search className="ml-1.5 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search concepts..."
-              className="bg-transparent text-xs text-foreground placeholder:text-muted-foreground focus:outline-none w-36 sm:w-56"
+              className="w-36 bg-transparent text-xs text-foreground placeholder:text-muted-foreground focus:outline-none sm:w-56"
             />
           </div>
 
           {/* Viewport Control Buttons */}
-          <div className="flex items-center gap-2 pointer-events-auto">
+          <div className="pointer-events-auto flex items-center gap-2">
             <button
               onClick={() => setShowParticles((p) => !p)}
-              className={`p-2.5 rounded-xl border text-xs font-bold transition-all shadow-md flex items-center gap-1.5 ${
+              className={`flex items-center gap-1.5 rounded-xl border p-2.5 text-xs font-bold shadow-md transition-all ${
                 showParticles
-                  ? "bg-primary/20 border-primary text-primary"
-                  : "bg-card/80 border-border/80 text-muted-foreground hover:text-foreground"
+                  ? "border-primary bg-primary/20 text-primary"
+                  : "border-border/80 bg-card/80 text-muted-foreground hover:text-foreground"
               }`}
               title="Toggle Prerequisite Particles"
             >
               <Zap className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline text-[11px]">Flows</span>
+              <span className="hidden text-[11px] sm:inline">Flows</span>
             </button>
 
             <button
               onClick={() => fgRef.current?.zoom(fgRef.current.zoom() * 1.3, 400)}
-              className="p-2.5 rounded-xl bg-card/80 border border-border/80 text-foreground hover:bg-muted/80 text-xs shadow-md transition-all"
+              className="rounded-xl border border-border/80 bg-card/80 p-2.5 text-xs text-foreground shadow-md transition-all hover:bg-muted/80"
               title="Zoom In"
             >
               <ZoomIn className="h-4 w-4" />
             </button>
             <button
               onClick={() => fgRef.current?.zoom(fgRef.current.zoom() * 0.7, 400)}
-              className="p-2.5 rounded-xl bg-card/80 border border-border/80 text-foreground hover:bg-muted/80 text-xs shadow-md transition-all"
+              className="rounded-xl border border-border/80 bg-card/80 p-2.5 text-xs text-foreground shadow-md transition-all hover:bg-muted/80"
               title="Zoom Out"
             >
               <ZoomOut className="h-4 w-4" />
             </button>
             <button
               onClick={() => fgRef.current?.zoomToFit(600, 50)}
-              className="p-2.5 rounded-xl bg-card/80 border border-border/80 text-foreground hover:bg-muted/80 text-xs shadow-md transition-all"
+              className="rounded-xl border border-border/80 bg-card/80 p-2.5 text-xs text-foreground shadow-md transition-all hover:bg-muted/80"
               title="Fit to Screen"
             >
               <Maximize2 className="h-4 w-4" />
@@ -328,7 +328,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
         </div>
 
         {/* Force Graph Renderer */}
-        <div className="w-full h-[560px]">
+        <div className="h-[560px] w-full">
           <ForceGraph2D
             ref={fgRef}
             graphData={graphData}
@@ -344,8 +344,10 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
             }}
             linkColor={linkColor}
             linkWidth={(link) => {
-              const srcId = typeof link.source === "object" ? (link.source as GraphNode).id : link.source;
-              const tgtId = typeof link.target === "object" ? (link.target as GraphNode).id : link.target;
+              const srcId =
+                typeof link.source === "object" ? (link.source as GraphNode).id : link.source;
+              const tgtId =
+                typeof link.target === "object" ? (link.target as GraphNode).id : link.target;
               return hoverNodeId === srcId || hoverNodeId === tgtId ? 2.5 : 1.2;
             }}
             linkDirectionalArrowLength={4.5}
@@ -368,13 +370,13 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
         </div>
 
         {/* Bottom Cluster Filter Pills */}
-        <div className="absolute bottom-4 left-4 right-4 z-20 flex items-center gap-2 overflow-x-auto pb-1 pointer-events-auto">
+        <div className="pointer-events-auto absolute bottom-4 left-4 right-4 z-20 flex items-center gap-2 overflow-x-auto pb-1">
           <button
             onClick={() => setActiveCluster(null)}
-            className={`px-3 py-1.5 rounded-full text-[11px] font-bold border transition-all cursor-pointer backdrop-blur-xl ${
+            className={`cursor-pointer rounded-full border px-3 py-1.5 text-[11px] font-bold backdrop-blur-xl transition-all ${
               activeCluster === null
-                ? "bg-primary text-primary-foreground border-primary shadow-md"
-                : "bg-card/80 border-border/80 text-muted-foreground hover:text-foreground"
+                ? "border-primary bg-primary text-primary-foreground shadow-md"
+                : "border-border/80 bg-card/80 text-muted-foreground hover:text-foreground"
             }`}
           >
             All Clusters ({graph.nodes.length})
@@ -383,14 +385,19 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
             <button
               key={c.cluster_id}
               onClick={() => setActiveCluster(activeCluster === c.cluster_id ? null : c.cluster_id)}
-              className={`px-3 py-1.5 rounded-full text-[11px] font-medium border flex items-center gap-2 cursor-pointer transition-all backdrop-blur-xl ${
+              className={`flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-[11px] font-medium backdrop-blur-xl transition-all ${
                 activeCluster === c.cluster_id
-                  ? "border-primary text-primary ring-2 ring-primary/30 scale-105 bg-card"
-                  : "border-border/60 text-muted-foreground hover:text-foreground bg-card/80"
+                  ? "scale-105 border-primary bg-card text-primary ring-2 ring-primary/30"
+                  : "border-border/60 bg-card/80 text-muted-foreground hover:text-foreground"
               }`}
             >
-              <span className="w-2.5 h-2.5 rounded-full shadow-xs" style={{ backgroundColor: c.color_hex }} />
-              <span>{c.name} ({c.node_ids.length})</span>
+              <span
+                className="shadow-xs h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: c.color_hex }}
+              />
+              <span>
+                {c.name} ({c.node_ids.length})
+              </span>
             </button>
           ))}
         </div>
@@ -398,35 +405,38 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
 
       {/* Selected Concept Deep-Dive Drawer */}
       {selectedNodeObj && (
-        <div className="w-full lg:w-96 rounded-3xl bg-card/95 border border-border/80 p-6 space-y-5 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-right-4 duration-300 text-foreground sleek-bezel">
+        <div className="sleek-bezel w-full space-y-5 rounded-3xl border border-border/80 bg-card/95 p-6 text-foreground shadow-2xl backdrop-blur-2xl duration-300 animate-in fade-in slide-in-from-right-4 lg:w-96">
           <div className="flex items-center justify-between border-b border-border/50 pb-3">
-            <div className="flex items-center gap-2 font-bold text-sm text-foreground">
-              <Sparkles className="h-4.5 w-4.5 text-primary animate-pulse" />
+            <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+              <Sparkles className="h-4.5 w-4.5 animate-pulse text-primary" />
               <span>Concept Inspector</span>
             </div>
-            <span className="text-[10px] uppercase text-primary font-mono font-bold px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20">
+            <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1 font-mono text-[10px] font-bold uppercase text-primary">
               {selectedNodeObj.category}
             </span>
           </div>
 
           <div>
-            <h3 className="text-lg font-black text-foreground tracking-tight">{selectedNodeObj.name}</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed mt-1.5">
-              {selectedNodeObj.description || "Core academic concept vectorized from course documents."}
+            <h3 className="text-lg font-black tracking-tight text-foreground">
+              {selectedNodeObj.name}
+            </h3>
+            <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+              {selectedNodeObj.description ||
+                "Core academic concept vectorized from course documents."}
             </p>
           </div>
 
           {/* Importance & Centrality Rating */}
-          <div className="p-4 rounded-2xl bg-muted/40 border border-border/60 space-y-2 text-xs">
-            <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
-              <span className="uppercase font-bold">Curriculum Centrality</span>
+          <div className="space-y-2 rounded-2xl border border-border/60 bg-muted/40 p-4 text-xs">
+            <div className="flex items-center justify-between font-mono text-[11px] text-muted-foreground">
+              <span className="font-bold uppercase">Curriculum Centrality</span>
               <span className="font-bold text-foreground">
                 {Math.round((selectedNodeObj.importance_score || 0.5) * 100)}%
               </span>
             </div>
-            <div className="h-2 w-full bg-background rounded-full overflow-hidden">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-background">
               <div
-                className="h-full bg-gradient-to-r from-primary via-indigo-400 to-purple-400 rounded-full transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-primary via-indigo-400 to-purple-400 transition-all duration-500"
                 style={{ width: `${(selectedNodeObj.importance_score || 0.5) * 100}%` }}
               />
             </div>
@@ -436,7 +446,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
           <div className="space-y-3">
             {connectedEdges.prerequisites.length > 0 && (
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase text-muted-foreground">
                   <BookOpen className="h-3.5 w-3.5 text-amber-400" />
                   Prerequisite Foundations ({connectedEdges.prerequisites.length})
                 </span>
@@ -445,7 +455,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
                     <button
                       key={p.id}
                       onClick={() => handleNodeClick(p)}
-                      className="px-2.5 py-1 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-colors"
+                      className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-400 transition-colors hover:bg-amber-500/20"
                     >
                       {p.name}
                     </button>
@@ -456,7 +466,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
 
             {connectedEdges.dependents.length > 0 && (
               <div className="space-y-1.5">
-                <span className="text-[11px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
+                <span className="flex items-center gap-1.5 text-[11px] font-bold uppercase text-muted-foreground">
                   <Activity className="h-3.5 w-3.5 text-emerald-400" />
                   Unlocks Downstream ({connectedEdges.dependents.length})
                 </span>
@@ -465,7 +475,7 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
                     <button
                       key={d.id}
                       onClick={() => handleNodeClick(d)}
-                      className="px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors"
+                      className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/20"
                     >
                       {d.name}
                     </button>
@@ -476,19 +486,19 @@ export function KnowledgeGraphViewer({ graph, onSelectNode }: Props) {
           </div>
 
           {/* Quick RAG Chat & Gap Actions */}
-          <div className="space-y-2 pt-2 border-t border-border/50">
+          <div className="space-y-2 border-t border-border/50 pt-2">
             <Link
               href={`/chat?q=${encodeURIComponent(`Explain ${selectedNodeObj.name} in detail with formulas, proofs, and examples from my uploaded course notes.`)}`}
-              className="w-full py-3 px-4 rounded-2xl bg-primary text-primary-foreground font-bold text-xs flex items-center justify-center gap-2 shadow-lg hover:opacity-90 active:scale-98 transition-all"
+              className="active:scale-98 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-xs font-bold text-primary-foreground shadow-lg transition-all hover:opacity-90"
             >
               <Sparkles className="h-3.5 w-3.5" />
               <span>Query in Grounded RAG Chat</span>
-              <ArrowRight className="h-3.5 w-3.5 ml-auto" />
+              <ArrowRight className="ml-auto h-3.5 w-3.5" />
             </Link>
 
             <Link
               href={`/gaps?concept=${encodeURIComponent(selectedNodeObj.name)}`}
-              className="w-full py-2.5 px-4 rounded-2xl bg-muted/60 hover:bg-muted text-foreground font-bold text-xs flex items-center justify-center gap-2 border border-border/80 transition-all"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border/80 bg-muted/60 px-4 py-2.5 text-xs font-bold text-foreground transition-all hover:bg-muted"
             >
               <Layers className="h-3.5 w-3.5 text-indigo-400" />
               <span>Check Prerequisite Gaps</span>

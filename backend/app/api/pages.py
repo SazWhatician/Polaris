@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.deps import CurrentUser
-from app.core.supabase import is_initialized
 from app.models.document import PageListResponse
 from app.repositories.document_repo import DocumentRepository
 from app.repositories.page_repo import PageRepository

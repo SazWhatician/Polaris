@@ -13,6 +13,7 @@ and Precision@K for academic STEM queries.
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+
 from opentelemetry import trace
 
 from app.core.logging import get_logger
@@ -33,6 +34,7 @@ class RerankService:
     def _init_ranker(self) -> None:
         try:
             from flashrank import Ranker
+
             self._ranker = Ranker(model_name=self._model_name)
             log.info("rerank.initialized", model=self._model_name)
         except Exception as exc:
@@ -62,8 +64,7 @@ class RerankService:
                 from flashrank import RerankRequest
 
                 passages = [
-                    {"id": idx, "text": c.text, "meta": idx}
-                    for idx, c in enumerate(chunks)
+                    {"id": idx, "text": c.text, "meta": idx} for idx, c in enumerate(chunks)
                 ]
                 request = RerankRequest(query=query, passages=passages)
                 results = self._ranker.rerank(request)

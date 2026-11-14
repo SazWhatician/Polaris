@@ -52,7 +52,9 @@ export default function IngestPage() {
   const [docs, setDocs] = useState<DocumentResponse[]>([]);
   const [fetching, setFetching] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "ready" | "processing" | "failed">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "ready" | "processing" | "failed">(
+    "all",
+  );
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [viewingDoc, setViewingDoc] = useState<DocumentResponse | null>(null);
 
@@ -136,7 +138,9 @@ export default function IngestPage() {
   };
 
   const totalDocs = docs.length;
-  const processedDocs = docs.filter((d) => d.status === "ocr_complete" || d.status === "indexed").length;
+  const processedDocs = docs.filter(
+    (d) => d.status === "ocr_complete" || d.status === "indexed",
+  ).length;
   const inFlightDocs = docs.filter((d) => IN_FLIGHT_STATES.has(d.status)).length;
   const totalPages = docs.reduce((acc, d) => acc + (d.page_count || 0), 0);
   const totalBytes = docs.reduce((acc, d) => acc + (d.size_bytes || 0), 0);
@@ -151,8 +155,8 @@ export default function IngestPage() {
         (statusFilter === "ready"
           ? d.status === "ocr_complete" || d.status === "indexed"
           : statusFilter === "processing"
-          ? IN_FLIGHT_STATES.has(d.status)
-          : d.status === statusFilter);
+            ? IN_FLIGHT_STATES.has(d.status)
+            : d.status === statusFilter);
       return matchSearch && matchStatus;
     });
   }, [docs, searchQuery, statusFilter]);
@@ -160,16 +164,18 @@ export default function IngestPage() {
   if (loading || !user) return null;
 
   return (
-    <div className="relative min-h-screen text-foreground pb-32 pt-14 sm:pt-16 overflow-x-hidden selection:bg-primary/30 selection:text-foreground">
+    <div className="relative min-h-screen overflow-x-hidden pb-32 pt-14 text-foreground selection:bg-primary/30 selection:text-foreground sm:pt-16">
       {/* ── Ambient Fluid Liquid Caustic Spheres (iOS/visionOS Glass Glow) ── */}
-      <div className="ambient-liquid-glow -top-24 -left-24 w-[500px] h-[500px] bg-indigo-500/20" />
-      <div className="ambient-liquid-glow top-[40%] -right-32 w-[550px] h-[550px] bg-purple-500/15" />
-      <div className="ambient-liquid-glow bottom-12 left-[25%] w-[600px] h-[600px] bg-emerald-500/12" />
+      <div className="ambient-liquid-glow -left-24 -top-24 h-[500px] w-[500px] bg-indigo-500/20" />
+      <div className="ambient-liquid-glow -right-32 top-[40%] h-[550px] w-[550px] bg-purple-500/15" />
+      <div className="ambient-liquid-glow bg-emerald-500/12 bottom-12 left-[25%] h-[600px] w-[600px]" />
 
       <SiteHeader />
 
-      <main ref={containerRef} className="relative z-10 max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
-        
+      <main
+        ref={containerRef}
+        className="relative z-10 mx-auto max-w-7xl space-y-6 px-3 py-4 sm:px-6 lg:px-8"
+      >
         {/* Page Header */}
         <div className="gsap-ingest">
           <PageHeader
@@ -185,7 +191,7 @@ export default function IngestPage() {
                 size="sm"
                 onClick={loadDocs}
                 disabled={fetching}
-                className="gap-2 text-xs font-bold rounded-2xl border-white/20 bg-white/10 dark:bg-white/5 hover:bg-white/15 backdrop-blur-xl"
+                className="gap-2 rounded-2xl border-white/20 bg-white/10 text-xs font-bold backdrop-blur-xl hover:bg-white/15 dark:bg-white/5"
               >
                 <RefreshCw className={cn("h-3.5 w-3.5", fetching && "animate-spin text-primary")} />
                 <span>{fetching ? "Refreshing..." : "Sync Index"}</span>
@@ -195,7 +201,7 @@ export default function IngestPage() {
         </div>
 
         {/* Telemetry Stats Matrix */}
-        <div className="gsap-ingest grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="gsap-ingest grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             label="Ingested Course Files"
             numericValue={totalDocs}
@@ -213,7 +219,11 @@ export default function IngestPage() {
             value={totalPages.toString()}
             icon={Layers}
             colorScheme="purple"
-            trend={totalDocs > 0 ? `${(totalPages / Math.max(1, totalDocs)).toFixed(1)} avg/doc` : "0 pages"}
+            trend={
+              totalDocs > 0
+                ? `${(totalPages / Math.max(1, totalDocs)).toFixed(1)} avg/doc`
+                : "0 pages"
+            }
             trendPositive
             tag="OCR OCRv2"
           />
@@ -244,11 +254,13 @@ export default function IngestPage() {
         {/* Ingestion Dropzone Studio */}
         <div className="gsap-ingest space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-mono font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <h2 className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
               <span>Multi-File Ingestion Pipeline</span>
             </h2>
-            <span className="text-[11px] font-mono text-muted-foreground">Supported formats: PDF, Slides (PDF)</span>
+            <span className="font-mono text-[11px] text-muted-foreground">
+              Supported formats: PDF, Slides (PDF)
+            </span>
           </div>
 
           <UploadCard onUploadComplete={loadDocs} />
@@ -256,40 +268,41 @@ export default function IngestPage() {
 
         {/* Vector Document Explorer Matrix */}
         <div className="gsap-ingest space-y-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-border/40 pb-3">
+          <div className="flex flex-col justify-between gap-3 border-b border-border/40 pb-3 md:flex-row md:items-center">
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2 font-mono uppercase tracking-wider">
+              <h2 className="flex items-center gap-2 font-mono text-base font-bold uppercase tracking-wider text-foreground sm:text-lg">
                 <Database className="h-4 w-4 text-primary" />
                 <span>Indexed Vector Knowledge Base ({filteredDocs.length})</span>
               </h2>
               <p className="text-xs text-muted-foreground">
-                All indexed course materials ready for Grounded RAG Chat queries and Knowledge Graph extraction.
+                All indexed course materials ready for Grounded RAG Chat queries and Knowledge Graph
+                extraction.
               </p>
             </div>
 
             {/* Filter and Search Controls */}
             <div className="flex flex-wrap items-center gap-2.5">
               <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Filter documents..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8.5 pr-3 py-1.5 text-xs rounded-xl bg-muted/40 border border-border/60 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary w-48 sm:w-60 shadow-xs"
+                  className="pl-8.5 shadow-xs w-48 rounded-xl border border-border/60 bg-muted/40 py-1.5 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary sm:w-60"
                 />
               </div>
 
-              <div className="flex items-center p-1 rounded-xl bg-muted/40 border border-border/60 text-xs">
+              <div className="flex items-center rounded-xl border border-border/60 bg-muted/40 p-1 text-xs">
                 {(["all", "ready", "processing", "failed"] as const).map((mode) => (
                   <button
                     key={mode}
                     onClick={() => setStatusFilter(mode)}
                     className={cn(
-                      "px-2.5 py-1 rounded-lg font-bold capitalize transition-all",
+                      "rounded-lg px-2.5 py-1 font-bold capitalize transition-all",
                       statusFilter === mode
-                        ? "bg-background text-foreground shadow-xs"
-                        : "text-muted-foreground hover:text-foreground"
+                        ? "shadow-xs bg-background text-foreground"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                   >
                     {mode}
@@ -301,21 +314,27 @@ export default function IngestPage() {
 
           {/* Documents Grid / Empty State */}
           {fetching ? (
-            <Card className="p-12 text-center text-xs flex flex-col items-center justify-center gap-3 bg-card/85 backdrop-blur-2xl border-border/80 rounded-3xl shadow-xs">
+            <Card className="shadow-xs flex flex-col items-center justify-center gap-3 rounded-3xl border-border/80 bg-card/85 p-12 text-center text-xs backdrop-blur-2xl">
               <Clock className="h-6 w-6 animate-spin text-primary" />
-              <span className="font-bold text-sm text-foreground">Synchronizing Vector Documents...</span>
-              <p className="text-xs text-muted-foreground">Checking live Qdrant collection embeddings and OCR jobs.</p>
+              <span className="text-sm font-bold text-foreground">
+                Synchronizing Vector Documents...
+              </span>
+              <p className="text-xs text-muted-foreground">
+                Checking live Qdrant collection embeddings and OCR jobs.
+              </p>
             </Card>
           ) : filteredDocs.length === 0 ? (
-            <Card className="p-12 text-center text-xs flex flex-col items-center justify-center gap-3 bg-card/60 backdrop-blur-xl border-border/80 rounded-3xl">
+            <Card className="flex flex-col items-center justify-center gap-3 rounded-3xl border-border/80 bg-card/60 p-12 text-center text-xs backdrop-blur-xl">
               <FileText className="h-8 w-8 text-muted-foreground/40" />
-              <span className="font-bold text-sm text-foreground">No documents found</span>
-              <p className="text-xs text-muted-foreground max-w-sm">
-                {searchQuery ? "No results match your search query." : "Upload course PDF notes or syllabus files above to begin vector indexing."}
+              <span className="text-sm font-bold text-foreground">No documents found</span>
+              <p className="max-w-sm text-xs text-muted-foreground">
+                {searchQuery
+                  ? "No results match your search query."
+                  : "Upload course PDF notes or syllabus files above to begin vector indexing."}
               </p>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <div className="grid grid-cols-1 gap-3.5 md:grid-cols-2 lg:grid-cols-3">
               {filteredDocs.map((d) => {
                 const isReady = d.status === "ocr_complete" || d.status === "indexed";
                 const isFailed = d.status === "failed";
@@ -324,18 +343,21 @@ export default function IngestPage() {
                 return (
                   <div
                     key={d.id}
-                    className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs flex flex-col justify-between space-y-3 group"
+                    className="bento-card shadow-xs group flex flex-col justify-between space-y-3 rounded-2xl border border-border/80 bg-card/85 p-4 backdrop-blur-xl"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20 shrink-0 bento-icon-bounce">
-                          <FileText className="w-4 h-4" />
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="bento-icon-bounce shrink-0 rounded-xl border border-primary/20 bg-primary/10 p-2.5 text-primary">
+                          <FileText className="h-4 w-4" />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-foreground truncate" title={d.filename}>
+                          <h4
+                            className="truncate text-xs font-bold text-foreground"
+                            title={d.filename}
+                          >
                             {d.filename}
                           </h4>
-                          <p className="text-[10px] font-mono text-muted-foreground flex items-center gap-2 pt-0.5">
+                          <p className="flex items-center gap-2 pt-0.5 font-mono text-[10px] text-muted-foreground">
                             <span>{sizeStr} MB</span>
                             <span>•</span>
                             <span>{d.page_count || 1} pg</span>
@@ -347,39 +369,43 @@ export default function IngestPage() {
 
                       <span
                         className={cn(
-                          "px-2 py-0.5 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider shrink-0",
+                          "shrink-0 rounded-md px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider",
                           isReady
-                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                            ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
                             : isFailed
-                            ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                            : "bg-amber-500/10 text-amber-500 border border-amber-500/20 animate-pulse"
+                              ? "border border-rose-500/20 bg-rose-500/10 text-rose-500"
+                              : "animate-pulse border border-amber-500/20 bg-amber-500/10 text-amber-500",
                         )}
                       >
                         {d.status.replace("_", " ")}
                       </span>
                     </div>
 
-                    <div className="pt-2 border-t border-border/40 flex items-center justify-between gap-1.5">
+                    <div className="flex items-center justify-between gap-1.5 border-t border-border/40 pt-2">
                       <div className="flex items-center gap-1.5">
                         {isReady && (
                           <>
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => router.push(`/chat?q=Explain%20key%20concepts%20from%20${encodeURIComponent(d.filename)}`)}
-                              className="h-7 px-2.5 rounded-lg text-[11px] font-bold gap-1 text-primary border-primary/30 hover:bg-primary/10"
+                              onClick={() =>
+                                router.push(
+                                  `/chat?q=Explain%20key%20concepts%20from%20${encodeURIComponent(d.filename)}`,
+                                )
+                              }
+                              className="h-7 gap-1 rounded-lg border-primary/30 px-2.5 text-[11px] font-bold text-primary hover:bg-primary/10"
                             >
-                              <MessageSquare className="w-3 h-3" />
+                              <MessageSquare className="h-3 w-3" />
                               <span>Ask RAG</span>
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => setViewingDoc(d)}
-                              className="h-7 px-2 rounded-lg text-[11px] text-muted-foreground hover:text-foreground"
+                              className="h-7 rounded-lg px-2 text-[11px] text-muted-foreground hover:text-foreground"
                               title="Inspect OCR text"
                             >
-                              <Eye className="w-3.5 h-3.5" />
+                              <Eye className="h-3.5 w-3.5" />
                             </Button>
                           </>
                         )}
@@ -388,10 +414,10 @@ export default function IngestPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleReprocess(d)}
-                            className="h-7 px-2 rounded-lg text-[11px] text-muted-foreground hover:text-foreground"
+                            className="h-7 rounded-lg px-2 text-[11px] text-muted-foreground hover:text-foreground"
                             title="Reprocess OCR & Vectors"
                           >
-                            <RefreshCw className="w-3.5 h-3.5" />
+                            <RefreshCw className="h-3.5 w-3.5" />
                           </Button>
                         )}
                       </div>
@@ -400,10 +426,10 @@ export default function IngestPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => setPendingDeleteId(d.id)}
-                        className="h-7 px-2 rounded-lg text-[11px] text-rose-500/70 hover:text-rose-500 hover:bg-rose-500/10"
+                        className="h-7 rounded-lg px-2 text-[11px] text-rose-500/70 hover:bg-rose-500/10 hover:text-rose-500"
                         title="Delete document"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </div>
@@ -415,21 +441,26 @@ export default function IngestPage() {
       </main>
 
       {/* Delete Document Confirmation Dialog */}
-      <AlertDialog open={!!pendingDeleteId} onOpenChange={(open) => !open && setPendingDeleteId(null)}>
+      <AlertDialog
+        open={!!pendingDeleteId}
+        onOpenChange={(open) => !open && setPendingDeleteId(null)}
+      >
         <AlertDialogContent className="rounded-3xl border-border/80 bg-card/95 backdrop-blur-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-base font-bold text-foreground">
               Remove Document from Vector Index?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-xs text-muted-foreground">
-              This will delete the document, its extracted OCR text, and all associated dense vector embeddings from Qdrant. Grounded RAG Chat answers will no longer reference this document.
+              This will delete the document, its extracted OCR text, and all associated dense vector
+              embeddings from Qdrant. Grounded RAG Chat answers will no longer reference this
+              document.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="rounded-xl text-xs">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="rounded-xl text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold"
+              className="rounded-xl bg-rose-600 text-xs font-bold text-white hover:bg-rose-700"
             >
               Delete from Index
             </AlertDialogAction>

@@ -69,9 +69,7 @@ export async function streamChat(
       const frame = buffer.slice(0, sep);
       buffer = buffer.slice(sep + 2);
 
-      const dataLine = frame
-        .split("\n")
-        .find((l) => l.startsWith("data:"));
+      const dataLine = frame.split("\n").find((l) => l.startsWith("data:"));
       if (!dataLine) continue;
       const payload = dataLine.slice("data:".length).trim();
       if (!payload) continue;

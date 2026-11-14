@@ -116,10 +116,7 @@ export interface AnimatedShaderCardProps {
   className?: string;
 }
 
-export function AnimatedShaderCard({
-  children,
-  className = "",
-}: AnimatedShaderCardProps) {
+export function AnimatedShaderCard({ children, className = "" }: AnimatedShaderCardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { theme, resolvedTheme } = useTheme();
@@ -160,11 +157,7 @@ export function AnimatedShaderCard({
 
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, 1, -1, -1, 1, 1, 1, -1]),
-      gl.STATIC_DRAW
-    );
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, 1, -1, -1, 1, 1, 1, -1]), gl.STATIC_DRAW);
 
     const position = gl.getAttribLocation(program, "position");
     gl.enableVertexAttribArray(position);
@@ -220,7 +213,7 @@ export function AnimatedShaderCard({
           }
         }
       },
-      { rootMargin: "250px" }
+      { rootMargin: "250px" },
     );
     intersectionObserver.observe(container);
 
@@ -241,19 +234,19 @@ export function AnimatedShaderCard({
   return (
     <div
       ref={containerRef}
-      className={`relative overflow-hidden rounded-3xl border border-white/15 shadow-2xl group transition-all duration-500 hover:border-[#2BA648]/40 hover:shadow-[0_25px_70px_-10px_rgba(43,166,72,0.3)] ${className}`}
+      className={`group relative overflow-hidden rounded-3xl border border-white/15 shadow-2xl transition-all duration-500 hover:border-[#2BA648]/40 hover:shadow-[0_25px_70px_-10px_rgba(43,166,72,0.3)] ${className}`}
     >
       {/* Exact Landing Page WebGL2 Shader Canvas */}
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0 opacity-85 transition-opacity duration-500 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover opacity-85 transition-opacity duration-500 group-hover:opacity-100"
       />
 
       {/* Dark Luxury Vignette & Glass Blur Overlay for 100% Text Legibility */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-[4px] z-[1] pointer-events-none" />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-black/40 backdrop-blur-[4px]" />
 
       {/* Top Subtle Bevel Highlight Line */}
-      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#2BA648]/70 to-transparent group-hover:via-white transition-all duration-500 z-[2]" />
+      <div className="absolute left-0 right-0 top-0 z-[2] h-[1.5px] bg-gradient-to-r from-transparent via-[#2BA648]/70 to-transparent transition-all duration-500 group-hover:via-white" />
 
       {/* Card Content */}
       <div className="relative z-10">{children}</div>

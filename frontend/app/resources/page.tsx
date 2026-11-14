@@ -2,15 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Sparkles,
-  Youtube,
-  ExternalLink,
-  Clock,
-  Play,
-  ListVideo,
-  X,
-} from "lucide-react";
+import { Sparkles, Youtube, ExternalLink, Clock, Play, ListVideo, X } from "lucide-react";
 
 import { SiteHeader } from "@/components/site-header";
 import { PageHeader } from "@/components/ui/page-header";
@@ -72,7 +64,11 @@ export default function ResourcesPage() {
         }
       }
 
-      if (quickRes.status === "fulfilled" && quickRes.value && quickRes.value.resources.length > 0) {
+      if (
+        quickRes.status === "fulfilled" &&
+        quickRes.value &&
+        quickRes.value.resources.length > 0
+      ) {
         setDiscoveryResult(quickRes.value);
         gotVideos = true;
       }
@@ -141,9 +137,9 @@ export default function ResourcesPage() {
   };
 
   return (
-    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 selection:bg-primary/30 selection:text-foreground">
+    <div className="min-h-screen pb-32 pt-14 text-foreground selection:bg-primary/30 selection:text-foreground sm:pt-16">
       <SiteHeader />
-      <main ref={containerRef} className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 space-y-6">
+      <main ref={containerRef} className="mx-auto max-w-7xl space-y-6 px-3 py-4 sm:px-6 lg:px-8">
         <div className="gsap-resources">
           <PageHeader
             category="STUDY PLANNING // VIDEO RESOURCES"
@@ -156,24 +152,24 @@ export default function ResourcesPage() {
         </div>
 
         {/* Search Card */}
-        <Card className="gsap-resources p-4 sm:p-5 rounded-2xl bg-card/85 border border-border/80 bento-card shadow-xs backdrop-blur-xl">
-          <form onSubmit={handleDiscovery} className="flex flex-col sm:flex-row gap-2.5">
+        <Card className="gsap-resources bento-card shadow-xs rounded-2xl border border-border/80 bg-card/85 p-4 backdrop-blur-xl sm:p-5">
+          <form onSubmit={handleDiscovery} className="flex flex-col gap-2.5 sm:flex-row">
             <input
               type="text"
               value={topicTitle}
               onChange={(e) => setTopicTitle(e.target.value)}
               placeholder="Enter a syllabus topic (e.g. Binary Search Trees, Dynamic Programming, Dijkstra)..."
-              className="flex-1 px-3.5 py-2 border border-border/80 rounded-xl bg-muted/40 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary text-xs"
+              className="flex-1 rounded-xl border border-border/80 bg-muted/40 px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
               disabled={loading}
             />
             <button
               type="submit"
               disabled={loading || !topicTitle.trim()}
-              className="px-5 py-2 bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 text-xs h-8.5"
+              className="shadow-xs h-8.5 flex items-center justify-center gap-1.5 rounded-xl bg-primary px-5 py-2 text-xs font-bold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Clock className="animate-spin h-3.5 w-3.5" />
+                  <Clock className="h-3.5 w-3.5 animate-spin" />
                   <span>Discovering…</span>
                 </>
               ) : (
@@ -186,55 +182,55 @@ export default function ResourcesPage() {
           </form>
 
           {statusMsg && (
-            <div className="mt-3 text-xs font-mono text-primary font-medium animate-pulse flex items-center gap-1.5">
+            <div className="mt-3 flex animate-pulse items-center gap-1.5 font-mono text-xs font-medium text-primary">
               <Sparkles className="h-3 w-3" /> {statusMsg}
             </div>
           )}
 
-          {error && <div className="mt-3 text-xs text-rose-500 font-medium">{error}</div>}
+          {error && <div className="mt-3 text-xs font-medium text-rose-500">{error}</div>}
         </Card>
 
         {/* Playlists Section */}
         {playlists.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2 font-mono uppercase tracking-wider">
+              <h2 className="flex items-center gap-2 font-mono text-sm font-bold uppercase tracking-wider text-foreground sm:text-base">
                 <ListVideo className="h-4 w-4 text-rose-500" />
                 <span>Full Course Playlists</span>
               </h2>
-              <span className="text-[10px] text-muted-foreground font-mono">
+              <span className="font-mono text-[10px] text-muted-foreground">
                 {playlists.length} playlists
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
               {playlists.map((pl, pIdx) => (
                 <div
                   key={pIdx}
-                  className="rounded-2xl bg-card/90 border border-border/80 overflow-hidden flex flex-col justify-between hover:border-rose-500/40 transition-all bento-card shadow-xs group"
+                  className="bento-card shadow-xs group flex flex-col justify-between overflow-hidden rounded-2xl border border-border/80 bg-card/90 transition-all hover:border-rose-500/40"
                 >
-                  <div className="relative aspect-video bg-muted overflow-hidden">
+                  <div className="relative aspect-video overflow-hidden bg-muted">
                     <img
                       src={pl.thumbnail_url}
                       alt={pl.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       onError={(e) => {
                         (e.target as HTMLElement).style.display = "none";
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2.5">
-                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-black/80 text-white border border-white/20">
+                    <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/80 via-transparent to-transparent p-2.5">
+                      <span className="rounded border border-white/20 bg-black/80 px-2 py-0.5 font-mono text-[9px] font-bold text-white">
                         {pl.video_count || "Course Series"}
                       </span>
                     </div>
                   </div>
 
-                  <div className="p-3 space-y-1.5 flex-1 flex flex-col justify-between">
+                  <div className="flex flex-1 flex-col justify-between space-y-1.5 p-3">
                     <div>
-                      <h4 className="text-xs font-bold text-foreground line-clamp-2 leading-snug">
+                      <h4 className="line-clamp-2 text-xs font-bold leading-snug text-foreground">
                         {pl.title}
                       </h4>
-                      <p className="text-[11px] text-muted-foreground font-mono mt-0.5 truncate">
+                      <p className="mt-0.5 truncate font-mono text-[11px] text-muted-foreground">
                         {pl.channel_title}
                       </p>
                     </div>
@@ -243,7 +239,7 @@ export default function ResourcesPage() {
                       href={pl.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 w-full py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-[11px] font-bold transition-colors flex items-center justify-center gap-1 border border-rose-500/20"
+                      className="mt-2 flex w-full items-center justify-center gap-1 rounded-lg border border-rose-500/20 bg-rose-500/10 py-1.5 text-[11px] font-bold text-rose-500 transition-colors hover:bg-rose-500/20"
                     >
                       <span>Open Full Playlist</span>
                       <ExternalLink className="h-3 w-3" />
@@ -259,38 +255,38 @@ export default function ResourcesPage() {
         {discoveryResult && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2 font-mono uppercase tracking-wider">
+              <h2 className="flex items-center gap-2 font-mono text-sm font-bold uppercase tracking-wider text-foreground sm:text-base">
                 <span>Ranked Educational Videos</span>
                 {discoveryResult.from_cache && (
-                  <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 font-mono font-medium">
+                  <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 font-mono text-[9px] font-medium text-emerald-500">
                     Cached
                   </span>
                 )}
               </h2>
-              <span className="text-[10px] text-muted-foreground font-mono">
+              <span className="font-mono text-[10px] text-muted-foreground">
                 Found {discoveryResult.resources.length} videos
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {discoveryResult.resources.map((item, idx) => (
                 <div
                   key={idx}
-                  className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs flex flex-col justify-between space-y-3 group"
+                  className="bento-card shadow-xs group flex flex-col justify-between space-y-3 rounded-2xl border border-border/80 bg-card/85 p-4 backdrop-blur-xl"
                 >
                   <div className="space-y-2.5">
                     <div className="flex gap-3">
-                      <div className="relative w-28 sm:w-32 aspect-video rounded-xl bg-muted overflow-hidden shrink-0">
+                      <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-xl bg-muted sm:w-32">
                         <img
                           src={item.thumbnail_url}
                           alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
                           onError={(e) => {
                             (e.target as HTMLElement).style.display = "none";
                           }}
                         />
                         {item.duration !== "N/A" && (
-                          <span className="absolute bottom-1 right-1 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/80 text-white">
+                          <span className="absolute bottom-1 right-1 rounded bg-black/80 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white">
                             {item.duration}
                           </span>
                         )}
@@ -298,22 +294,22 @@ export default function ResourcesPage() {
 
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-start justify-between gap-2">
-                          <h3 className="font-bold text-foreground text-xs sm:text-sm leading-snug line-clamp-2">
+                          <h3 className="line-clamp-2 text-xs font-bold leading-snug text-foreground sm:text-sm">
                             {item.title}
                           </h3>
-                          <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 shrink-0">
+                          <span className="shrink-0 rounded-md border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[9px] font-bold text-primary">
                             {(item.rank_score * 100).toFixed(0)}% Rank
                           </span>
                         </div>
-                        <p className="text-[11px] text-muted-foreground font-mono truncate flex items-center gap-1">
-                          <Youtube className="h-3 w-3 text-rose-500 shrink-0" />
+                        <p className="flex items-center gap-1 truncate font-mono text-[11px] text-muted-foreground">
+                          <Youtube className="h-3 w-3 shrink-0 text-rose-500" />
                           {item.channel_title}
                         </p>
                       </div>
                     </div>
 
                     {item.why_recommended && (
-                      <p className="text-[11px] text-muted-foreground bg-muted/40 p-2.5 rounded-xl border border-border/40 leading-relaxed font-sans">
+                      <p className="rounded-xl border border-border/40 bg-muted/40 p-2.5 font-sans text-[11px] leading-relaxed text-muted-foreground">
                         💡 <span className="font-semibold text-foreground">Why Recommended:</span>{" "}
                         {item.why_recommended}
                       </p>
@@ -323,7 +319,7 @@ export default function ResourcesPage() {
                   <div className="flex items-center gap-2 pt-1">
                     <button
                       onClick={() => setActiveVideoModal(item)}
-                      className="flex-1 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-xs"
+                      className="shadow-xs flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary py-1.5 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90"
                     >
                       <Play className="h-3 w-3 fill-current" />
                       <span>Watch in App</span>
@@ -332,7 +328,7 @@ export default function ResourcesPage() {
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="py-1.5 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-500 text-xs font-bold transition-colors flex items-center justify-center gap-1"
+                      className="flex items-center justify-center gap-1 rounded-xl border border-rose-500/20 bg-rose-500/10 px-3 py-1.5 text-xs font-bold text-rose-500 transition-colors hover:bg-rose-500/20"
                       title="Open on YouTube"
                     >
                       <span>YouTube</span>
@@ -348,45 +344,45 @@ export default function ResourcesPage() {
 
       {/* Embedded YouTube Video Player Modal */}
       {activeVideoModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-3xl rounded-3xl bg-card border border-border/80 overflow-hidden shadow-2xl space-y-4 p-4 sm:p-5">
+        <div className="z-60 fixed inset-0 flex items-center justify-center bg-black/85 p-3 backdrop-blur-md duration-200 animate-in fade-in sm:p-6">
+          <div className="w-full max-w-3xl space-y-4 overflow-hidden rounded-3xl border border-border/80 bg-card p-4 shadow-2xl sm:p-5">
             <div className="flex items-center justify-between">
               <div className="min-w-0 pr-4">
-                <h4 className="text-sm font-bold text-foreground truncate">
+                <h4 className="truncate text-sm font-bold text-foreground">
                   {activeVideoModal.title}
                 </h4>
-                <p className="text-xs text-muted-foreground font-mono flex items-center gap-1 mt-0.5">
+                <p className="mt-0.5 flex items-center gap-1 font-mono text-xs text-muted-foreground">
                   <Youtube className="h-3.5 w-3.5 text-rose-500" />
                   {activeVideoModal.channel_title}
                 </p>
               </div>
               <button
                 onClick={() => setActiveVideoModal(null)}
-                className="p-1.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted"
+                className="rounded-xl p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-border/40">
+            <div className="aspect-video w-full overflow-hidden rounded-2xl border border-border/40 bg-black">
               <iframe
                 src={`https://www.youtube.com/embed/${activeVideoModal.video_id}?autoplay=1`}
                 title={activeVideoModal.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                className="w-full h-full border-0"
+                className="h-full w-full border-0"
               />
             </div>
 
-            <div className="flex items-center justify-between text-xs pt-1">
-              <p className="text-muted-foreground text-[11px] font-sans">
+            <div className="flex items-center justify-between pt-1 text-xs">
+              <p className="font-sans text-[11px] text-muted-foreground">
                 {activeVideoModal.why_recommended}
               </p>
               <a
                 href={activeVideoModal.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline flex items-center gap-1 font-bold shrink-0 ml-3"
+                className="ml-3 flex shrink-0 items-center gap-1 font-bold text-primary hover:underline"
               >
                 <span>Open in YouTube</span>
                 <ExternalLink className="h-3 w-3" />

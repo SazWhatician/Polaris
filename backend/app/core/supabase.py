@@ -37,7 +37,7 @@ def initialize_supabase(settings: Settings) -> bool:
         return True
 
     try:
-        from supabase import Client, create_client
+        from supabase import create_client
 
         _supabase_client = create_client(url, key)
         _initialized = True

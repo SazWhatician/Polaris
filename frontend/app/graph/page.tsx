@@ -65,10 +65,10 @@ export default function GraphPage() {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 selection:bg-primary/30 selection:text-foreground">
+    <div className="min-h-screen pb-32 pt-14 text-foreground selection:bg-primary/30 selection:text-foreground sm:pt-16">
       <SiteHeader />
 
-      <main ref={containerRef} className="max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
+      <main ref={containerRef} className="mx-auto max-w-7xl space-y-6 px-3 py-4 sm:px-6 lg:px-8">
         {/* Standardized Page Header */}
         <div className="gsap-graph">
           <PageHeader
@@ -84,9 +84,11 @@ export default function GraphPage() {
                 size="sm"
                 onClick={handleReExtract}
                 disabled={extracting}
-                className="gap-2 text-xs font-bold rounded-xl border-border/80 hover:bg-muted/80"
+                className="gap-2 rounded-xl border-border/80 text-xs font-bold hover:bg-muted/80"
               >
-                <RefreshCw className={`h-3.5 w-3.5 ${extracting ? "animate-spin text-primary" : ""}`} />
+                <RefreshCw
+                  className={`h-3.5 w-3.5 ${extracting ? "animate-spin text-primary" : ""}`}
+                />
                 <span>{extracting ? "Extracting Graph..." : "Re-Extract Graph"}</span>
               </Button>
             }
@@ -94,7 +96,7 @@ export default function GraphPage() {
         </div>
 
         {/* Header Block & Telemetry Cards */}
-        <div className="gsap-graph grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        <div className="gsap-graph grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
           <StatCard
             label="Total Concepts"
             numericValue={graph ? graph.nodes.length : 0}
@@ -130,12 +132,12 @@ export default function GraphPage() {
         {/* Knowledge Graph Viewer Canvas */}
         <div className="gsap-graph space-y-4">
           {fetching ? (
-            <Card className="p-12 text-center text-muted-foreground text-xs flex items-center justify-center gap-3 bg-card/75 backdrop-blur-2xl rounded-3xl border-border/80 shadow-xl">
+            <Card className="flex items-center justify-center gap-3 rounded-3xl border-border/80 bg-card/75 p-12 text-center text-xs text-muted-foreground shadow-xl backdrop-blur-2xl">
               <RefreshCw className="h-5 w-5 animate-spin text-primary" />
               <span>Constructing Knowledge Graph Visualization...</span>
             </Card>
           ) : graph ? (
-            <div className="rounded-3xl overflow-hidden border border-border/80 shadow-2xl bg-card/75 backdrop-blur-2xl sleek-bezel">
+            <div className="sleek-bezel overflow-hidden rounded-3xl border border-border/80 bg-card/75 shadow-2xl backdrop-blur-2xl">
               <KnowledgeGraphViewer graph={graph} />
             </div>
           ) : null}

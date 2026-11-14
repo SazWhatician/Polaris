@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -11,7 +12,9 @@ class StudyBlock(BaseModel):
     priority: Literal["high", "medium", "low"] = Field(
         default="medium", description="Priority level of the topic"
     )
-    notes: str = Field(default="", description="Study recommendation or instructions for this block")
+    notes: str = Field(
+        default="", description="Study recommendation or instructions for this block"
+    )
 
 
 class DaySchedule(BaseModel):

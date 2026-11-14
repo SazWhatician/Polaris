@@ -2,7 +2,8 @@ import { getFirebaseFirestore, getFirebaseAuth } from "./firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
 export type TodoPriority = "high" | "medium" | "low";
-export type TodoCategory = "General" | "Revision" | "Syllabus" | "RAG Research" | "Assignment" | "Exam Prep";
+export type TodoCategory =
+  "General" | "Revision" | "Syllabus" | "RAG Research" | "Assignment" | "Exam Prep";
 
 export interface TodoItem {
   id: string;
@@ -126,7 +127,7 @@ export function addTodo(
   title: string,
   priority: TodoPriority = "medium",
   category: TodoCategory = "General",
-  dueDate?: string
+  dueDate?: string,
 ): TodoItem {
   const newTodo: TodoItem = {
     id: "todo-" + Math.random().toString(36).substring(2, 9) + Date.now().toString(36),
@@ -158,7 +159,10 @@ export function deleteTodo(id: string): TodoItem[] {
   return updated;
 }
 
-export function updateTodo(id: string, updates: Partial<Omit<TodoItem, "id" | "createdAt">>): TodoItem[] {
+export function updateTodo(
+  id: string,
+  updates: Partial<Omit<TodoItem, "id" | "createdAt">>,
+): TodoItem[] {
   const current = getStoredTodos();
   const updated = current.map((t) => (t.id === id ? { ...t, ...updates } : t));
   saveStoredTodos(updated);
@@ -190,4 +194,3 @@ export function openCopilotModal(): void {
     window.dispatchEvent(new CustomEvent("polaris:open-copilot"));
   }
 }
-

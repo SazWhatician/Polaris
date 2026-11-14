@@ -30,15 +30,17 @@ async def analyze_career_path(
     agent = PathfinderAgent()
     graph = agent.compile()
 
-    result = await graph.ainvoke({
-        "user_id": user_id,
-        "career_goal_id": req.career_goal_id,
-        "career_goal": None,
-        "twin_data": None,
-        "skill_analysis": None,
-        "career_plan": None,
-        "error": None,
-    })
+    result = await graph.ainvoke(
+        {
+            "user_id": user_id,
+            "career_goal_id": req.career_goal_id,
+            "career_goal": None,
+            "twin_data": None,
+            "skill_analysis": None,
+            "career_plan": None,
+            "error": None,
+        }
+    )
 
     if result.get("error"):
         raise HTTPException(

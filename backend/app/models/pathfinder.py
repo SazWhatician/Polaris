@@ -29,5 +29,7 @@ class CareerPlan(BaseModel):
     missing_skills: list[str] = Field(default_factory=list)
     readiness_score: float = 0.0  # 0.0 to 1.0
     recommended_projects: list[RecommendedProject] = Field(default_factory=list)
-    learning_path: list[str] = Field(default_factory=list, description="Ordered list of skills to learn")
+    learning_path: list[str] = Field(
+        default_factory=list, description="Ordered list of skills to learn"
+    )
     summary: str = ""

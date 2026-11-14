@@ -7,23 +7,16 @@ import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Move3d, Loader2 } from "lucide-react";
-import {
-  MODEL_COLORWAYS,
-  ModelColorway,
-  ColorwayConfig,
-} from "./reactor-canvas";
+import { MODEL_COLORWAYS, ModelColorway, ColorwayConfig } from "./reactor-canvas";
 
 export { MODEL_COLORWAYS };
 export type { ModelColorway, ColorwayConfig };
 
 // Dynamic import with SSR disabled for Next.js 15 App Router WebGL canvas
-const ReactorCanvas = dynamic(
-  () => import("./reactor-canvas").then((mod) => mod.ReactorCanvas),
-  {
-    ssr: false,
-    loading: () => null,
-  }
-);
+const ReactorCanvas = dynamic(() => import("./reactor-canvas").then((mod) => mod.ReactorCanvas), {
+  ssr: false,
+  loading: () => null,
+});
 
 export interface ReactorFooterProps {
   /** Custom 3D model URL (e.g. "/models/bouche_a_levres.glb") */
@@ -56,7 +49,7 @@ export function ReactorFooter({
         const entry = entries[0];
         setIsInView(Boolean(entry?.isIntersecting));
       },
-      { rootMargin: "350px" }
+      { rootMargin: "350px" },
     );
     observer.observe(footerEl);
     return () => observer.disconnect();
@@ -96,15 +89,15 @@ export function ReactorFooter({
   }, []);
 
   return (
-    <div className="relative z-20 w-full min-h-screen bg-black overflow-hidden select-none flex flex-col justify-between">
+    <div className="relative z-20 flex min-h-screen w-full select-none flex-col justify-between overflow-hidden bg-black">
       <footer
         ref={footerRef}
-        className="reactor-zone relative z-20 w-full min-h-screen overflow-hidden bg-black flex flex-col justify-between"
+        className="reactor-zone relative z-20 flex min-h-screen w-full flex-col justify-between overflow-hidden bg-black"
       >
         {/* 3D React Three Fiber Canvas Layer — Lazy mounted on scroll */}
         <div
           id="footer-canvas"
-          className="absolute inset-0 w-full h-full pointer-events-none"
+          className="pointer-events-none absolute inset-0 h-full w-full"
           aria-hidden="true"
         >
           {isInView ? (
@@ -119,10 +112,10 @@ export function ReactorFooter({
 
         {/* Loading Overlay */}
         {isLoading && (
-          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm pointer-events-none transition-opacity duration-500">
-            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/[0.05] border border-white/10 shadow-2xl">
-              <Loader2 className="w-5 h-5 text-[#2BA648] animate-spin" />
-              <span className="text-xs font-mono text-white/80 tracking-wider">
+          <div className="pointer-events-none absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm transition-opacity duration-500">
+            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-3 shadow-2xl">
+              <Loader2 className="h-5 w-5 animate-spin text-[#2BA648]" />
+              <span className="font-mono text-xs tracking-wider text-white/80">
                 Loading 3D Chamber...
               </span>
             </div>
@@ -132,29 +125,33 @@ export function ReactorFooter({
         {/* Content Overlay */}
         <div
           ref={contentContainerRef}
-          className="relative w-full min-h-screen flex flex-col justify-between p-8 sm:p-14 lg:p-20 pointer-events-none z-10"
+          className="pointer-events-none relative z-10 flex min-h-screen w-full flex-col justify-between p-8 sm:p-14 lg:p-20"
         >
           {/* Top Section: ENIGMA Connect With Us + Socials + Menu */}
-          <div className="w-full pt-10 sm:pt-14 flex flex-col md:flex-row items-start justify-between gap-10 pointer-events-none">
+          <div className="pointer-events-none flex w-full flex-col items-start justify-between gap-10 pt-10 sm:pt-14 md:flex-row">
             {/* Left: Giant Heading */}
             <div className="pointer-events-auto">
-              <h1 className="text-5xl sm:text-7xl lg:text-8xl font-light tracking-tighter uppercase leading-none">
-                connect<br />WITH<br />US
+              <h1 className="text-5xl font-light uppercase leading-none tracking-tighter sm:text-7xl lg:text-8xl">
+                connect
+                <br />
+                WITH
+                <br />
+                US
               </h1>
             </div>
 
             {/* Right: Socials & Menu */}
-            <div className="flex gap-12 sm:gap-24 pointer-events-auto">
+            <div className="pointer-events-auto flex gap-12 sm:gap-24">
               {/* Socials Column */}
               <div className="flex flex-col gap-3 text-right">
-                <h3 className="text-base sm:text-xl font-normal text-slate-400 uppercase tracking-wider mb-2">
+                <h3 className="mb-2 text-base font-normal uppercase tracking-wider text-slate-400 sm:text-xl">
                   SOCIALS
                 </h3>
                 <a
                   href="https://instagram.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xl sm:text-3xl font-light text-white hover:text-[#2BA648] transition-colors"
+                  className="text-xl font-light text-white transition-colors hover:text-[#2BA648] sm:text-3xl"
                 >
                   INSTAGRAM
                 </a>
@@ -162,7 +159,7 @@ export function ReactorFooter({
                   href="https://x.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xl sm:text-3xl font-light text-white hover:text-[#2BA648] transition-colors"
+                  className="text-xl font-light text-white transition-colors hover:text-[#2BA648] sm:text-3xl"
                 >
                   X
                 </a>
@@ -170,7 +167,7 @@ export function ReactorFooter({
                   href="https://linkedin.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xl sm:text-3xl font-light text-white hover:text-[#2BA648] transition-colors"
+                  className="text-xl font-light text-white transition-colors hover:text-[#2BA648] sm:text-3xl"
                 >
                   LINKEDIN
                 </a>
@@ -178,24 +175,24 @@ export function ReactorFooter({
 
               {/* Menu Column */}
               <div className="flex flex-col gap-3 text-right">
-                <h3 className="text-base sm:text-xl font-normal text-slate-400 uppercase tracking-wider mb-2">
+                <h3 className="mb-2 text-base font-normal uppercase tracking-wider text-slate-400 sm:text-xl">
                   MENU
                 </h3>
                 <Link
                   href="/"
-                  className="text-xl sm:text-3xl font-light text-white hover:text-[#2BA648] transition-colors"
+                  className="text-xl font-light text-white transition-colors hover:text-[#2BA648] sm:text-3xl"
                 >
                   HOME
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="text-xl sm:text-3xl font-light text-white hover:text-[#2BA648] transition-colors"
+                  className="text-xl font-light text-white transition-colors hover:text-[#2BA648] sm:text-3xl"
                 >
                   WORKSPACE
                 </Link>
                 <Link
                   href="/login"
-                  className="text-xl sm:text-3xl font-light text-white hover:text-[#2BA648] transition-colors"
+                  className="text-xl font-light text-white transition-colors hover:text-[#2BA648] sm:text-3xl"
                 >
                   CONTACT
                 </Link>
@@ -204,16 +201,16 @@ export function ReactorFooter({
           </div>
 
           {/* Bottom HUD Bar */}
-          <div className="w-full pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-white/50 border-t border-white/10 pointer-events-auto">
-            <div className="flex items-center gap-3 flex-wrap">
-              <div className="px-3 py-1 rounded-full bg-white/[0.05] border border-white/10 flex items-center gap-2">
-                <Move3d className="w-3.5 h-3.5 text-[#2BA648]" />
-                <span className="text-[10px] tracking-widest uppercase">3D CHAMBER CORE</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="pointer-events-auto flex w-full flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 font-mono text-xs text-white/50 sm:flex-row">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 py-1">
+                <Move3d className="h-3.5 w-3.5 text-[#2BA648]" />
+                <span className="text-[10px] uppercase tracking-widest">3D CHAMBER CORE</span>
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
               </div>
 
               {/* Interactive Colorway Pills */}
-              <div className="flex items-center gap-1.5 bg-white/[0.03] p-1 rounded-full border border-white/5">
+              <div className="flex items-center gap-1.5 rounded-full border border-white/5 bg-white/[0.03] p-1">
                 {(Object.keys(MODEL_COLORWAYS) as ModelColorway[]).map((cw) => {
                   const cfg = MODEL_COLORWAYS[cw];
                   const isSelected = selectedColorway === cw;
@@ -221,26 +218,28 @@ export function ReactorFooter({
                     <button
                       key={cw}
                       onClick={() => setSelectedColorway(cw)}
-                      className={`px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider transition-all flex items-center gap-1 ${
+                      className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wider transition-all ${
                         isSelected
-                          ? "bg-white/15 text-white font-semibold shadow-sm"
+                          ? "bg-white/15 font-semibold text-white shadow-sm"
                           : "text-white/40 hover:text-white/80"
                       }`}
                       title={cfg.label}
                     >
                       <span
-                        className="w-2 h-2 rounded-full inline-block"
+                        className="inline-block h-2 w-2 rounded-full"
                         style={{ backgroundColor: cfg.dotColor }}
                       />
-                      <span className="hidden md:inline">{cfg.label.split(" ")[1] || cfg.label}</span>
+                      <span className="hidden md:inline">
+                        {cfg.label.split(" ")[1] || cfg.label}
+                      </span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-[10px] tracking-widest uppercase">
-              <div className="relative h-6 w-28 sm:w-36 opacity-80 hover:opacity-100 transition-opacity">
+            <div className="flex items-center gap-4 text-[10px] uppercase tracking-widest">
+              <div className="relative h-6 w-28 opacity-80 transition-opacity hover:opacity-100 sm:w-36">
                 <Image
                   src="/polaris-monochrome.png"
                   alt="Polaris Logo"
@@ -249,8 +248,8 @@ export function ReactorFooter({
                   className="object-contain invert"
                 />
               </div>
-              <span className="hidden sm:inline border-l border-white/20 pl-3">
-                AUTONOMOUS RESEARCH <span className="text-[#2BA648] font-bold">POLARIS.</span>
+              <span className="hidden border-l border-white/20 pl-3 sm:inline">
+                AUTONOMOUS RESEARCH <span className="font-bold text-[#2BA648]">POLARIS.</span>
               </span>
             </div>
           </div>

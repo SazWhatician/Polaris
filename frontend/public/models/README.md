@@ -11,6 +11,7 @@ In `frontend/app/page.tsx`, pass your model's path to `<ReactorFooter />`:
 ```
 
 ### Auto-Fit & Normalization:
+
 - Any 3D model placed here is **automatically centered and scaled** to fit inside the footer reactor chamber.
 - It will automatically receive the same breathing pulse animation, 3D lighting, and interactive mouse parallax tracking.
 - You can optionally adjust the scale factor with `modelScale`:

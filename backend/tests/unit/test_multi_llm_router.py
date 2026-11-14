@@ -1,9 +1,9 @@
-import pytest
-from typing import AsyncIterator, Type, TypeVar
-from pydantic import BaseModel
+from collections.abc import AsyncIterator
 
+import pytest
 from app.services.llm.base import BaseLLMProvider
 from app.services.llm.router import LLMRouter
+from pydantic import BaseModel
 
 
 class MockSchema(BaseModel):
@@ -23,7 +23,7 @@ class FailingProvider(BaseLLMProvider):
     async def complete(self, prompt: str, **kwargs) -> str:
         raise RuntimeError("429 Rate limit exhausted on primary provider")
 
-    async def structured_complete(self, prompt: str, schema_class: Type[BaseModel], **kwargs):
+    async def structured_complete(self, prompt: str, schema_class: type[BaseModel], **kwargs):
         raise RuntimeError("429 Rate limit exhausted on primary provider")
 
 
@@ -39,7 +39,7 @@ class SuccessfulProvider(BaseLLMProvider):
     async def complete(self, prompt: str, **kwargs) -> str:
         return "Fallback response text"
 
-    async def structured_complete(self, prompt: str, schema_class: Type[BaseModel], **kwargs):
+    async def structured_complete(self, prompt: str, schema_class: type[BaseModel], **kwargs):
         return MockSchema(summary="Fallback summary", score=0.95)
 
 
@@ -113,4 +113,3 @@ def test_create_default_llm_router_task_specialization():
     assert syl_names[0] == "gemini"
     assert syl_names[1] == "groq"
     assert syl_names[2].startswith("nvidia")
-

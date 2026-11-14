@@ -1,14 +1,11 @@
 ---
-title: Polaris
+title: Polaris Academic AI Backend
 emoji: 🌌
-colorFrom: blue
-colorTo: purple
-sdk: gradio
-sdk_version: 6.27.0
-python_version: '3.12'
-app_file: app.py
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 7860
 pinned: false
-license: mit
 ---
 
 # Polaris Academic AI Backend

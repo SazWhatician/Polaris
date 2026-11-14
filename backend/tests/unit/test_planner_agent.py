@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock
-import pytest
 
+import pytest
 from app.agents.planner_agent import PlannerAgent
 
 

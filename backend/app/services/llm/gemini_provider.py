@@ -1,9 +1,10 @@
 import json
-from typing import AsyncIterator, Type, TypeVar, Optional
-from pydantic import BaseModel
+from collections.abc import AsyncIterator
+from typing import TypeVar
 
-from app.services.llm.base import BaseLLMProvider
 from app.services.gemini_client import GeminiClient
+from app.services.llm.base import BaseLLMProvider
+from pydantic import BaseModel
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -26,7 +27,9 @@ class GeminiProvider(BaseLLMProvider):
         max_tokens: int = 1024,
     ) -> AsyncIterator[str]:
         # Complete full response and yield in tokens if streaming endpoint un-wrapped
-        res_text = await self._gemini.complete(prompt, temperature=temperature, max_tokens=max_tokens)
+        res_text = await self._gemini.complete(
+            prompt, temperature=temperature, max_tokens=max_tokens
+        )
         words = res_text.split(" ")
         for i, word in enumerate(words):
             yield word + (" " if i < len(words) - 1 else "")
@@ -43,14 +46,12 @@ class GeminiProvider(BaseLLMProvider):
     async def structured_complete(
         self,
         prompt: str,
-        schema_class: Type[T],
+        schema_class: type[T],
         *,
         temperature: float = 0.1,
     ) -> T:
         json_prompt = f"{prompt}\n\nReturn JSON matching schema: {schema_class.model_json_schema()}"
-        res_text = await self._gemini.complete(
-            json_prompt, temperature=temperature, json_mode=True
-        )
+        res_text = await self._gemini.complete(json_prompt, temperature=temperature, json_mode=True)
         clean_text = res_text.replace("```json", "").replace("```", "").strip()
         data = json.loads(clean_text)
         return schema_class.model_validate(data)

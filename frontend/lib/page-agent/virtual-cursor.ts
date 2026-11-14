@@ -246,7 +246,7 @@ export class VirtualCursor {
    */
   public async moveToElement(
     element: HTMLElement,
-    options?: CursorMoveOptions
+    options?: CursorMoveOptions,
   ): Promise<{ x: number; y: number }> {
     this.show();
 
@@ -353,7 +353,7 @@ export class VirtualCursor {
   public async typeText(
     element: HTMLInputElement | HTMLTextAreaElement,
     text: string,
-    speedMs = 35
+    speedMs = 35,
   ): Promise<void> {
     if (!this.cursorEl) return;
 

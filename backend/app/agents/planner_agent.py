@@ -4,7 +4,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any, TypedDict
 
-from app.models.planner import DaySchedule, RevisionPlan, StudyBlock
+from app.models.planner import DaySchedule, RevisionPlan
 from app.repositories.plan_repo import PlanRepository
 from langgraph.graph import END, START, StateGraph
 
@@ -69,12 +69,18 @@ class PlannerAgent:
             return {"error": "No available schedules to allocate topics"}
 
         topic_gaps = state.get("topic_gaps") or [
-            {"topic_id": "general_revision", "topic_title": "General Syllabus Revision", "priority": "high"}
+            {
+                "topic_id": "general_revision",
+                "topic_title": "General Syllabus Revision",
+                "priority": "high",
+            }
         ]
 
         sorted_gaps = sorted(
             topic_gaps,
-            key=lambda x: 0 if x.get("priority") == "high" else (1 if x.get("priority") == "medium" else 2),
+            key=lambda x: (
+                0 if x.get("priority") == "high" else (1 if x.get("priority") == "medium" else 2)
+            ),
         )
 
         total_allocated_hours = 0.0

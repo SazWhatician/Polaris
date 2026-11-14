@@ -59,29 +59,30 @@ export function UploadCard({ onUploaded, onUploadComplete }: Props) {
       }}
       onDragLeave={() => setDragOver(false)}
       onDrop={handleDrop}
-      className={`relative p-6 sm:p-7 rounded-3xl liquid-glass transition-all duration-300 overflow-hidden ${
-        dragOver ? "border-primary/80 ring-2 ring-primary/40 scale-[1.015] bg-white/10" : ""
+      className={`liquid-glass relative overflow-hidden rounded-3xl p-6 transition-all duration-300 sm:p-7 ${
+        dragOver ? "scale-[1.015] border-primary/80 bg-white/10 ring-2 ring-primary/40" : ""
       }`}
     >
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+      <div className="flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-6">
         <div className="flex items-center gap-4 text-left">
-          <div className="p-3.5 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center shadow-xs shrink-0 bento-icon-bounce">
+          <div className="shadow-xs bento-icon-bounce flex shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 p-3.5 text-primary">
             <Upload className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+            <h3 className="flex items-center gap-2 text-sm font-bold text-foreground sm:text-base">
               Upload Course Materials
-              <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+              <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[9px] text-primary">
                 PDF & Slides
               </span>
             </h3>
-            <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-              Drag & drop lecture notes, syllabus or click to browse. Supports PDF, JPEG, PNG up to 500 MiB.
+            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+              Drag & drop lecture notes, syllabus or click to browse. Supports PDF, JPEG, PNG up to
+              500 MiB.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
+        <div className="flex w-full items-center gap-3 sm:w-auto">
           <input
             ref={inputRef}
             type="file"
@@ -96,7 +97,7 @@ export function UploadCard({ onUploaded, onUploadComplete }: Props) {
           <Button
             onClick={onPick}
             disabled={busy}
-            className="w-full sm:w-auto text-xs font-bold px-6 py-2.5 rounded-2xl shadow-md gap-2 bg-primary text-primary-foreground hover:bg-primary/90 transition-all hover:scale-102"
+            className="hover:scale-102 w-full gap-2 rounded-2xl bg-primary px-6 py-2.5 text-xs font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90 sm:w-auto"
           >
             <Upload className="h-4 w-4" />
             <span>{busy ? `Uploading… ${progress ?? 0}%` : "Select Document"}</span>
@@ -105,14 +106,14 @@ export function UploadCard({ onUploaded, onUploadComplete }: Props) {
       </div>
 
       {busy && progress !== null && (
-        <div className="mt-4 pt-4 border-t border-border/40 space-y-2">
-          <div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
+        <div className="mt-4 space-y-2 border-t border-border/40 pt-4">
+          <div className="flex items-center justify-between font-mono text-xs text-muted-foreground">
             <span>OCR Extraction & Vector Chunking</span>
-            <span className="text-primary font-bold">{progress}%</span>
+            <span className="font-bold text-primary">{progress}%</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-muted/60">
             <div
-              className="h-full bg-gradient-to-r from-primary to-indigo-400 rounded-full transition-all duration-300"
+              className="h-full rounded-full bg-gradient-to-r from-primary to-indigo-400 transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>

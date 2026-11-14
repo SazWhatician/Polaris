@@ -16,7 +16,10 @@ export interface ErrorNotificationOptions extends NotificationOptions {
 /**
  * Extracts a human-readable message from an unknown error object.
  */
-export function extractErrorMessage(error: unknown, fallback = "An unexpected error occurred."): string {
+export function extractErrorMessage(
+  error: unknown,
+  fallback = "An unexpected error occurred.",
+): string {
   if (!error) return fallback;
   if (typeof error === "string") return error;
   if (error instanceof Error) return error.message;
@@ -32,11 +35,7 @@ export function extractErrorMessage(error: unknown, fallback = "An unexpected er
 /**
  * Dispatches a formatted success notification.
  */
-export function notifySuccess(
-  title: string,
-  description?: string,
-  options?: NotificationOptions
-) {
+export function notifySuccess(title: string, description?: string, options?: NotificationOptions) {
   return toast.success(title, {
     description,
     duration: options?.duration ?? 4000,
@@ -55,7 +54,7 @@ export function notifySuccess(
 export function notifyError(
   title: string,
   descriptionOrError?: string | unknown,
-  options?: ErrorNotificationOptions
+  options?: ErrorNotificationOptions,
 ) {
   let description: string | undefined;
 
@@ -76,22 +75,18 @@ export function notifyError(
           onClick: options.retry,
         }
       : options?.action
-      ? {
-          label: options.action.label,
-          onClick: options.action.onClick,
-        }
-      : undefined,
+        ? {
+            label: options.action.label,
+            onClick: options.action.onClick,
+          }
+        : undefined,
   });
 }
 
 /**
  * Dispatches an informational notification.
  */
-export function notifyInfo(
-  title: string,
-  description?: string,
-  options?: NotificationOptions
-) {
+export function notifyInfo(title: string, description?: string, options?: NotificationOptions) {
   return toast.info(title, {
     description,
     duration: options?.duration ?? 4500,

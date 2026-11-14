@@ -104,9 +104,7 @@ class YouTubeService:
         logger.info("Using seed mock dataset for query: %s", clean_query)
         return self._generate_mock_results(clean_query, max_results)
 
-    async def search_playlists(
-        self, query: str, max_results: int = 5
-    ) -> list[dict[str, Any]]:
+    async def search_playlists(self, query: str, max_results: int = 5) -> list[dict[str, Any]]:
         """Searches YouTube for full courses and curated topic playlists."""
         clean_query = query.strip()
         if self.api_key:
@@ -127,9 +125,7 @@ class YouTubeService:
         # Mock fallback for playlists if offline
         return self._generate_mock_playlists(clean_query, max_results)
 
-    async def get_block_resources(
-        self, topic_title: str, subtopics: list[str]
-    ) -> dict[str, Any]:
+    async def get_block_resources(self, topic_title: str, subtopics: list[str]) -> dict[str, Any]:
         """Fetches curated playlists and categorized videos for a syllabus topic block and all its subtopics."""
         # 1. Fetch playlists for the block
         # 2. Fetch main topic videos
@@ -184,9 +180,7 @@ class YouTubeService:
             search_data = res.json()
 
             items = search_data.get("items", [])
-            video_ids = [
-                item["id"]["videoId"] for item in items if "videoId" in item.get("id", {})
-            ]
+            video_ids = [item["id"]["videoId"] for item in items if "videoId" in item.get("id", {})]
             if not video_ids:
                 return []
 
@@ -222,9 +216,7 @@ class YouTubeService:
                         "title": snippet.get("title", ""),
                         "url": f"https://www.youtube.com/watch?v={v_id}",
                         "channel_title": snippet.get("channelTitle", "Educator Channel"),
-                        "thumbnail_url": snippet.get("thumbnails", {})
-                        .get("high", {})
-                        .get("url")
+                        "thumbnail_url": snippet.get("thumbnails", {}).get("high", {}).get("url")
                         or f"https://i.ytimg.com/vi/{v_id}/hqdefault.jpg",
                         "duration": duration_formatted,
                         "publication_date": snippet.get("publishedAt", ""),
@@ -235,9 +227,7 @@ class YouTubeService:
                 )
             return results
 
-    async def _search_playlists_via_api(
-        self, query: str, max_results: int
-    ) -> list[dict[str, Any]]:
+    async def _search_playlists_via_api(self, query: str, max_results: int) -> list[dict[str, Any]]:
         async with httpx.AsyncClient(timeout=8.0) as client:
             search_url = "https://www.googleapis.com/youtube/v3/search"
             params = {
@@ -265,17 +255,13 @@ class YouTubeService:
                         "channel_title": snippet.get("channelTitle", "Course Educator"),
                         "video_count": "Course Series",
                         "url": f"https://www.youtube.com/playlist?list={p_id}",
-                        "thumbnail_url": snippet.get("thumbnails", {})
-                        .get("high", {})
-                        .get("url")
+                        "thumbnail_url": snippet.get("thumbnails", {}).get("high", {}).get("url")
                         or f"https://i.ytimg.com/vi/{p_id}/hqdefault.jpg",
                     }
                 )
             return playlists
 
-    async def _scrape_youtube_videos(
-        self, query: str, max_results: int
-    ) -> list[dict[str, Any]]:
+    async def _scrape_youtube_videos(self, query: str, max_results: int) -> list[dict[str, Any]]:
         try:
             url = "https://www.youtube.com/results"
             params = {"search_query": f"{query} tutorial computer science"}
@@ -337,9 +323,7 @@ class YouTubeService:
             logger.warning("Scrape YouTube videos error for '%s': %s", query, err)
             return []
 
-    async def _scrape_youtube_playlists(
-        self, query: str, max_results: int
-    ) -> list[dict[str, Any]]:
+    async def _scrape_youtube_playlists(self, query: str, max_results: int) -> list[dict[str, Any]]:
         try:
             url = "https://www.youtube.com/results"
             params = {"search_query": f"{query} course playlist", "sp": "EgIQAw=="}
@@ -369,9 +353,11 @@ class YouTubeService:
 
                         meta = lk.get("metadata", {}).get("lockupMetadataViewModel", {})
                         title = meta.get("title", {}).get("content", "")
-                        rows = meta.get("metadata", {}).get(
-                            "contentMetadataViewModel", {}
-                        ).get("metadataRows", [])
+                        rows = (
+                            meta.get("metadata", {})
+                            .get("contentMetadataViewModel", {})
+                            .get("metadataRows", [])
+                        )
                         channel = ""
                         video_count = ""
                         for row in rows:

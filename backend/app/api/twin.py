@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 from app.agents.twin_agent import TwinAgent
 from app.core.deps import get_current_user_id
-from app.core.firebase import is_initialized
 from app.models.twin import AcademicTwin, ReadinessQuery, TwinSignal
 from app.repositories.graph_repo import GraphRepository
 from app.services.twin_service import TwinService
@@ -47,14 +46,16 @@ async def check_readiness(
     agent = TwinAgent(twin_service=_twin_service, graph_repo=GraphRepository())
     graph = agent.compile()
 
-    result = await graph.ainvoke({
-        "user_id": user_id,
-        "target_concept": query.concept,
-        "twin_data": None,
-        "graph_data": None,
-        "readiness": None,
-        "error": None,
-    })
+    result = await graph.ainvoke(
+        {
+            "user_id": user_id,
+            "target_concept": query.concept,
+            "twin_data": None,
+            "graph_data": None,
+            "readiness": None,
+            "error": None,
+        }
+    )
 
     if result.get("error"):
         raise HTTPException(

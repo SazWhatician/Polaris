@@ -107,7 +107,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const mappedUser: AuthUser = {
             ...session.user,
             uid: session.user.id,
-            displayName: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "Scholar",
+            displayName:
+              session.user.user_metadata?.full_name ||
+              session.user.email?.split("@")[0] ||
+              "Scholar",
             photoURL: session.user.user_metadata?.avatar_url || null,
           };
           setUser(mappedUser);
@@ -122,7 +125,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const mappedUser: AuthUser = {
             ...session.user,
             uid: session.user.id,
-            displayName: session.user.user_metadata?.full_name || session.user.email?.split("@")[0] || "Scholar",
+            displayName:
+              session.user.user_metadata?.full_name ||
+              session.user.email?.split("@")[0] ||
+              "Scholar",
             photoURL: session.user.user_metadata?.avatar_url || null,
           };
           setUser(mappedUser);
@@ -183,7 +189,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } catch (fbErr: unknown) {
           const fbErrObj = fbErr as { code?: string; message?: string };
-          if (fbErrObj?.code === "auth/popup-closed-by-user" || fbErrObj?.code === "auth/cancelled-popup-request") {
+          if (
+            fbErrObj?.code === "auth/popup-closed-by-user" ||
+            fbErrObj?.code === "auth/cancelled-popup-request"
+          ) {
             toast.info("Google Sign-In cancelled");
             return;
           }
@@ -314,4 +323,3 @@ export function useAuth(): AuthState {
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }
-

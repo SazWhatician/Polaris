@@ -176,7 +176,7 @@ export function NavDrawer() {
       {/* Backdrop overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm duration-200 animate-in fade-in"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -184,19 +184,19 @@ export function NavDrawer() {
       {/* Side Drawer Panel */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-80 sm:w-88 bg-card/95 border-r border-border/80 p-0 flex flex-col shadow-2xl backdrop-blur-2xl transition-transform duration-300 ease-out text-foreground",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          "sm:w-88 fixed inset-y-0 left-0 z-50 flex w-80 flex-col border-r border-border/80 bg-card/95 p-0 text-foreground shadow-2xl backdrop-blur-2xl transition-transform duration-300 ease-out",
+          isOpen ? "translate-x-0" : "-translate-x-full",
         )}
         aria-label="Navigation Sidebar"
       >
         {/* Drawer Brand Header */}
-        <div className="p-5 border-b border-border/60 flex items-center justify-between bg-muted/20">
+        <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 p-5">
           <Link
             href="/dashboard"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 group"
+            className="group flex items-center gap-3"
           >
-            <div className="relative w-9 h-9 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105 shadow-sm">
+            <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 shadow-sm transition-transform group-hover:scale-105">
               <Image
                 src="/polaris-standalone.png"
                 alt="Polaris Logo"
@@ -207,19 +207,24 @@ export function NavDrawer() {
                   (e.target as HTMLElement).style.display = "none";
                 }}
               />
-              <Sparkles className="h-4 w-4 text-primary absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Sparkles className="absolute inset-0 m-auto h-4 w-4 text-primary opacity-0 transition-opacity group-hover:opacity-100" />
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-sm tracking-wider bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent">
-                POLARIS <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 ml-1">AI</span>
+              <span className="bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-sm font-black tracking-wider text-transparent">
+                POLARIS{" "}
+                <span className="ml-1 rounded border border-primary/20 bg-primary/10 px-1.5 py-0.5 font-mono text-[9px] uppercase text-primary">
+                  AI
+                </span>
               </span>
-              <span className="text-[10px] text-muted-foreground font-mono">Academic Workspace</span>
+              <span className="font-mono text-[10px] text-muted-foreground">
+                Academic Workspace
+              </span>
             </div>
           </Link>
 
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            className="rounded-xl p-2 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
             title="Close Drawer (Esc or Ctrl+B)"
           >
             <X className="h-5 w-5" />
@@ -227,24 +232,24 @@ export function NavDrawer() {
         </div>
 
         {/* Quick Launch Action Tiles */}
-        <div className="p-3 border-b border-border/40 grid grid-cols-2 gap-2 bg-muted/10">
+        <div className="grid grid-cols-2 gap-2 border-b border-border/40 bg-muted/10 p-3">
           {/* Centered Copilot Launcher */}
           <button
             onClick={() => {
               setIsOpen(false);
               openCopilotModal();
             }}
-            className="p-2.5 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 text-left transition-all group flex items-center gap-2.5"
+            className="group flex items-center gap-2.5 rounded-xl border border-primary/20 bg-primary/5 p-2.5 text-left transition-all hover:bg-primary/10"
           >
-            <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:scale-105 transition-transform">
+            <div className="rounded-lg bg-primary/10 p-2 text-primary transition-transform group-hover:scale-105">
               <Bot className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-foreground truncate flex items-center gap-1">
+              <p className="flex items-center gap-1 truncate text-xs font-bold text-foreground">
                 Copilot
-                <Sparkles className="h-3 w-3 text-primary animate-pulse" />
+                <Sparkles className="h-3 w-3 animate-pulse text-primary" />
               </p>
-              <p className="text-[10px] text-muted-foreground font-mono">⌘K Centered</p>
+              <p className="font-mono text-[10px] text-muted-foreground">⌘K Centered</p>
             </div>
           </button>
 
@@ -254,27 +259,27 @@ export function NavDrawer() {
               setIsOpen(false);
               openTodoDrawer();
             }}
-            className="p-2.5 rounded-xl border border-border/80 bg-muted/30 hover:bg-muted/60 text-left transition-all group flex items-center gap-2.5"
+            className="group flex items-center gap-2.5 rounded-xl border border-border/80 bg-muted/30 p-2.5 text-left transition-all hover:bg-muted/60"
           >
-            <div className="p-2 rounded-lg bg-muted text-muted-foreground group-hover:text-primary group-hover:scale-105 transition-transform">
+            <div className="rounded-lg bg-muted p-2 text-muted-foreground transition-transform group-hover:scale-105 group-hover:text-primary">
               <ListTodo className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-foreground truncate flex items-center gap-1.5">
+              <p className="flex items-center gap-1.5 truncate text-xs font-bold text-foreground">
                 Tasks
                 {activeTodoCount > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-primary text-primary-foreground font-bold">
+                  <span className="py-0.2 rounded-full bg-primary px-1.5 font-mono text-[9px] font-bold text-primary-foreground">
                     {activeTodoCount}
                   </span>
                 )}
               </p>
-              <p className="text-[10px] text-muted-foreground font-mono">Alt+T</p>
+              <p className="font-mono text-[10px] text-muted-foreground">Alt+T</p>
             </div>
           </button>
         </div>
 
         {/* Grouped Navigation Links */}
-        <div className="flex-1 overflow-y-auto p-3 space-y-4 text-xs">
+        <div className="flex-1 space-y-4 overflow-y-auto p-3 text-xs">
           {NAV_GROUPS.map((group) => (
             <div key={group.title} className="space-y-1">
               <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
@@ -293,43 +298,43 @@ export function NavDrawer() {
                       key={item.href}
                       href={item.href as Parameters<typeof Link>[0]["href"]}
                       onClick={() => setIsOpen(false)}
-                      data-agent-target={`nav-item-${item.href.replace('/', '')}`}
+                      data-agent-target={`nav-item-${item.href.replace("/", "")}`}
                       className={cn(
-                        "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium transition-all select-none",
+                        "group relative flex select-none items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition-all",
                         isActive
-                          ? "bg-primary/10 text-primary font-bold border border-primary/25 shadow-sm"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                          ? "border border-primary/25 bg-primary/10 font-bold text-primary shadow-sm"
+                          : "text-muted-foreground hover:bg-muted/40 hover:text-foreground",
                       )}
                     >
                       <div
                         className={cn(
-                          "p-2 rounded-lg transition-colors",
+                          "rounded-lg p-2 transition-colors",
                           isActive
                             ? "bg-primary text-primary-foreground"
-                            : "bg-muted/60 text-muted-foreground group-hover:text-foreground group-hover:bg-muted"
+                            : "bg-muted/60 text-muted-foreground group-hover:bg-muted group-hover:text-foreground",
                         )}
                       >
                         <Icon className="h-4 w-4" />
                       </div>
 
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs truncate">{item.label}</span>
+                          <span className="truncate text-xs">{item.label}</span>
                           {item.badge && (
-                            <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <span className="rounded border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 font-mono text-[9px] font-bold text-emerald-400">
                               {item.badge}
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-muted-foreground truncate font-normal">
+                        <p className="truncate text-[10px] font-normal text-muted-foreground">
                           {item.description}
                         </p>
                       </div>
 
                       <ChevronRight
                         className={cn(
-                          "h-4 w-4 text-muted-foreground/40 group-hover:text-foreground group-hover:translate-x-0.5 transition-all shrink-0",
-                          isActive && "text-primary opacity-100"
+                          "h-4 w-4 shrink-0 text-muted-foreground/40 transition-all group-hover:translate-x-0.5 group-hover:text-foreground",
+                          isActive && "text-primary opacity-100",
                         )}
                       />
                     </Link>
@@ -341,24 +346,24 @@ export function NavDrawer() {
         </div>
 
         {/* User Account & Session Footer */}
-        <div className="p-3 border-t border-border/60 bg-muted/20 space-y-3">
+        <div className="space-y-3 border-t border-border/60 bg-muted/20 p-3">
           {user ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between px-2">
                 <Link
                   href="/user"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2 min-w-0 hover:opacity-80 transition-opacity"
+                  className="flex min-w-0 items-center gap-2 transition-opacity hover:opacity-80"
                   title="View User Profile, Uploads & Community"
                 >
-                  <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs uppercase">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-xs font-bold uppercase text-primary">
                     {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-foreground truncate">
+                    <p className="truncate text-xs font-bold text-foreground">
                       {user.displayName || user.email?.split("@")[0]}
                     </p>
-                    <p className="text-[10px] text-muted-foreground font-mono truncate max-w-[130px]">
+                    <p className="max-w-[130px] truncate font-mono text-[10px] text-muted-foreground">
                       {user.email}
                     </p>
                   </div>
@@ -374,7 +379,7 @@ export function NavDrawer() {
                   setIsOpen(false);
                   signOut();
                 }}
-                className="w-full justify-center gap-2 text-xs font-bold text-muted-foreground hover:text-destructive hover:bg-destructive/10 h-8 rounded-xl"
+                className="h-8 w-full justify-center gap-2 rounded-xl text-xs font-bold text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 <span>Sign Out</span>

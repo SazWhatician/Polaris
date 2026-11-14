@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from typing import Any
+
 from firebase_admin import firestore
 
 from app.models.planner import RevisionPlan
-
 
 _mem_plans: dict[str, list[RevisionPlan]] = {}
 

@@ -73,15 +73,27 @@ export default function RevisionPlanPage() {
           exam_date: examDate,
           daily_hours: dailyHours,
           topic_gaps: [
-            { topic_id: "t1", topic_title: "Dynamic Programming (Knapsack & LCS)", priority: "high" },
-            { topic_id: "t2", topic_title: "Minimum Spanning Trees (Prim / Kruskal)", priority: "medium" },
-            { topic_id: "t3", topic_title: "Binary Search Tree Rotation & Balance", priority: "high" },
+            {
+              topic_id: "t1",
+              topic_title: "Dynamic Programming (Knapsack & LCS)",
+              priority: "high",
+            },
+            {
+              topic_id: "t2",
+              topic_title: "Minimum Spanning Trees (Prim / Kruskal)",
+              priority: "medium",
+            },
+            {
+              topic_id: "t3",
+              topic_title: "Binary Search Tree Rotation & Balance",
+              priority: "high",
+            },
           ],
         }),
       });
 
       toast.success("Revision plan task started!");
-      
+
       const interval = setInterval(async () => {
         try {
           const pollRes = await api<RevisionPlan>(`/api/agents/planner/runs/${res.thread_id}`);
@@ -100,7 +112,6 @@ export default function RevisionPlanPage() {
         clearInterval(interval);
         setGenerating(false);
       }, 15000);
-
     } catch (e) {
       setGenerating(false);
       toast.error("Plan generation failed", {
@@ -112,9 +123,9 @@ export default function RevisionPlanPage() {
   if (loading || !user) return null;
 
   return (
-    <div className="min-h-screen text-foreground pb-32 pt-14 sm:pt-16 selection:bg-primary/30 selection:text-foreground">
+    <div className="min-h-screen pb-32 pt-14 text-foreground selection:bg-primary/30 selection:text-foreground sm:pt-16">
       <SiteHeader />
-      <main ref={containerRef} className="max-w-7xl mx-auto space-y-6 py-4 px-3 sm:px-6 lg:px-8">
+      <main ref={containerRef} className="mx-auto max-w-7xl space-y-6 px-3 py-4 sm:px-6 lg:px-8">
         {/* Standardized Page Header */}
         <div className="gsap-plan">
           <PageHeader
@@ -128,15 +139,15 @@ export default function RevisionPlanPage() {
         </div>
 
         {/* Input Configuration Card */}
-        <Card className="gsap-plan p-4 sm:p-5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs space-y-4">
+        <Card className="gsap-plan bento-card shadow-xs space-y-4 rounded-2xl border border-border/80 bg-card/85 p-4 backdrop-blur-xl sm:p-5">
           <div className="flex items-center justify-between border-b border-border/40 pb-2.5">
-            <h3 className="font-bold text-xs text-foreground tracking-wide font-mono uppercase">
+            <h3 className="font-mono text-xs font-bold uppercase tracking-wide text-foreground">
               Configure Revision Constraints
             </h3>
-            <span className="text-[10px] font-mono text-muted-foreground">YYYY-MM-DD Bounds</span>
+            <span className="font-mono text-[10px] text-muted-foreground">YYYY-MM-DD Bounds</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+          <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-3">
             <div className="space-y-1">
               <label className="text-[11px] font-bold text-foreground">Target Exam Date</label>
               <Input
@@ -144,12 +155,14 @@ export default function RevisionPlanPage() {
                 value={examDate}
                 onChange={(e) => setExamDate(e.target.value)}
                 data-agent-target="plan-exam-date"
-                className="bg-muted/40 border-border/60 text-foreground text-xs rounded-xl h-8.5"
+                className="h-8.5 rounded-xl border-border/60 bg-muted/40 text-xs text-foreground"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] font-bold text-foreground">Daily Study Target (Hours)</label>
+              <label className="text-[11px] font-bold text-foreground">
+                Daily Study Target (Hours)
+              </label>
               <Input
                 type="number"
                 step="0.5"
@@ -158,7 +171,7 @@ export default function RevisionPlanPage() {
                 value={dailyHours}
                 onChange={(e) => setDailyHours(parseFloat(e.target.value) || 1)}
                 data-agent-target="plan-daily-hours"
-                className="bg-muted/40 border-border/60 text-foreground text-xs rounded-xl h-8.5"
+                className="h-8.5 rounded-xl border-border/60 bg-muted/40 text-xs text-foreground"
               />
             </div>
 
@@ -167,16 +180,16 @@ export default function RevisionPlanPage() {
                 onClick={generatePlan}
                 disabled={generating}
                 data-agent-target="generate-plan-btn"
-                className="w-full h-8.5 text-xs font-bold rounded-xl bg-primary text-primary-foreground shadow-xs"
+                className="h-8.5 shadow-xs w-full rounded-xl bg-primary text-xs font-bold text-primary-foreground"
               >
                 {generating ? (
                   <>
-                    <Clock className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                    <Clock className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                     <span>Computing Plan...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                    <Sparkles className="mr-1.5 h-3.5 w-3.5" />
                     <span>Generate Schedule</span>
                   </>
                 )}
@@ -187,37 +200,49 @@ export default function RevisionPlanPage() {
 
         {/* Plan Output Schedule */}
         <div className="gsap-plan space-y-3">
-          <h2 className="text-sm sm:text-base font-bold text-foreground font-mono uppercase tracking-wider">
+          <h2 className="font-mono text-sm font-bold uppercase tracking-wider text-foreground sm:text-base">
             Active Study Schedule
           </h2>
 
           {plan ? (
             <div className="space-y-3">
-              <Card className="p-3.5 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 text-emerald-500 font-bold font-mono">
+              <Card className="bento-card shadow-xs flex items-center justify-between rounded-2xl border border-border/80 bg-card/85 p-3.5 text-xs backdrop-blur-xl">
+                <div className="flex items-center gap-2 font-mono font-bold text-emerald-500">
                   <CheckCircle2 className="h-4 w-4" />
                   <span>Schedule Synthesized (Exam Date: {plan.exam_date})</span>
                 </div>
-                <span className="text-[10px] font-mono text-muted-foreground font-bold">Allocated: {plan.total_hours_allocated} hrs</span>
+                <span className="font-mono text-[10px] font-bold text-muted-foreground">
+                  Allocated: {plan.total_hours_allocated} hrs
+                </span>
               </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 {plan.schedules.map((day, idx) => (
-                  <Card key={idx} className="p-4 rounded-2xl bg-card/85 border border-border/80 backdrop-blur-xl bento-card shadow-xs space-y-2.5">
+                  <Card
+                    key={idx}
+                    className="bento-card shadow-xs space-y-2.5 rounded-2xl border border-border/80 bg-card/85 p-4 backdrop-blur-xl"
+                  >
                     <div className="flex items-center justify-between border-b border-border/40 pb-2">
-                      <div className="flex items-center gap-1.5 font-bold text-xs text-primary font-mono">
+                      <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-primary">
                         <Calendar className="h-3.5 w-3.5" />
                         <span>Date: {day.date}</span>
                       </div>
-                      <span className="text-[10px] font-mono text-muted-foreground">{day.available_hours} hrs quota</span>
+                      <span className="font-mono text-[10px] text-muted-foreground">
+                        {day.available_hours} hrs quota
+                      </span>
                     </div>
 
                     <div className="space-y-1.5">
                       {day.blocks.map((block, bIdx) => (
-                        <div key={bIdx} className="p-2.5 rounded-xl bg-muted/40 border border-border/50 text-xs space-y-1">
+                        <div
+                          key={bIdx}
+                          className="space-y-1 rounded-xl border border-border/50 bg-muted/40 p-2.5 text-xs"
+                        >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-foreground text-xs">{block.topic_title}</span>
-                            <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-primary/10 text-primary border border-primary/20 font-bold">
+                            <span className="text-xs font-bold text-foreground">
+                              {block.topic_title}
+                            </span>
+                            <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 font-mono text-[9px] font-bold text-primary">
                               {block.allocated_minutes} mins
                             </span>
                           </div>
@@ -230,13 +255,14 @@ export default function RevisionPlanPage() {
               </div>
             </div>
           ) : (
-            <Card className="p-8 rounded-2xl bg-card/60 border border-border/80 text-center text-muted-foreground text-xs space-y-2">
-              <AlertCircle className="h-5 w-5 text-muted-foreground mx-auto" />
-              <p>No revision plan generated yet. Configure your exam date above and click Generate.</p>
+            <Card className="space-y-2 rounded-2xl border border-border/80 bg-card/60 p-8 text-center text-xs text-muted-foreground">
+              <AlertCircle className="mx-auto h-5 w-5 text-muted-foreground" />
+              <p>
+                No revision plan generated yet. Configure your exam date above and click Generate.
+              </p>
             </Card>
           )}
         </div>
-
       </main>
     </div>
   );

@@ -33,7 +33,8 @@ export function StatCard({
   className,
 }: StatCardProps) {
   // If a numeric value is provided, animate it smoothly with Anime.js
-  const targetNum = typeof numericValue === "number" ? numericValue : typeof value === "number" ? value : null;
+  const targetNum =
+    typeof numericValue === "number" ? numericValue : typeof value === "number" ? value : null;
   const animatedNumber = useAnimeCounter(targetNum ?? 0, 1000);
   const displayVal = targetNum !== null ? `${prefix}${animatedNumber}${suffix}` : value;
 
@@ -48,19 +49,19 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "relative p-5 rounded-3xl liquid-glass group select-none flex flex-col justify-between",
-        className
+        "liquid-glass group relative flex select-none flex-col justify-between rounded-3xl p-5",
+        className,
       )}
     >
       {/* Top subtle highlight line */}
-      <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute left-0 right-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
       <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1 min-w-0">
-          <p className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider truncate">
+        <div className="min-w-0 space-y-1">
+          <p className="truncate font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
             {label}
           </p>
-          <p className="text-xl sm:text-2xl font-black text-foreground font-mono tracking-tight truncate">
+          <p className="truncate font-mono text-xl font-black tracking-tight text-foreground sm:text-2xl">
             {displayVal}
           </p>
 
@@ -69,20 +70,16 @@ export function StatCard({
               {trend && (
                 <span
                   className={cn(
-                    "text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-md",
+                    "py-0.2 rounded-md px-1.5 font-mono text-[9px] font-bold",
                     trendPositive
-                      ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10"
-                      : "text-rose-600 dark:text-rose-400 bg-rose-500/10"
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                      : "bg-rose-500/10 text-rose-600 dark:text-rose-400",
                   )}
                 >
                   {trend}
                 </span>
               )}
-              {tag && (
-                <span className="text-[9px] font-mono text-muted-foreground">
-                  {tag}
-                </span>
-              )}
+              {tag && <span className="font-mono text-[9px] text-muted-foreground">{tag}</span>}
             </div>
           )}
         </div>
@@ -90,8 +87,8 @@ export function StatCard({
         {/* Icon tile */}
         <div
           className={cn(
-            "p-2.5 rounded-xl border flex items-center justify-center shrink-0 bento-icon-bounce shadow-xs",
-            colorVariants[colorScheme]
+            "bento-icon-bounce shadow-xs flex shrink-0 items-center justify-center rounded-xl border p-2.5",
+            colorVariants[colorScheme],
           )}
         >
           <Icon className="h-4 w-4" />

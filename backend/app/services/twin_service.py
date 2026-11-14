@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from typing import Optional
 
 from google.cloud.firestore import Client
 
@@ -35,7 +34,9 @@ class TwinService:
             return _twin_cache[user_id]
 
         try:
-            doc_ref = self.db.collection("users").document(user_id).collection("twin").document("state")
+            doc_ref = (
+                self.db.collection("users").document(user_id).collection("twin").document("state")
+            )
             snapshot = doc_ref.get()
             if snapshot.exists:
                 twin = AcademicTwin.model_validate(snapshot.to_dict())
@@ -100,7 +101,10 @@ class TwinService:
         nodes_by_id = {n.id: n for n in graph.nodes}
         prereq_ids: list[str] = []
         for edge in graph.edges:
-            if edge.target_concept_id == target_concept_id and edge.relation_type == "prerequisite_of":
+            if (
+                edge.target_concept_id == target_concept_id
+                and edge.relation_type == "prerequisite_of"
+            ):
                 prereq_ids.append(edge.source_concept_id)
 
         known_set = set(twin.known_concepts)
@@ -116,7 +120,11 @@ class TwinService:
                 missing_prereqs.append({"concept_id": pid, "name": name, "status": "missing"})
 
         is_ready = len(missing_prereqs) == 0 and len(prereq_ids) > 0
-        target_name = nodes_by_id[target_concept_id].name if target_concept_id in nodes_by_id else target_concept_id
+        target_name = (
+            nodes_by_id[target_concept_id].name
+            if target_concept_id in nodes_by_id
+            else target_concept_id
+        )
 
         if not prereq_ids:
             summary = f"No prerequisites found for '{target_name}'. You can start learning it now."
@@ -156,7 +164,9 @@ class TwinService:
     def _persist(self, user_id: str, twin: AcademicTwin) -> None:
         """Best-effort persist to Firestore."""
         try:
-            doc_ref = self.db.collection("users").document(user_id).collection("twin").document("state")
+            doc_ref = (
+                self.db.collection("users").document(user_id).collection("twin").document("state")
+            )
             doc_ref.set(twin.model_dump())
         except Exception as e:
             logger.warning("Failed to persist twin for %s: %s", user_id, e)

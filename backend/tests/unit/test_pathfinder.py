@@ -15,15 +15,17 @@ async def test_pathfinder_agent_execution():
     agent = PathfinderAgent()
     graph = agent.compile()
 
-    result = await graph.ainvoke({
-        "user_id": "test_user_pathfinder",
-        "career_goal_id": "ml_engineer",
-        "career_goal": None,
-        "twin_data": None,
-        "skill_analysis": None,
-        "career_plan": None,
-        "error": None,
-    })
+    result = await graph.ainvoke(
+        {
+            "user_id": "test_user_pathfinder",
+            "career_goal_id": "ml_engineer",
+            "career_goal": None,
+            "twin_data": None,
+            "skill_analysis": None,
+            "career_plan": None,
+            "error": None,
+        }
+    )
 
     assert result.get("error") is None
     plan = result.get("career_plan")

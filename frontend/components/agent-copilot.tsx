@@ -25,14 +25,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import {
-  pageController,
-  type DOMActionStep,
-} from "@/lib/page-agent/page-controller";
+import { pageController, type DOMActionStep } from "@/lib/page-agent/page-controller";
 import { virtualCursor } from "@/lib/page-agent/virtual-cursor";
-import {
-  type InteractiveElementNode,
-} from "@/lib/page-agent/dom-tree";
+import { type InteractiveElementNode } from "@/lib/page-agent/dom-tree";
 import {
   addTodo,
   deleteTodo,
@@ -47,7 +42,12 @@ import {
 import { cn } from "@/lib/utils";
 
 interface TodoActionPlan {
-  todosToAdd?: Array<{ title: string; priority?: TodoPriority; category?: TodoCategory; dueDate?: string }>;
+  todosToAdd?: Array<{
+    title: string;
+    priority?: TodoPriority;
+    category?: TodoCategory;
+    dueDate?: string;
+  }>;
   todosToDelete?: string[];
   todosToComplete?: string[];
   clearCompleted?: boolean;
@@ -120,7 +120,13 @@ function applyTodoModifications(plan: TodoActionPlan): {
         continue;
       }
 
-      if (targetClean === "last" || targetClean === "recent" || targetClean === "task" || targetClean === "the task" || !targetClean) {
+      if (
+        targetClean === "last" ||
+        targetClean === "recent" ||
+        targetClean === "task" ||
+        targetClean === "the task" ||
+        !targetClean
+      ) {
         const lastItem = current[current.length - 1];
         if (lastItem) {
           deleteTodo(lastItem.id);
@@ -135,7 +141,7 @@ function applyTodoModifications(plan: TodoActionPlan): {
           t.id.toLowerCase() === targetClean ||
           t.title.toLowerCase() === targetClean ||
           t.title.toLowerCase().includes(targetClean) ||
-          targetClean.includes(t.title.toLowerCase())
+          targetClean.includes(t.title.toLowerCase()),
       );
 
       if (matched && !deleted.some((d) => d.id === matched.id)) {
@@ -163,7 +169,12 @@ function applyTodoModifications(plan: TodoActionPlan): {
         continue;
       }
 
-      if (targetClean === "last" || targetClean === "recent" || targetClean === "task" || !targetClean) {
+      if (
+        targetClean === "last" ||
+        targetClean === "recent" ||
+        targetClean === "task" ||
+        !targetClean
+      ) {
         const lastUncompleted = [...current].reverse().find((t) => !t.completed);
         if (lastUncompleted) {
           updateTodo(lastUncompleted.id, { completed: true });
@@ -178,7 +189,7 @@ function applyTodoModifications(plan: TodoActionPlan): {
           t.id.toLowerCase() === targetClean ||
           t.title.toLowerCase() === targetClean ||
           t.title.toLowerCase().includes(targetClean) ||
-          targetClean.includes(t.title.toLowerCase())
+          targetClean.includes(t.title.toLowerCase()),
       );
       if (matched && !matched.completed) {
         updateTodo(matched.id, { completed: true });
@@ -191,14 +202,16 @@ function applyTodoModifications(plan: TodoActionPlan): {
   if (plan.todosToAdd && plan.todosToAdd.length > 0) {
     for (const item of plan.todosToAdd) {
       if (!item.title?.trim()) continue;
-      const priority = (["high", "medium", "low"].includes(item.priority || "")
-        ? item.priority
-        : "medium") as TodoPriority;
-      const category = (["Syllabus", "Revision", "RAG Research", "Exam Prep", "Assignment", "General"].includes(
-        item.category || ""
-      )
-        ? item.category
-        : "General") as TodoCategory;
+      const priority = (
+        ["high", "medium", "low"].includes(item.priority || "") ? item.priority : "medium"
+      ) as TodoPriority;
+      const category = (
+        ["Syllabus", "Revision", "RAG Research", "Exam Prep", "Assignment", "General"].includes(
+          item.category || "",
+        )
+          ? item.category
+          : "General"
+      ) as TodoCategory;
       const newItem = addTodo(item.title.trim(), priority, category, item.dueDate || "Today");
       created.push(newItem);
       messages.push(`Created "${newItem.title}" (${priority} priority)`);
@@ -263,7 +276,12 @@ export function AgentCopilot() {
   // Moveable / Draggable window state
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const dragStartRef = useRef<{ startX: number; startY: number; initialPosX: number; initialPosY: number }>({
+  const dragStartRef = useRef<{
+    startX: number;
+    startY: number;
+    initialPosX: number;
+    initialPosY: number;
+  }>({
     startX: 0,
     startY: 0,
     initialPosX: 0,
@@ -330,7 +348,12 @@ export function AgentCopilot() {
   // Pointer dragging handlers for moveable card
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement;
-    if (target.closest("button") || target.closest("input") || target.closest("textarea") || target.closest("[data-no-drag]")) {
+    if (
+      target.closest("button") ||
+      target.closest("input") ||
+      target.closest("textarea") ||
+      target.closest("[data-no-drag]")
+    ) {
       return;
     }
 
@@ -361,8 +384,14 @@ export function AgentCopilot() {
     const cardWidth = cardRef.current?.offsetWidth || 560;
     const cardHeight = cardRef.current?.offsetHeight || 380;
 
-    const newX = Math.max(12, Math.min(window.innerWidth - cardWidth - 12, dragStartRef.current.initialPosX + deltaX));
-    const newY = Math.max(12, Math.min(window.innerHeight - cardHeight - 12, dragStartRef.current.initialPosY + deltaY));
+    const newX = Math.max(
+      12,
+      Math.min(window.innerWidth - cardWidth - 12, dragStartRef.current.initialPosX + deltaX),
+    );
+    const newY = Math.max(
+      12,
+      Math.min(window.innerHeight - cardHeight - 12, dragStartRef.current.initialPosY + deltaY),
+    );
 
     setPosition({ x: newX, y: newY });
   };
@@ -529,7 +558,7 @@ export function AgentCopilot() {
             })),
             temperature: 0.1,
           }),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -545,7 +574,12 @@ export function AgentCopilot() {
       }
 
       // Handle Todo updates if specified in plan
-      if (data.todos_to_add?.length || data.todos_to_delete?.length || data.todos_to_complete?.length || data.clear_completed_todos) {
+      if (
+        data.todos_to_add?.length ||
+        data.todos_to_delete?.length ||
+        data.todos_to_complete?.length ||
+        data.clear_completed_todos
+      ) {
         const todoMods = applyTodoModifications({
           todosToAdd: data.todos_to_add,
           todosToDelete: data.todos_to_delete,
@@ -572,47 +606,131 @@ export function AgentCopilot() {
       const qLower = query.toLowerCase();
 
       // Fallback: Tasks deletion, addition, or completion
-      if (qLower.includes("task") || qLower.includes("todo") || qLower.includes("delete") || qLower.includes("clear") || qLower.includes("add")) {
-        const isDelete = qLower.includes("delete") || qLower.includes("remove") || qLower.includes("clear") || qLower.includes("trash");
-        const isComplete = qLower.includes("complete") || qLower.includes("check off") || qLower.includes("finish");
+      if (
+        qLower.includes("task") ||
+        qLower.includes("todo") ||
+        qLower.includes("delete") ||
+        qLower.includes("clear") ||
+        qLower.includes("add")
+      ) {
+        const isDelete =
+          qLower.includes("delete") ||
+          qLower.includes("remove") ||
+          qLower.includes("clear") ||
+          qLower.includes("trash");
+        const isComplete =
+          qLower.includes("complete") || qLower.includes("check off") || qLower.includes("finish");
 
         if (isDelete) {
           let target = query;
-          for (const word of ["delete", "remove", "clear", "trash", "erase", "task", "the", "todo", "item", "please", "my", "a"]) {
+          for (const word of [
+            "delete",
+            "remove",
+            "clear",
+            "trash",
+            "erase",
+            "task",
+            "the",
+            "todo",
+            "item",
+            "please",
+            "my",
+            "a",
+          ]) {
             target = target.replace(new RegExp(`\\b${word}\\b`, "gi"), "");
           }
           target = target.trim();
           applyTodoModifications({ todosToDelete: [target || "last"] });
-          await executeAutonomousSequence([{ actionType: "click", domSelector: "[data-agent-target='tasks-btn']", description: "Open Tasks Drawer", cursorTargetLabel: "Open Tasks" }]);
+          await executeAutonomousSequence([
+            {
+              actionType: "click",
+              domSelector: "[data-agent-target='tasks-btn']",
+              description: "Open Tasks Drawer",
+              cursorTargetLabel: "Open Tasks",
+            },
+          ]);
         } else if (isComplete) {
           applyTodoModifications({ todosToComplete: ["last"] });
-          await executeAutonomousSequence([{ actionType: "click", domSelector: "[data-agent-target='tasks-btn']", description: "Open Tasks Drawer", cursorTargetLabel: "Open Tasks" }]);
+          await executeAutonomousSequence([
+            {
+              actionType: "click",
+              domSelector: "[data-agent-target='tasks-btn']",
+              description: "Open Tasks Drawer",
+              cursorTargetLabel: "Open Tasks",
+            },
+          ]);
         } else {
           let taskTitle = query;
-          for (const word of ["open", "tasks", "task", "and", "add", "a", "revision", "for", "to-do", "todo", "create", "new", "schedule", "my", "please"]) {
+          for (const word of [
+            "open",
+            "tasks",
+            "task",
+            "and",
+            "add",
+            "a",
+            "revision",
+            "for",
+            "to-do",
+            "todo",
+            "create",
+            "new",
+            "schedule",
+            "my",
+            "please",
+          ]) {
             taskTitle = taskTitle.replace(new RegExp(`\\b${word}\\b`, "gi"), "");
           }
           const cleanTitle = taskTitle.trim() || "Academic Revision Goal";
           applyTodoModifications({
-            todosToAdd: [{
-              title: cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1),
-              priority: "high",
-              category: "Revision",
-              dueDate: "Today",
-            }],
+            todosToAdd: [
+              {
+                title: cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1),
+                priority: "high",
+                category: "Revision",
+                dueDate: "Today",
+              },
+            ],
           });
-          await executeAutonomousSequence([{ actionType: "click", domSelector: "[data-agent-target='tasks-btn']", description: "Open Tasks Drawer", cursorTargetLabel: "Open Tasks" }]);
+          await executeAutonomousSequence([
+            {
+              actionType: "click",
+              domSelector: "[data-agent-target='tasks-btn']",
+              description: "Open Tasks Drawer",
+              cursorTargetLabel: "Open Tasks",
+            },
+          ]);
         }
-      } else if (qLower.includes("menu") || qLower.includes("chat") || qLower.includes("syllabus") || qLower.includes("gaps")) {
+      } else if (
+        qLower.includes("menu") ||
+        qLower.includes("chat") ||
+        qLower.includes("syllabus") ||
+        qLower.includes("gaps")
+      ) {
         const fallbackSteps: DOMActionStep[] = [];
         if (qLower.includes("syllabus")) {
-          fallbackSteps.push({ actionType: "navigate", targetRoute: "/syllabus", description: "Navigate to Syllabus", cursorTargetLabel: "Syllabus" });
+          fallbackSteps.push({
+            actionType: "navigate",
+            targetRoute: "/syllabus",
+            description: "Navigate to Syllabus",
+            cursorTargetLabel: "Syllabus",
+          });
         }
         if (qLower.includes("menu") || qLower.includes("sidebar")) {
-          fallbackSteps.push({ actionType: "click", domSelector: "[data-agent-target='nav-menu-btn']", description: "Open Navigation Menu", cursorTargetLabel: "Open Menu" });
+          fallbackSteps.push({
+            actionType: "click",
+            domSelector: "[data-agent-target='nav-menu-btn']",
+            description: "Open Navigation Menu",
+            cursorTargetLabel: "Open Menu",
+          });
         }
         if (qLower.includes("chat") || qLower.includes("rag")) {
-          fallbackSteps.push({ actionType: "click", domSelector: "[data-agent-target='nav-item-chat']", targetRoute: "/chat", description: "Click Grounded RAG Chat link", cursorTargetLabel: "Open RAG Chat" });
+          fallbackSteps.push({
+            actionType: "click",
+            domSelector: "[data-agent-target='nav-item-chat']",
+            targetRoute: "/chat",
+            description: "Click Grounded RAG Chat link",
+            cursorTargetLabel: "Open RAG Chat",
+          });
         }
         if (fallbackSteps.length > 0) {
           await executeAutonomousSequence(fallbackSteps);
@@ -640,63 +758,59 @@ export function AgentCopilot() {
       <div
         ref={cardRef}
         data-agent-ui="true"
-        style={
-          position
-            ? { left: `${position.x}px`, top: `${position.y}px` }
-            : undefined
-        }
+        style={position ? { left: `${position.x}px`, top: `${position.y}px` } : undefined}
         className={cn(
-          "fixed z-50 font-sans select-none transition-shadow duration-200",
+          "fixed z-50 select-none font-sans transition-shadow duration-200",
           !position && "bottom-6 left-1/2 -translate-x-1/2",
-          isDragging && "cursor-grabbing"
+          isDragging && "cursor-grabbing",
         )}
       >
         {/* Curvilinear Liquid Glow Border Wrapper */}
-        <div className="rounded-[34px] p-[1.5px] bg-gradient-to-b from-sky-400/50 via-indigo-500/25 to-purple-500/40 shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_45px_rgba(56,189,248,0.22)]">
+        <div className="rounded-[34px] bg-gradient-to-b from-sky-400/50 via-indigo-500/25 to-purple-500/40 p-[1.5px] shadow-[0_25px_80px_rgba(0,0,0,0.85),0_0_45px_rgba(56,189,248,0.22)]">
           <div
             className={cn(
-              "w-[580px] max-w-[calc(100vw-32px)] bg-slate-950/90 dark:bg-black/92 rounded-[33px] backdrop-blur-3xl flex flex-col overflow-hidden text-foreground animate-in fade-in zoom-in-95 duration-200"
+              "dark:bg-black/92 flex w-[580px] max-w-[calc(100vw-32px)] flex-col overflow-hidden rounded-[33px] bg-slate-950/90 text-foreground backdrop-blur-3xl duration-200 animate-in fade-in zoom-in-95",
             )}
           >
             {/* Ambient Radial Lighting Overlay */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_40%_at_50%_0%,rgba(56,189,248,0.12),transparent)] pointer-events-none" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_40%_at_50%_0%,rgba(56,189,248,0.12),transparent)]" />
 
             {/* Draggable Header Bar */}
             <div
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
-              className="px-5 py-3 border-b border-white/[0.08] bg-white/[0.02] flex items-center justify-between gap-2 cursor-grab active:cursor-grabbing select-none relative"
+              className="relative flex cursor-grab select-none items-center justify-between gap-2 border-b border-white/[0.08] bg-white/[0.02] px-5 py-3 active:cursor-grabbing"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <GripHorizontal className="h-4 w-4 text-muted-foreground/40 shrink-0" />
-                <div className="relative p-2 rounded-2xl bg-sky-500/15 text-sky-400 border border-sky-500/30 shrink-0 shadow-inner">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <GripHorizontal className="h-4 w-4 shrink-0 text-muted-foreground/40" />
+                <div className="relative shrink-0 rounded-2xl border border-sky-500/30 bg-sky-500/15 p-2 text-sky-400 shadow-inner">
                   <Bot className="h-4 w-4" />
                   {(executing || isThinking) && (
-                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                    <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-ping rounded-full bg-emerald-400" />
                   )}
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black tracking-wider uppercase bg-gradient-to-r from-sky-300 via-indigo-200 to-purple-300 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-sky-300 via-indigo-200 to-purple-300 bg-clip-text text-xs font-black uppercase tracking-wider text-transparent">
                       PolarAssist
                     </span>
-                    <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/25">
+                    <span className="rounded-full border border-sky-500/25 bg-sky-500/15 px-2 py-0.5 font-mono text-[9px] font-bold text-sky-300">
                       Autonomous
                     </span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground font-mono truncate mt-0.5">
-                    Active Page: <span className="text-sky-300 font-semibold">{pathname}</span>
+                  <p className="mt-0.5 truncate font-mono text-[10px] text-muted-foreground">
+                    Active Page: <span className="font-semibold text-sky-300">{pathname}</span>
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 shrink-0" data-no-drag="true">
+              <div className="flex shrink-0 items-center gap-1.5" data-no-drag="true">
                 {/* Reset to Bottom Center */}
                 {position && (
                   <button
                     onClick={resetPosition}
-                    className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors"
+                    className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
                     title="Reset Position to Center"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
@@ -704,12 +818,14 @@ export function AgentCopilot() {
                 )}
 
                 {/* Speed Selector */}
-                <div className="flex items-center bg-white/[0.06] border border-white/10 rounded-full p-0.5 text-[10px] font-mono">
+                <div className="flex items-center rounded-full border border-white/10 bg-white/[0.06] p-0.5 font-mono text-[10px]">
                   <button
                     onClick={() => setSpeedMultiplier(1)}
                     className={cn(
-                      "px-2 py-0.5 rounded-full transition-colors",
-                      speedMultiplier === 1 ? "bg-sky-500 text-white font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
+                      "rounded-full px-2 py-0.5 transition-colors",
+                      speedMultiplier === 1
+                        ? "shadow-xs bg-sky-500 font-bold text-white"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                     title="Cinematic Speed (1x)"
                   >
@@ -718,8 +834,10 @@ export function AgentCopilot() {
                   <button
                     onClick={() => setSpeedMultiplier(2)}
                     className={cn(
-                      "px-2 py-0.5 rounded-full transition-colors",
-                      speedMultiplier === 2 ? "bg-sky-500 text-white font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
+                      "rounded-full px-2 py-0.5 transition-colors",
+                      speedMultiplier === 2
+                        ? "shadow-xs bg-sky-500 font-bold text-white"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                     title="Fast Speed (2x)"
                   >
@@ -728,8 +846,10 @@ export function AgentCopilot() {
                   <button
                     onClick={() => setSpeedMultiplier(4)}
                     className={cn(
-                      "px-2 py-0.5 rounded-full transition-colors",
-                      speedMultiplier === 4 ? "bg-sky-500 text-white font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
+                      "rounded-full px-2 py-0.5 transition-colors",
+                      speedMultiplier === 4
+                        ? "shadow-xs bg-sky-500 font-bold text-white"
+                        : "text-muted-foreground hover:text-foreground",
                     )}
                     title="Turbo Speed (4x)"
                   >
@@ -741,8 +861,10 @@ export function AgentCopilot() {
                 <button
                   onClick={() => setShowInspector(!showInspector)}
                   className={cn(
-                    "p-2 rounded-full transition-colors",
-                    showInspector ? "bg-sky-500/20 text-sky-300 border border-sky-500/40" : "text-muted-foreground hover:text-foreground hover:bg-white/10"
+                    "rounded-full p-2 transition-colors",
+                    showInspector
+                      ? "border border-sky-500/40 bg-sky-500/20 text-sky-300"
+                      : "text-muted-foreground hover:bg-white/10 hover:text-foreground",
                   )}
                   title="Toggle DOM Inspector"
                 >
@@ -755,7 +877,7 @@ export function AgentCopilot() {
                     setIsOpen(false);
                     virtualCursor.hide();
                   }}
-                  className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-white/10 transition-colors"
+                  className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
                   title="Close Copilot (Esc)"
                 >
                   <X className="h-4 w-4" />
@@ -765,24 +887,29 @@ export function AgentCopilot() {
 
             {/* Active Live Action Banner during Execution */}
             {executing && totalStepsCount && (
-              <div className="px-5 py-2.5 bg-sky-500/15 border-b border-sky-500/20 flex items-center justify-between gap-3 text-xs animate-pulse">
-                <div className="flex items-center gap-2 min-w-0">
-                  <MousePointer className="h-3.5 w-3.5 text-sky-400 shrink-0" />
-                  <span className="font-semibold text-sky-100 truncate text-[11.5px]">
-                    Step {currentStepIndex || 1} of {totalStepsCount}: {currentStepDesc || "Actuating DOM"}
+              <div className="flex animate-pulse items-center justify-between gap-3 border-b border-sky-500/20 bg-sky-500/15 px-5 py-2.5 text-xs">
+                <div className="flex min-w-0 items-center gap-2">
+                  <MousePointer className="h-3.5 w-3.5 shrink-0 text-sky-400" />
+                  <span className="truncate text-[11.5px] font-semibold text-sky-100">
+                    Step {currentStepIndex || 1} of {totalStepsCount}:{" "}
+                    {currentStepDesc || "Actuating DOM"}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0" data-no-drag="true">
+                <div className="flex shrink-0 items-center gap-1.5" data-no-drag="true">
                   <button
                     onClick={() => setIsPaused(!isPaused)}
-                    className="p-1.5 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 text-foreground"
+                    className="rounded-full border border-white/20 bg-white/10 p-1.5 text-foreground hover:bg-white/20"
                     title={isPaused ? "Resume" : "Pause"}
                   >
-                    {isPaused ? <Play className="h-3 w-3 text-emerald-400" /> : <Pause className="h-3 w-3 text-amber-400" />}
+                    {isPaused ? (
+                      <Play className="h-3 w-3 text-emerald-400" />
+                    ) : (
+                      <Pause className="h-3 w-3 text-amber-400" />
+                    )}
                   </button>
                   <button
                     onClick={handleStopExecution}
-                    className="p-1.5 rounded-full bg-rose-500/20 border border-rose-500/40 hover:bg-rose-500/30 text-rose-300"
+                    className="rounded-full border border-rose-500/40 bg-rose-500/20 p-1.5 text-rose-300 hover:bg-rose-500/30"
                     title="Stop Execution"
                   >
                     <Square className="h-3 w-3" />
@@ -793,10 +920,10 @@ export function AgentCopilot() {
 
             {/* Live Thinking & Reasoning UI */}
             {(isThinking || reasoningPhases || aiPlanSummary) && (
-              <div className="p-4 border-b border-white/10 bg-white/[0.02] space-y-2.5 max-h-[220px] overflow-y-auto font-sans">
+              <div className="max-h-[220px] space-y-2.5 overflow-y-auto border-b border-white/10 bg-white/[0.02] p-4 font-sans">
                 {/* Thinking Indicator */}
                 {isThinking && (
-                  <div className="flex items-center gap-2 text-xs text-sky-300 animate-pulse font-mono">
+                  <div className="flex animate-pulse items-center gap-2 font-mono text-xs text-sky-300">
                     <Activity className="h-3.5 w-3.5 animate-spin text-sky-400" />
                     <span>[THINKING] Formulating cognitive DOM actuation plan...</span>
                   </div>
@@ -804,45 +931,51 @@ export function AgentCopilot() {
 
                 {/* Goal Summary */}
                 {aiPlanSummary && !isThinking && (
-                  <div className="p-3 rounded-2xl bg-sky-500/10 border border-sky-500/25 text-sky-100 text-xs flex items-start gap-2.5">
-                    <Sparkles className="h-4 w-4 text-sky-400 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-2.5 rounded-2xl border border-sky-500/25 bg-sky-500/10 p-3 text-xs text-sky-100">
+                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />
                     <div>
-                      <span className="font-bold text-sky-300 font-mono text-[10px] uppercase tracking-wider block">
+                      <span className="block font-mono text-[10px] font-bold uppercase tracking-wider text-sky-300">
                         Autonomous Objective
                       </span>
-                      <p className="leading-relaxed mt-0.5 text-[11.5px]">{aiPlanSummary}</p>
+                      <p className="mt-0.5 text-[11.5px] leading-relaxed">{aiPlanSummary}</p>
                     </div>
                   </div>
                 )}
 
                 {/* Reasoning Monologue Breakdown */}
                 {reasoningPhases && (
-                  <div className="rounded-2xl border border-white/10 bg-black/40 overflow-hidden text-[11px] font-mono shadow-inner">
+                  <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/40 font-mono text-[11px] shadow-inner">
                     <button
                       onClick={() => setShowThinkingDetails(!showThinkingDetails)}
-                      className="w-full px-3.5 py-2 bg-white/[0.03] flex items-center justify-between text-muted-foreground hover:text-foreground text-[10px] font-semibold transition-colors"
+                      className="flex w-full items-center justify-between bg-white/[0.03] px-3.5 py-2 text-[10px] font-semibold text-muted-foreground transition-colors hover:text-foreground"
                     >
                       <span className="flex items-center gap-1.5">
                         <Terminal className="h-3 w-3 text-sky-400" />
                         Cognitive Reasoning Process
                       </span>
-                      {showThinkingDetails ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                      {showThinkingDetails ? (
+                        <ChevronUp className="h-3 w-3" />
+                      ) : (
+                        <ChevronDown className="h-3 w-3" />
+                      )}
                     </button>
 
                     {showThinkingDetails && (
-                      <div className="p-3.5 space-y-2 text-slate-300 leading-relaxed border-t border-white/5 select-text">
+                      <div className="select-text space-y-2 border-t border-white/5 p-3.5 leading-relaxed text-slate-300">
                         {reasoningPhases.perception && (
                           <div className="space-y-0.5">
-                            <span className="text-[9.5px] font-bold text-cyan-400 uppercase tracking-wide">
+                            <span className="text-[9.5px] font-bold uppercase tracking-wide text-cyan-400">
                               [PERCEPTION]
                             </span>
-                            <p className="text-[10.5px] text-slate-300">{reasoningPhases.perception}</p>
+                            <p className="text-[10.5px] text-slate-300">
+                              {reasoningPhases.perception}
+                            </p>
                           </div>
                         )}
 
                         {reasoningPhases.intent && (
                           <div className="space-y-0.5">
-                            <span className="text-[9.5px] font-bold text-purple-400 uppercase tracking-wide">
+                            <span className="text-[9.5px] font-bold uppercase tracking-wide text-purple-400">
                               [INTENT]
                             </span>
                             <p className="text-[10.5px] text-slate-300">{reasoningPhases.intent}</p>
@@ -851,7 +984,7 @@ export function AgentCopilot() {
 
                         {reasoningPhases.plan && (
                           <div className="space-y-0.5">
-                            <span className="text-[9.5px] font-bold text-sky-400 uppercase tracking-wide">
+                            <span className="text-[9.5px] font-bold uppercase tracking-wide text-sky-400">
                               [PLAN]
                             </span>
                             <p className="text-[10.5px] text-slate-300">{reasoningPhases.plan}</p>
@@ -860,16 +993,20 @@ export function AgentCopilot() {
 
                         {reasoningPhases.verify && (
                           <div className="space-y-0.5">
-                            <span className="text-[9.5px] font-bold text-emerald-400 uppercase tracking-wide">
+                            <span className="text-[9.5px] font-bold uppercase tracking-wide text-emerald-400">
                               [VERIFICATION]
                             </span>
                             <p className="text-[10.5px] text-slate-300">{reasoningPhases.verify}</p>
                           </div>
                         )}
 
-                        {!reasoningPhases.perception && !reasoningPhases.intent && reasoningPhases.rawThought && (
-                          <p className="text-[10.5px] text-slate-300">{reasoningPhases.rawThought}</p>
-                        )}
+                        {!reasoningPhases.perception &&
+                          !reasoningPhases.intent &&
+                          reasoningPhases.rawThought && (
+                            <p className="text-[10.5px] text-slate-300">
+                              {reasoningPhases.rawThought}
+                            </p>
+                          )}
                       </div>
                     )}
                   </div>
@@ -879,15 +1016,15 @@ export function AgentCopilot() {
 
             {/* DOM Inspector Panel (Collapsible) */}
             {showInspector && (
-              <div className="p-3.5 border-b border-white/10 bg-black/50 max-h-[180px] overflow-y-auto font-mono text-[10px] space-y-1.5">
-                <div className="flex items-center justify-between pb-1 border-b border-white/10 text-muted-foreground">
+              <div className="max-h-[180px] space-y-1.5 overflow-y-auto border-b border-white/10 bg-black/50 p-3.5 font-mono text-[10px]">
+                <div className="flex items-center justify-between border-b border-white/10 pb-1 text-muted-foreground">
                   <span className="flex items-center gap-1.5">
                     <Layers className="h-3 w-3 text-sky-400" />
                     Live DOM Nodes ({detectedNodes.length})
                   </span>
                   <button
                     onClick={refreshDomScan}
-                    className="text-sky-400 hover:underline text-[9.5px]"
+                    className="text-[9.5px] text-sky-400 hover:underline"
                   >
                     Rescan
                   </button>
@@ -895,20 +1032,24 @@ export function AgentCopilot() {
                 {detectedNodes.slice(0, 15).map((node) => (
                   <div
                     key={node.index}
-                    className="p-1.5 rounded-xl bg-white/[0.03] border border-white/5 hover:border-sky-500/40 flex items-center justify-between gap-2"
+                    className="flex items-center justify-between gap-2 rounded-xl border border-white/5 bg-white/[0.03] p-1.5 hover:border-sky-500/40"
                   >
                     <div className="min-w-0 truncate">
-                      <span className="text-sky-400 font-bold mr-1">#{node.index}</span>
-                      <span className="text-foreground font-semibold mr-1">&lt;{node.tagName}&gt;</span>
+                      <span className="mr-1 font-bold text-sky-400">#{node.index}</span>
+                      <span className="mr-1 font-semibold text-foreground">
+                        &lt;{node.tagName}&gt;
+                      </span>
                       {node.dataAgentTarget && (
-                        <span className="text-purple-300 mr-1">[{node.dataAgentTarget}]</span>
+                        <span className="mr-1 text-purple-300">[{node.dataAgentTarget}]</span>
                       )}
-                      <span className="text-muted-foreground truncate">{node.text || node.selector}</span>
+                      <span className="truncate text-muted-foreground">
+                        {node.text || node.selector}
+                      </span>
                     </div>
                     <button
                       onClick={() => handleTestElementClick(node)}
                       disabled={executing}
-                      className="px-2.5 py-1 rounded-full bg-sky-500/20 hover:bg-sky-500 text-sky-300 hover:text-white font-bold text-[9px] transition-colors shrink-0 disabled:opacity-40"
+                      className="shrink-0 rounded-full bg-sky-500/20 px-2.5 py-1 text-[9px] font-bold text-sky-300 transition-colors hover:bg-sky-500 hover:text-white disabled:opacity-40"
                     >
                       Click
                     </button>
@@ -919,7 +1060,7 @@ export function AgentCopilot() {
 
             {/* Preset Command Pills */}
             {!executing && !isThinking && (
-              <div className="px-4 pt-3 pb-1 flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5 px-4 pb-1 pt-3">
                 {SAMPLE_COMMANDS.map((cmd, idx) => (
                   <button
                     key={idx}
@@ -927,10 +1068,10 @@ export function AgentCopilot() {
                       setInputTask(cmd.prompt);
                       handleRunTask(cmd.prompt);
                     }}
-                    className="px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.04] hover:bg-sky-500/15 hover:border-sky-500/40 text-[10.5px] font-medium text-slate-300 hover:text-white transition-all flex items-center gap-1.5 text-left group shadow-2xs"
+                    className="shadow-2xs group flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-left text-[10.5px] font-medium text-slate-300 transition-all hover:border-sky-500/40 hover:bg-sky-500/15 hover:text-white"
                   >
-                    <Zap className="h-3 w-3 text-sky-400 group-hover:scale-110 transition-transform shrink-0" />
-                    <span className="truncate max-w-[240px]">{cmd.title}</span>
+                    <Zap className="h-3 w-3 shrink-0 text-sky-400 transition-transform group-hover:scale-110" />
+                    <span className="max-w-[240px] truncate">{cmd.title}</span>
                   </button>
                 ))}
               </div>
@@ -948,7 +1089,7 @@ export function AgentCopilot() {
                 className="flex items-center gap-2"
               >
                 <div className="relative flex-1">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 pointer-events-none" />
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
                   <input
                     ref={inputRef}
                     type="text"
@@ -956,9 +1097,9 @@ export function AgentCopilot() {
                     onChange={(e) => setInputTask(e.target.value)}
                     placeholder="Ask PolarAssist (e.g. 'delete quantum task', 'open menu and open rag chat')..."
                     disabled={executing || isThinking}
-                    className="w-full bg-white/[0.06] border border-white/15 rounded-full pl-10 pr-16 py-2.5 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-sky-400/60 focus:border-sky-400/80 disabled:opacity-50 transition-all font-sans shadow-inner"
+                    className="w-full rounded-full border border-white/15 bg-white/[0.06] py-2.5 pl-10 pr-16 font-sans text-xs text-foreground shadow-inner transition-all placeholder:text-muted-foreground/50 focus:border-sky-400/80 focus:outline-none focus:ring-2 focus:ring-sky-400/60 disabled:opacity-50"
                   />
-                  <kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-0.5 text-[9px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-muted-foreground border border-white/10">
+                  <kbd className="absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-0.5 rounded-full border border-white/10 bg-white/10 px-2 py-0.5 font-mono text-[9px] text-muted-foreground sm:inline-flex">
                     Ctrl+K
                   </kbd>
                 </div>
@@ -966,7 +1107,7 @@ export function AgentCopilot() {
                 <button
                   type="submit"
                   disabled={executing || isThinking || !inputTask.trim()}
-                  className="px-5 py-2.5 rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white font-bold text-xs hover:from-sky-400 hover:to-purple-400 transition-all flex items-center gap-1.5 shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                  className="flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-sky-500/25 transition-all hover:from-sky-400 hover:to-purple-400 hover:shadow-sky-500/40 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <span>Run</span>
                   <ArrowRight className="h-3.5 w-3.5" />
@@ -975,8 +1116,8 @@ export function AgentCopilot() {
 
               {/* Action status label */}
               {actionStatus && (
-                <div className="mt-2 px-2 flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono truncate">
-                  <CheckCircle2 className="h-3 w-3 text-sky-400 shrink-0" />
+                <div className="mt-2 flex items-center gap-1.5 truncate px-2 font-mono text-[10px] text-muted-foreground">
+                  <CheckCircle2 className="h-3 w-3 shrink-0 text-sky-400" />
                   <span className="truncate">{actionStatus}</span>
                 </div>
               )}

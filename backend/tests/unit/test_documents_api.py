@@ -142,4 +142,3 @@ async def test_direct_upload_success(api: tuple[AsyncClient, DocumentService]) -
     body = r2.json()
     assert body["filename"] == "doc.pdf"
     assert body["status"] == "queued"
-

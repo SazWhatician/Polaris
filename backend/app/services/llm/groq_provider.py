@@ -1,10 +1,11 @@
 import json
 import re
-from typing import AsyncIterator, Type, TypeVar
-from pydantic import BaseModel
+from collections.abc import AsyncIterator
+from typing import TypeVar
 
-from app.services.llm.base import BaseLLMProvider
 from app.services.groq_client import GroqClient
+from app.services.llm.base import BaseLLMProvider
+from pydantic import BaseModel
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -48,7 +49,7 @@ class GroqProvider(BaseLLMProvider):
     async def structured_complete(
         self,
         prompt: str,
-        schema_class: Type[T],
+        schema_class: type[T],
         *,
         temperature: float = 0.1,
     ) -> T:
@@ -58,14 +59,15 @@ class GroqProvider(BaseLLMProvider):
             f"Schema: {schema_class.model_json_schema()}"
         )
         response_text = await self.complete(json_prompt, temperature=temperature, max_tokens=2048)
-        
+
         # Clean think tags and extract JSON substring
         cleaned = re.sub(r"<think>.*?</think>", "", response_text, flags=re.DOTALL).strip()
         match = re.search(r"\{[\s\S]*\}", cleaned)
-        json_str = match.group(0) if match else cleaned.replace("```json", "").replace("```", "").strip()
+        json_str = (
+            match.group(0) if match else cleaned.replace("```json", "").replace("```", "").strip()
+        )
         data = json.loads(json_str)
         return schema_class.model_validate(data)
 
 
 GroqLLMProvider = GroqProvider
-

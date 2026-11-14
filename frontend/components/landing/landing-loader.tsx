@@ -8,10 +8,7 @@ interface LandingLoaderProps {
   minDisplayTime?: number;
 }
 
-export function LandingLoader({
-  onComplete,
-  minDisplayTime = 800,
-}: LandingLoaderProps) {
+export function LandingLoader({ onComplete, minDisplayTime = 800 }: LandingLoaderProps) {
   const [stage, setStage] = useState<"loading" | "splitting" | "done">("loading");
 
   useEffect(() => {
@@ -38,13 +35,13 @@ export function LandingLoader({
 
   return (
     <div
-      className="fixed inset-0 z-[100] pointer-events-none overflow-hidden select-none"
+      className="pointer-events-none fixed inset-0 z-[100] select-none overflow-hidden"
       aria-hidden="true"
     >
       {/* TOP HALF CURTAIN */}
       <div
         style={{ transitionTimingFunction: "cubic-bezier(0.77, 0, 0.175, 1)" }}
-        className={`fixed top-0 inset-x-0 h-1/2 bg-black z-[101] border-b border-white/[0.08] transition-transform duration-700 will-change-transform ${
+        className={`fixed inset-x-0 top-0 z-[101] h-1/2 border-b border-white/[0.08] bg-black transition-transform duration-700 will-change-transform ${
           isSplitting ? "-translate-y-full" : "translate-y-0"
         }`}
       >
@@ -55,7 +52,7 @@ export function LandingLoader({
       {/* BOTTOM HALF CURTAIN */}
       <div
         style={{ transitionTimingFunction: "cubic-bezier(0.77, 0, 0.175, 1)" }}
-        className={`fixed bottom-0 inset-x-0 h-1/2 bg-black z-[101] border-t border-white/[0.08] transition-transform duration-700 will-change-transform ${
+        className={`fixed inset-x-0 bottom-0 z-[101] h-1/2 border-t border-white/[0.08] bg-black transition-transform duration-700 will-change-transform ${
           isSplitting ? "translate-y-full" : "translate-y-0"
         }`}
       >
@@ -65,18 +62,16 @@ export function LandingLoader({
 
       {/* CENTER P STENCIL LOADER */}
       <div
-        className={`fixed inset-0 z-[102] flex flex-col items-center justify-center pointer-events-none transition-all duration-600 ease-out ${
-          isSplitting
-            ? "opacity-0 scale-125 filter blur-xs"
-            : "opacity-100 scale-100"
+        className={`duration-600 pointer-events-none fixed inset-0 z-[102] flex flex-col items-center justify-center transition-all ease-out ${
+          isSplitting ? "blur-xs scale-125 opacity-0 filter" : "scale-100 opacity-100"
         }`}
       >
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
+        <div className="relative flex h-16 w-16 items-center justify-center sm:h-20 sm:w-20">
           {/* Subtle Ambient Pulse Ring */}
-          <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping [animation-duration:2.2s] opacity-40" />
-          
+          <div className="absolute inset-0 animate-ping rounded-full bg-primary/20 opacity-40 [animation-duration:2.2s]" />
+
           {/* Stencil Image */}
-          <div className="relative w-12 h-12 sm:w-16 sm:h-16 animate-pulse [animation-duration:1.6s]">
+          <div className="relative h-12 w-12 animate-pulse [animation-duration:1.6s] sm:h-16 sm:w-16">
             <Image
               src="/polaris-standalone.png"
               alt="Polaris Emblem"
@@ -90,8 +85,8 @@ export function LandingLoader({
 
         {/* Small Tactical Status Tag */}
         <div className="mt-4 flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-white/50">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+          <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/50">
             POLARIS · INITIALIZING
           </span>
         </div>

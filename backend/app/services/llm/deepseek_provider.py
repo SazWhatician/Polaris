@@ -1,10 +1,11 @@
 import json
-import httpx
-from typing import AsyncIterator, Type, TypeVar, Optional
-from pydantic import BaseModel
+from collections.abc import AsyncIterator
+from typing import TypeVar
 
-from app.services.llm.base import BaseLLMProvider
+import httpx
 from app.core.logging import get_logger
+from app.services.llm.base import BaseLLMProvider
+from pydantic import BaseModel
 
 log = get_logger(__name__)
 T = TypeVar("T", bound=BaseModel)
@@ -42,7 +43,9 @@ class DeepSeekProvider(BaseLLMProvider):
         }
 
         async with httpx.AsyncClient(timeout=60.0) as client:
-            resp = await client.post(f"{DEEPSEEK_BASE_URL}/chat/completions", headers=headers, json=payload)
+            resp = await client.post(
+                f"{DEEPSEEK_BASE_URL}/chat/completions", headers=headers, json=payload
+            )
             resp.raise_for_status()
             data = resp.json()
             return data["choices"][0]["message"]["content"]
@@ -62,7 +65,7 @@ class DeepSeekProvider(BaseLLMProvider):
     async def structured_complete(
         self,
         prompt: str,
-        schema_class: Type[T],
+        schema_class: type[T],
         *,
         temperature: float = 0.1,
     ) -> T:

@@ -23,7 +23,18 @@ export type HeroWaveProps = {
   children?: React.ReactNode;
 };
 
-export function HeroWave({ className, style, extendLeftPx = 320, title = "Build with AI.", subtitle = "The AI Fullstack Engineer. Build prototypes, apps, and websites", placeholder = "Describe what you want to create...", buttonText = "Generate", hideNavbar = false, onPromptSubmit, children }: HeroWaveProps) {
+export function HeroWave({
+  className,
+  style,
+  extendLeftPx = 320,
+  title = "Build with AI.",
+  subtitle = "The AI Fullstack Engineer. Build prototypes, apps, and websites",
+  placeholder = "Describe what you want to create...",
+  buttonText = "Generate",
+  hideNavbar = false,
+  onPromptSubmit,
+  children,
+}: HeroWaveProps) {
   const [prompt, setPrompt] = useState("");
   const containerRef = useRef<HTMLDivElement | null>(null);
   const waveRef = useRef<HTMLDivElement | null>(null);
@@ -423,7 +434,8 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
     function setupPointerTracking() {
       const el = waveRenderer.domElement;
       const readCoords = (e: PointerEvent | TouchEvent): { x: number; y: number } => {
-        if ("clientX" in e) return { x: (e as PointerEvent).clientX, y: (e as PointerEvent).clientY };
+        if ("clientX" in e)
+          return { x: (e as PointerEvent).clientX, y: (e as PointerEvent).clientY };
         const t = (e as TouchEvent).touches?.[0] || (e as TouchEvent).changedTouches?.[0];
         return t ? { x: t.clientX, y: t.clientY } : { x: mouse.x, y: mouse.y };
       };
@@ -471,7 +483,7 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
     function accumulateGlow(dt: number) {
       if (!instancedBars || !barCenters) return;
       const centers = barCenters;
-      const attr = (instancedBars.geometry.getAttribute("aGlow") as THREE.InstancedBufferAttribute);
+      const attr = instancedBars.geometry.getAttribute("aGlow") as THREE.InstancedBufferAttribute;
       const arr = attr.array as Float32Array;
 
       const mouseWorldX = proxyMouseX - cameraWidth * 0.5;
@@ -509,7 +521,7 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
       const span = waveWidth + EXTEND_LEFT_PX;
       let barCount = Math.min(
         MAX_BARS,
-        Math.max(1, Math.floor((span + FIXED_BAR_GAP) / (FIXED_BAR_WIDTH + FIXED_BAR_GAP)))
+        Math.max(1, Math.floor((span + FIXED_BAR_GAP) / (FIXED_BAR_WIDTH + FIXED_BAR_GAP))),
       );
       const gap = barCount > 1 ? (span - barCount * FIXED_BAR_WIDTH) / (barCount - 1) : 0;
       currentBarCount = barCount;
@@ -543,7 +555,7 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
       geo.setAttribute("aGroup", new THREE.InstancedBufferAttribute(aGroup, 1));
       geo.setAttribute(
         "aGlow",
-        new THREE.InstancedBufferAttribute(aGlow, 1).setUsage(THREE.DynamicDrawUsage)
+        new THREE.InstancedBufferAttribute(aGlow, 1).setUsage(THREE.DynamicDrawUsage),
       );
 
       barMaterial = createInstancedMaterial();
@@ -571,7 +583,7 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
             duration,
             ease: "power2.inOut",
           },
-          cur.time
+          cur.time,
         );
       }
       return tl;
@@ -610,7 +622,7 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
         cameraHeight / 2,
         -cameraHeight / 2,
         -1000,
-        1000
+        1000,
       );
       waveCamera.position.z = 10;
       waveCamera.lookAt(0, 0, 0);
@@ -622,7 +634,12 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
       waveRenderPass = new RenderPass(waveScene, waveCamera);
       waveComposer.addPass(waveRenderPass);
 
-      waveBloomPass = new UnrealBloomPass(new THREE.Vector2(cameraWidth, cameraHeight), 1.0, 0.68, 0.0);
+      waveBloomPass = new UnrealBloomPass(
+        new THREE.Vector2(cameraWidth, cameraHeight),
+        1.0,
+        0.68,
+        0.0,
+      );
       (waveBloomPass as any).resolution.set(cameraWidth * 0.5, cameraHeight * 0.5);
       waveComposer.addPass(waveBloomPass);
 
@@ -656,7 +673,7 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
       const span = waveWidth + EXTEND_LEFT_PX;
       let barCount = Math.min(
         MAX_BARS,
-        Math.max(1, Math.floor((span + FIXED_BAR_GAP) / (FIXED_BAR_WIDTH + FIXED_BAR_GAP)))
+        Math.max(1, Math.floor((span + FIXED_BAR_GAP) / (FIXED_BAR_WIDTH + FIXED_BAR_GAP))),
       );
       const gap = barCount > 1 ? (span - barCount * FIXED_BAR_WIDTH) / (barCount - 1) : 0;
 
@@ -667,7 +684,9 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
         const totW = span;
         const startX = -waveWidth / 2 - EXTEND_LEFT_PX;
         const aX = instancedBars!.geometry.getAttribute("aXPos") as THREE.InstancedBufferAttribute;
-        const aT = instancedBars!.geometry.getAttribute("aPosNorm") as THREE.InstancedBufferAttribute;
+        const aT = instancedBars!.geometry.getAttribute(
+          "aPosNorm",
+        ) as THREE.InstancedBufferAttribute;
 
         for (let i = 0; i < barCount; i++) {
           const x = startX + FIXED_BAR_WIDTH / 2 + i * (FIXED_BAR_WIDTH + gap);
@@ -820,25 +839,25 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
         }}
       >
         {children ? (
-          <div className="w-full h-full flex flex-col pointer-events-auto">
-            {children}
-          </div>
+          <div className="pointer-events-auto flex h-full w-full flex-col">{children}</div>
         ) : (
-          <div className="flex-1 flex items-center justify-center p-6 pt-16 sm:pt-20 pointer-events-none">
-            <div className="max-w-3xl w-full text-center" style={{ pointerEvents: "auto" }}>
-              <h1 className="text-slate-900 dark:text-white text-3xl sm:text-5xl font-semibold tracking-tight drop-shadow-[0_1px_8px_rgba(31,61,188,0.25)]">
+          <div className="pointer-events-none flex flex-1 items-center justify-center p-6 pt-16 sm:pt-20">
+            <div className="w-full max-w-3xl text-center" style={{ pointerEvents: "auto" }}>
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 drop-shadow-[0_1px_8px_rgba(31,61,188,0.25)] dark:text-white sm:text-5xl">
                 {title}
               </h1>
-              <p className="text-slate-700 dark:text-gray-300/90 mt-3 sm:mt-4 text-sm sm:text-base">{subtitle}</p>
+              <p className="mt-3 text-sm text-slate-700 dark:text-gray-300/90 sm:mt-4 sm:text-base">
+                {subtitle}
+              </p>
               <form
-                className="mt-6 sm:mt-8 flex items-center justify-center"
+                className="mt-6 flex items-center justify-center sm:mt-8"
                 onSubmit={(e) => {
                   e.preventDefault();
                   onPromptSubmit?.(prompt);
                 }}
               >
                 <div className="relative w-full sm:w-[720px]">
-                  <div className="relative rounded-2xl p-[2px] shadow-[0_1px_2px_0_rgba(0,0,0,0.06)] bg-gradient-to-br from-slate-200/40 via-white/10 to-slate-900/10 dark:from-white/10 dark:via-white/5 dark:to-black/20">
+                  <div className="relative rounded-2xl bg-gradient-to-br from-slate-200/40 via-white/10 to-slate-900/10 p-[2px] shadow-[0_1px_2px_0_rgba(0,0,0,0.06)] dark:from-white/10 dark:via-white/5 dark:to-black/20">
                     <textarea
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
@@ -853,16 +872,24 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
                       placeholder={animatedPlaceholder}
                       rows={5}
                       data-agent-target="chat-input"
-                      className="w-full h-32 sm:h-36 resize-none rounded-2xl bg-white/85 dark:bg-[rgba(15,15,20,0.55)] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-white/40 outline-none focus:ring-2 focus:ring-[#1f3dbc]/40 focus:border-[#1f3dbc]/40 backdrop-blur-md px-4 py-4 pr-16 shadow-xl"
+                      className="h-32 w-full resize-none rounded-2xl border border-slate-200 bg-white/85 px-4 py-4 pr-16 text-slate-900 shadow-xl outline-none backdrop-blur-md placeholder:text-slate-500 focus:border-[#1f3dbc]/40 focus:ring-2 focus:ring-[#1f3dbc]/40 dark:border-white/10 dark:bg-[rgba(15,15,20,0.55)] dark:text-white dark:placeholder:text-white/40 sm:h-36"
                     />
                   </div>
                   <button
                     type="submit"
                     aria-label={buttonText}
                     data-agent-target="chat-send-btn"
-                    className="absolute right-3 bottom-3 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-[#f0f2ff] dark:text-black dark:hover:bg-white transition-colors shadow-md"
+                    className="absolute bottom-3 right-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white shadow-md transition-colors hover:bg-slate-800 dark:bg-[#f0f2ff] dark:text-black dark:hover:bg-white"
                   >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5"
+                    >
                       <path d="M7 17L17 7" />
                       <path d="M7 7h10v10" />
                     </svg>

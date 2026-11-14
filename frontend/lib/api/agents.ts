@@ -44,4 +44,3 @@ export async function updateGapRecommendations(
     body: JSON.stringify({ recommendations }),
   });
 }
-

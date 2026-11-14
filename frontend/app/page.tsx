@@ -32,8 +32,7 @@ export default function Home() {
       <NotchNavbar />
 
       {/* 3. MAIN SCROLLABLE CONTENT (Curtain Layer over Drawer Footer) */}
-      <div className="relative z-10 bg-black shadow-[0_50px_100px_rgba(0,0,0,0.95)] border-b border-white/[0.08] rounded-b-[36px] sm:rounded-b-[56px]">
-        
+      <div className="relative z-10 rounded-b-[36px] border-b border-white/[0.08] bg-black shadow-[0_50px_100px_rgba(0,0,0,0.95)] sm:rounded-b-[56px]">
         {/* SCENE 1: SylvaHero 3D Living Green World Scene */}
         <Scene />
 
@@ -47,12 +46,15 @@ export default function Home() {
         <CodexQuillScrollSection />
 
         {/* SCENE 5: Tactical Feature Architecture & Intelligence Engine */}
-        <section id="features-section" className="relative z-20 py-28 sm:py-36 px-6 max-w-7xl mx-auto space-y-16 border-t border-white/[0.08]">
+        <section
+          id="features-section"
+          className="relative z-20 mx-auto max-w-7xl space-y-16 border-t border-white/[0.08] px-6 py-28 sm:py-36"
+        >
           {/* Precision Intelligence Banner Card */}
-          <AnimatedShaderCard className="max-w-4xl mx-auto">
-            <div className="relative z-10 text-center p-8 sm:p-14 space-y-5">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.08] border border-white/20 backdrop-blur-xl text-white text-xs font-mono tracking-[0.2em] uppercase shadow-lg">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          <AnimatedShaderCard className="mx-auto max-w-4xl">
+            <div className="relative z-10 space-y-5 p-8 text-center sm:p-14">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.08] px-3.5 py-1.5 font-mono text-xs uppercase tracking-[0.2em] text-white shadow-lg backdrop-blur-xl">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
                 <CrystalGlow fontSize={12} fontWeight={700} compact>
                   Academic Architecture
                 </CrystalGlow>
@@ -69,25 +71,26 @@ export default function Home() {
                 </CrystalGlow>
               </div>
 
-              <p className="text-slate-200 text-xs sm:text-base font-light leading-relaxed max-w-2xl mx-auto drop-shadow-sm">
-                Polaris indexes your course notes, textbooks, and syllabi to provide verified citations, identify prerequisite gaps, and structure automated revision plans.
+              <p className="mx-auto max-w-2xl text-xs font-light leading-relaxed text-slate-200 drop-shadow-sm sm:text-base">
+                Polaris indexes your course notes, textbooks, and syllabi to provide verified
+                citations, identify prerequisite gaps, and structure automated revision plans.
               </p>
 
-              <div className="pt-3 flex justify-center">
+              <div className="flex justify-center pt-3">
                 <button
                   type="button"
                   onClick={handlePrimaryCta}
-                  className="px-6 py-3 rounded-2xl bg-white text-black font-bold text-xs sm:text-sm flex items-center gap-2 hover:bg-slate-200 hover:scale-105 active:scale-95 transition-all shadow-xl"
+                  className="flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-xs font-bold text-black shadow-xl transition-all hover:scale-105 hover:bg-slate-200 active:scale-95 sm:text-sm"
                 >
                   <span>{user ? "Enter Workspace" : "Launch Navigator"}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </div>
           </AnimatedShaderCard>
 
           {/* 3 Core Popout Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
+          <div className="grid grid-cols-1 gap-8 pt-4 md:grid-cols-3">
             <PopoutFeatureCard
               variant="green"
               icon={<Zap className="h-6 w-6 text-primary" />}
@@ -113,7 +116,7 @@ export default function Home() {
         </section>
 
         {/* Subtle Bottom Spacer */}
-        <div className="w-full h-12 bg-transparent" />
+        <div className="h-12 w-full bg-transparent" />
       </div>
 
       {/* 4. DRAWER-REVEAL REACTOR 3D FOOTER */}
@@ -144,21 +147,30 @@ function PopoutFeatureCard({
   }[variant];
 
   const glowAccent = {
-    green: "bg-primary/10 border-primary/20 text-primary group-hover:bg-primary/20 group-hover:border-primary/50 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]",
-    purple: "bg-purple-500/10 border-purple-500/20 text-purple-400 group-hover:bg-purple-500/20 group-hover:border-purple-500/50 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]",
+    green:
+      "bg-primary/10 border-primary/20 text-primary group-hover:bg-primary/20 group-hover:border-primary/50 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]",
+    purple:
+      "bg-purple-500/10 border-purple-500/20 text-purple-400 group-hover:bg-purple-500/20 group-hover:border-purple-500/50 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]",
     cyan: "bg-cyan-500/10 border-cyan-500/20 text-cyan-400 group-hover:bg-cyan-500/20 group-hover:border-cyan-500/50 group-hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]",
   }[variant];
 
   return (
-    <div className={`p-8 rounded-3xl ${variantClasses} cursor-pointer`}>
+    <div className={`rounded-3xl p-8 ${variantClasses} cursor-pointer`}>
       {/* Top subtle highlight line */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:via-white/60 transition-all duration-500" />
+      <div className="absolute left-0 right-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-white/20 to-transparent transition-all duration-500 group-hover:via-white/60" />
 
-      <div className="flex items-center justify-between mb-8">
-        <div className={`p-3.5 rounded-2xl border flex items-center justify-center transition-all duration-500 group-hover:scale-110 ${glowAccent}`}>
+      <div className="mb-8 flex items-center justify-between">
+        <div
+          className={`flex items-center justify-center rounded-2xl border p-3.5 transition-all duration-500 group-hover:scale-110 ${glowAccent}`}
+        >
           {icon}
         </div>
-        <CrystalGlow fontSize={10} fontWeight={600} compact className="font-mono tracking-[0.2em] uppercase">
+        <CrystalGlow
+          fontSize={10}
+          fontWeight={600}
+          compact
+          className="font-mono uppercase tracking-[0.2em]"
+        >
           {category}
         </CrystalGlow>
       </div>
@@ -169,13 +181,13 @@ function PopoutFeatureCard({
         </CrystalGlow>
       </div>
 
-      <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed font-light group-hover:text-slate-200 transition-colors duration-300">
+      <p className="text-xs font-light leading-relaxed text-muted-foreground transition-colors duration-300 group-hover:text-slate-200 sm:text-sm">
         {description}
       </p>
 
-      <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono text-white/40 group-hover:text-white transition-colors">
+      <div className="mt-8 flex items-center justify-between border-t border-white/[0.06] pt-4 font-mono text-xs text-white/40 transition-colors group-hover:text-white">
         <span>Explore Module</span>
-        <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+        <ChevronRight className="h-4 w-4 transform transition-transform group-hover:translate-x-1" />
       </div>
     </div>
   );
