@@ -63,7 +63,7 @@ export default function IngestPage() {
   const containerRef = useGsapEntrance(".gsap-ingest", 0.04);
 
   useEffect(() => {
-    if (!loading && !user) router.replace("/");
+    if (!loading && !user) router.replace("/login");
   }, [loading, user, router]);
 
   const loadDocs = async () => {

@@ -91,7 +91,7 @@ export default function GapsPage() {
 
   // Redirect if not logged in
   useEffect(() => {
-    if (!loading && !user) router.replace("/");
+    if (!loading && !user) router.replace("/login");
   }, [loading, user, router]);
 
   // Fetch initial list of syllabi

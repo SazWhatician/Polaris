@@ -104,7 +104,6 @@ function LoginContent() {
   const handleGoogleSignIn = async () => {
     setIsSubmitting(true);
     try {
-      saveScholarProfileToStore();
       const success = await signIn();
       if (success) {
         router.replace("/dashboard");

@@ -42,7 +42,7 @@ function ChatContent() {
   useGsapEntrance(".chat-msg-reveal", 0.05);
 
   useEffect(() => {
-    if (!loading && !user) router.replace("/");
+    if (!loading && !user) router.replace("/login");
   }, [loading, user, router]);
 
   useEffect(() => {

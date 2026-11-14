@@ -48,7 +48,7 @@ export default function RevisionPlanPage() {
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) router.replace("/");
+    if (!loading && !user) router.replace("/login");
   }, [loading, user, router]);
 
   // Load latest plan

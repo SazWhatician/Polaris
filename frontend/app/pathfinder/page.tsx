@@ -43,7 +43,7 @@ export default function PathfinderPage() {
   const containerRef = useGsapEntrance(".gsap-pathfinder", 0.05);
 
   useEffect(() => {
-    if (!loading && !user) router.replace("/");
+    if (!loading && !user) router.replace("/login");
   }, [loading, user, router]);
 
   const loadGoals = useCallback(async () => {

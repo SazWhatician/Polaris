@@ -37,7 +37,7 @@ export default function TwinPage() {
   const containerRef = useGsapEntrance(".gsap-twin", 0.05);
 
   useEffect(() => {
-    if (!loading && !user) router.replace("/");
+    if (!loading && !user) router.replace("/login");
   }, [loading, user, router]);
 
   const loadTwin = useCallback(async () => {

@@ -183,20 +183,28 @@ export async function signOut(): Promise<void> {
 }
 
 export async function getIdToken(): Promise<string | null> {
+  try {
+    const { getFirebaseAuth } = await import("@/lib/firebase");
+    const auth = getFirebaseAuth();
+    if (typeof auth.authStateReady === "function") {
+      await auth.authStateReady();
+    }
+    const fbUser = auth.currentUser;
+    if (fbUser) {
+      const token = await fbUser.getIdToken();
+      if (token) return token;
+    }
+  } catch {}
+
   if (typeof window !== "undefined") {
     const demoUser = localStorage.getItem("polaris_demo_user");
     if (demoUser) {
       try {
         const parsed = JSON.parse(demoUser);
-        if (parsed?.uid) {
-          return parsed.uid.startsWith("user-") || parsed.uid.startsWith("demo-")
-            ? parsed.uid
-            : `user-${parsed.uid}`;
+        if (parsed?.uid === "demo-student-123" || parsed?.isDemo) {
+          return "demo-token-polaris-123";
         }
-      } catch {
-        return "demo-token-polaris-123";
-      }
-      return "demo-token-polaris-123";
+      } catch {}
     }
   }
 
@@ -206,10 +214,9 @@ export async function getIdToken(): Promise<string | null> {
     if (data.session?.access_token) {
       return data.session.access_token;
     }
-  } catch {
-    // Fall back to demo token
-  }
-  return "demo-token-polaris-123";
+  } catch {}
+
+  return null;
 }
 
 export type { User };

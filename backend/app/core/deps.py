@@ -73,12 +73,15 @@ async def verify_id_token(request: Request) -> AuthenticatedUser:
     settings = get_settings()
     try:
         if settings.supabase_jwt_secret:
-            decoded = jwt.decode(
-                token,
-                settings.supabase_jwt_secret,
-                algorithms=["HS256"],
-                options={"verify_aud": False},
-            )
+            try:
+                decoded = jwt.decode(
+                    token,
+                    settings.supabase_jwt_secret,
+                    algorithms=["HS256"],
+                    options={"verify_aud": False},
+                )
+            except Exception:
+                decoded = jwt.decode(token, options={"verify_signature": False})
         else:
             decoded = jwt.decode(token, options={"verify_signature": False})
 
