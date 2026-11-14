@@ -1,0 +1,3 @@
+# Gitleaks ignore list
+# Format: fingerprint (commit:file:rule:line)
+6039e15cfbf5961f8fe0f2b1f500e6099b4e035f:frontend/lib/firebase.ts:gcp-api-key:25
