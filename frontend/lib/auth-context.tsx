@@ -96,8 +96,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.setItem("polaris_demo_user", JSON.stringify(mappedUser));
 
           const cleanHandle =
-            redirectUser.email?.split("@")[0]?.toLowerCase().replace(/[^a-z0-9_]/g, "_") ||
-            "scholar";
+            redirectUser.email
+              ?.split("@")[0]
+              ?.toLowerCase()
+              .replace(/[^a-z0-9_]/g, "_") || "scholar";
           const communityProfile = {
             alias: mappedUser.displayName || "Scholar",
             username: `@${cleanHandle}`,
@@ -230,8 +232,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(mappedUser);
 
           const cleanHandle =
-            fbUser.email?.split("@")[0]?.toLowerCase().replace(/[^a-z0-9_]/g, "_") ||
-            "scholar";
+            fbUser.email
+              ?.split("@")[0]
+              ?.toLowerCase()
+              .replace(/[^a-z0-9_]/g, "_") || "scholar";
           const communityProfile = {
             alias: mappedUser.displayName || "Scholar",
             username: `@${cleanHandle}`,
