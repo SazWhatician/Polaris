@@ -60,7 +60,9 @@ class BlockResourcesResponse(BaseModel):
 def get_resource_agent_graph(request: Request) -> Any:
     groq_client = getattr(request.app.state, "groq_client", None)
     if not groq_client:
-        rag_service = getattr(request.app.state, "rag_service", None)
+        from app.main import get_rag_service_singleton
+
+        rag_service = getattr(request.app.state, "rag_service", None) or get_rag_service_singleton()
         if rag_service:
             groq_client = getattr(rag_service, "_groq", None)
 

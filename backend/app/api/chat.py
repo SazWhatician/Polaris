@@ -13,6 +13,10 @@ router = APIRouter(prefix="/api/chat", tags=["chat"])
 def _get_rag_service(request: Request) -> RagService:
     svc = getattr(request.app.state, "rag_service", None)
     if svc is None:
+        from app.main import get_rag_service_singleton
+
+        svc = get_rag_service_singleton()
+    if svc is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="RAG backend unavailable — check Qdrant / Groq config",

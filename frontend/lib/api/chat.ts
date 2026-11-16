@@ -52,7 +52,9 @@ export async function streamChat(
   });
 
   if (!res.ok) {
-    throw new Error(`${res.status} ${res.statusText}`);
+    const errorBody = await res.json().catch(() => null);
+    const detail = errorBody?.detail || `${res.status} ${res.statusText}`;
+    throw new Error(detail);
   }
   if (!res.body) throw new Error("No response body");
 

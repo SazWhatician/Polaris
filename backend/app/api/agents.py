@@ -42,7 +42,9 @@ def get_gap_agent_graph(request: Request) -> Any:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE, detail="Firestore backend unavailable"
         )
-    rag_service = getattr(request.app.state, "rag_service", None)
+    from app.main import get_rag_service_singleton
+
+    rag_service = getattr(request.app.state, "rag_service", None) or get_rag_service_singleton()
     if not rag_service:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail="RAG system unavailable")
 

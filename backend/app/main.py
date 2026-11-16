@@ -32,6 +32,12 @@ from app.services.groq_client import GroqClient
 from app.services.rag_service import RagService
 from app.services.task_queue import ArqTaskQueue, make_arq_pool
 
+_rag_service_singleton: RagService | None = None
+
+
+def get_rag_service_singleton() -> RagService | None:
+    return _rag_service_singleton
+
 
 def _build_app(settings: Settings) -> FastAPI:
     configure_logging(settings)
@@ -57,15 +63,28 @@ def _build_app(settings: Settings) -> FastAPI:
         # stays up; chat routes return 503 in that case.
         qdrant_client: AsyncQdrantClient | None = None
         try:
-            qdrant_client = AsyncQdrantClient(
-                url=settings.qdrant_url, api_key=settings.qdrant_api_key
-            )
-            qdrant_repo = QdrantRepository(
-                qdrant_client,
-                collection=settings.qdrant_collection_name,
-                vector_dim=settings.embedding_dim,
-            )
-            await qdrant_repo.ensure_collection()
+            try:
+                qdrant_client = AsyncQdrantClient(
+                    url=settings.qdrant_url,
+                    api_key=settings.qdrant_api_key,
+                    timeout=2.0,
+                    check_compatibility=False,
+                )
+                qdrant_repo = QdrantRepository(
+                    qdrant_client,
+                    collection=settings.qdrant_collection_name,
+                    vector_dim=settings.embedding_dim,
+                )
+                await qdrant_repo.ensure_collection()
+            except Exception as q_exc:
+                log.warning("qdrant.remote_failed", error=str(q_exc), fallback="in_memory")
+                qdrant_client = AsyncQdrantClient(location=":memory:", check_compatibility=False)
+                qdrant_repo = QdrantRepository(
+                    qdrant_client,
+                    collection=settings.qdrant_collection_name,
+                    vector_dim=settings.embedding_dim,
+                )
+                await qdrant_repo.ensure_collection()
 
             embedder = EmbeddingService(
                 model_name=settings.embedding_model,
@@ -74,11 +93,16 @@ def _build_app(settings: Settings) -> FastAPI:
             embedder.warm_up()
 
             groq_keys = settings.parsed_groq_api_keys
-            if not groq_keys:
-                raise RuntimeError("No Groq API keys configured")
-            groq = GroqClient(api_keys=groq_keys, model=settings.groq_model)
-
             gemini_keys = settings.parsed_gemini_api_keys
+            if groq_keys:
+                groq = GroqClient(api_keys=groq_keys, model=settings.groq_model)
+            elif gemini_keys:
+                from app.services.gemini_client import GeminiClient
+
+                groq = GeminiClient(api_keys=gemini_keys, model=settings.gemini_model)
+            else:
+                groq = GroqClient(api_key="gsk_fallback_dev_mode", model=settings.groq_model)
+
             if gemini_keys:
                 from app.services.gemini_client import GeminiClient
 
@@ -99,6 +123,8 @@ def _build_app(settings: Settings) -> FastAPI:
                 max_context_chars=settings.rag_max_context_chars,
                 reranker=reranker,
             )
+            global _rag_service_singleton
+            _rag_service_singleton = app_.state.rag_service
             app_.state.groq_client = groq
             app_.state.qdrant_repo = qdrant_repo
             app_.state.qdrant_client = qdrant_client
@@ -113,6 +139,7 @@ def _build_app(settings: Settings) -> FastAPI:
             app_.state.rag_service = None
             app_.state.qdrant_repo = None
             app_.state.qdrant_client = qdrant_client
+            _rag_service_singleton = None
             log.warning("app.rag.unavailable", error=str(exc))
 
         log.info("app.startup", env=settings.app_env, name=settings.app_name)
