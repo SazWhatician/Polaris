@@ -122,23 +122,26 @@ class QdrantRepository:
             must.append(qm.FieldCondition(key="document_id", match=qm.MatchAny(any=document_ids)))
 
         query_filter = qm.Filter(must=must)
-        if hasattr(self._client, "query_points") and not hasattr(self._client, "search"):
-            resp = await self._client.query_points(
-                collection_name=self._collection,
-                query=query_vector,
-                limit=top_k,
-                query_filter=query_filter,
-                with_payload=True,
-            )
-            result = getattr(resp, "points", resp)
-        else:
-            result = await self._client.search(
-                collection_name=self._collection,
-                query_vector=query_vector,
-                limit=top_k,
-                query_filter=query_filter,
-                with_payload=True,
-            )
+        try:
+            if hasattr(self._client, "query_points") and not hasattr(self._client, "search"):
+                resp = await self._client.query_points(
+                    collection_name=self._collection,
+                    query=query_vector,
+                    limit=top_k,
+                    query_filter=query_filter,
+                    with_payload=True,
+                )
+                result = getattr(resp, "points", resp)
+            else:
+                result = await self._client.search(
+                    collection_name=self._collection,
+                    query_vector=query_vector,
+                    limit=top_k,
+                    query_filter=query_filter,
+                    with_payload=True,
+                )
+        except Exception:
+            return []
         return [
             RetrievedChunk(
                 document_id=hit.payload["document_id"],

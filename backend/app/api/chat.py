@@ -16,6 +16,8 @@ def _get_rag_service(request: Request) -> RagService:
         from app.main import get_rag_service_singleton
 
         svc = get_rag_service_singleton()
+        if svc is not None:
+            request.app.state.rag_service = svc
     if svc is None:
         raise HTTPException(
             status.HTTP_503_SERVICE_UNAVAILABLE,

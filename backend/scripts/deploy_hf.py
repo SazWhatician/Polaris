@@ -3,11 +3,11 @@
 import os
 import sys
 from pathlib import Path
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, get_token
 
 
 def deploy() -> None:
-    token = os.environ.get("HF_TOKEN")
+    token = os.environ.get("HF_TOKEN") or get_token()
     if not token:
         print("Error: HF_TOKEN environment variable is not set.", file=sys.stderr)
         print("Please set HF_TOKEN=<your_huggingface_write_token>.", file=sys.stderr)
@@ -36,7 +36,8 @@ def deploy() -> None:
         ],
         commit_message=os.environ.get("HF_COMMIT_MESSAGE", "Sync backend from GitHub"),
     )
-    print(f"Successfully deployed! Commit: {commit_info.commit_id}")
+    commit_ref = getattr(commit_info, "commit_url", getattr(commit_info, "oid", str(commit_info)))
+    print(f"Successfully deployed! Commit: {commit_ref}")
 
 
 if __name__ == "__main__":

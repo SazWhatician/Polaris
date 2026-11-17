@@ -91,6 +91,11 @@ def initialize_firebase(settings: Settings) -> bool:
 
 
 def is_initialized() -> bool:
+    global _initialized
+    if not _initialized:
+        from app.core.config import get_settings
+
+        initialize_firebase(get_settings())
     return _initialized
 
 

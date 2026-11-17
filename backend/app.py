@@ -68,17 +68,13 @@ if HAS_GRADIO and gr is not None and spaces is not None:
     # Include all Polaris FastAPI routes into Gradio's underlying FastAPI app
     demo.app.include_router(fastapi_app.router)
 
-    from contextlib import asynccontextmanager
+    from app.core.supabase import initialize_supabase
+    from app.core.firebase import initialize_firebase
+    from app.main import get_rag_service_singleton
 
-    orig_lifespan = demo.app.router.lifespan_context
-
-    @asynccontextmanager
-    async def combined_lifespan(app_inst):
-        async with orig_lifespan(app_inst):
-            async with fastapi_app.router.lifespan_context(app_inst):
-                yield
-
-    demo.app.router.lifespan_context = combined_lifespan
+    initialize_supabase(settings)
+    initialize_firebase(settings)
+    demo.app.state.rag_service = get_rag_service_singleton()
 
     # Add CORS middleware to demo.app for frontend Vercel calls
     demo.app.add_middleware(
