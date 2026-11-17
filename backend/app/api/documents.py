@@ -26,9 +26,9 @@ router = APIRouter(prefix="/api/documents", tags=["documents"])
 def get_task_queue(request: Request) -> TaskQueue:
     queue = getattr(request.app.state, "task_queue", None)
     if queue is None:
-        from app.services.task_queue import NoopTaskQueue
+        from app.services.task_queue import BackgroundTaskQueue
 
-        return NoopTaskQueue()
+        return BackgroundTaskQueue.get_instance()
     return queue
 
 

@@ -55,8 +55,10 @@ def _build_app(settings: Settings) -> FastAPI:
             app_.state.task_queue = ArqTaskQueue(pool)
             log.info("app.task_queue.connected", redis=settings.redis_url)
         except Exception as exc:  # noqa: BLE001
-            app_.state.task_queue = None
-            log.warning("app.task_queue.unavailable", error=str(exc))
+            from app.services.task_queue import BackgroundTaskQueue
+
+            app_.state.task_queue = BackgroundTaskQueue.get_instance()
+            log.warning("app.task_queue.fallback_background", error=str(exc))
 
         # RAG stack: Qdrant client + embedding singleton + Groq client.
         # We log warnings (not errors) when these aren't configured so /health
