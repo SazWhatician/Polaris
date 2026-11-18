@@ -32,27 +32,30 @@ class QdrantRepository:
 
     async def ensure_collection(self) -> None:
         """Create the collection on first run, idempotent."""
-        existing = await self._client.get_collections()
-        names = {c.name for c in existing.collections}
-        if self._collection in names:
-            return
+        try:
+            existing = await self._client.get_collections()
+            names = {c.name for c in existing.collections}
+            if self._collection in names:
+                return
 
-        await self._client.create_collection(
-            collection_name=self._collection,
-            vectors_config=qm.VectorParams(size=self._vector_dim, distance=qm.Distance.COSINE),
-        )
-        # Payload indexes accelerate the per-query user_id + document_id filters.
-        await self._client.create_payload_index(
-            collection_name=self._collection,
-            field_name="user_id",
-            field_schema=qm.PayloadSchemaType.KEYWORD,
-        )
-        await self._client.create_payload_index(
-            collection_name=self._collection,
-            field_name="document_id",
-            field_schema=qm.PayloadSchemaType.KEYWORD,
-        )
-        log.info("qdrant.collection.created", collection=self._collection)
+            await self._client.create_collection(
+                collection_name=self._collection,
+                vectors_config=qm.VectorParams(size=self._vector_dim, distance=qm.Distance.COSINE),
+            )
+            # Payload indexes accelerate the per-query user_id + document_id filters.
+            await self._client.create_payload_index(
+                collection_name=self._collection,
+                field_name="user_id",
+                field_schema=qm.PayloadSchemaType.KEYWORD,
+            )
+            await self._client.create_payload_index(
+                collection_name=self._collection,
+                field_name="document_id",
+                field_schema=qm.PayloadSchemaType.KEYWORD,
+            )
+            log.info("qdrant.collection.created", collection=self._collection)
+        except Exception as exc:
+            log.warning("qdrant.ensure_collection_failed", error=str(exc))
 
     async def upsert_chunks(
         self,
@@ -89,22 +92,34 @@ class QdrantRepository:
             )
             for c, v in zip(chunks, vectors, strict=True)
         ]
-        await self._client.upsert(collection_name=self._collection, points=points)
+        try:
+            await self._client.upsert(collection_name=self._collection, points=points)
+        except Exception as exc:
+            if "not found" in str(exc).lower():
+                await self.ensure_collection()
+                await self._client.upsert(collection_name=self._collection, points=points)
+            else:
+                raise
 
     async def delete_for_document(self, *, user_id: str, document_id: str) -> None:
-        await self._client.delete(
-            collection_name=self._collection,
-            points_selector=qm.FilterSelector(
-                filter=qm.Filter(
-                    must=[
-                        qm.FieldCondition(key="user_id", match=qm.MatchValue(value=user_id)),
-                        qm.FieldCondition(
-                            key="document_id", match=qm.MatchValue(value=document_id)
-                        ),
-                    ]
-                )
-            ),
-        )
+        try:
+            await self._client.delete(
+                collection_name=self._collection,
+                points_selector=qm.FilterSelector(
+                    filter=qm.Filter(
+                        must=[
+                            qm.FieldCondition(key="user_id", match=qm.MatchValue(value=user_id)),
+                            qm.FieldCondition(
+                                key="document_id", match=qm.MatchValue(value=document_id)
+                            ),
+                        ]
+                    )
+                ),
+            )
+        except Exception as exc:
+            if "not found" in str(exc).lower():
+                return
+            raise
 
     async def search(
         self,

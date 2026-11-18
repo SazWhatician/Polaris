@@ -149,7 +149,6 @@ class BackgroundTaskQueue:
                         collection=settings.qdrant_collection_name,
                         vector_dim=settings.embedding_dim,
                     )
-                    await qdrant_repo.ensure_collection()
                 except Exception:
                     qdrant_client = AsyncQdrantClient(
                         location=":memory:", check_compatibility=False
@@ -159,7 +158,11 @@ class BackgroundTaskQueue:
                         collection=settings.qdrant_collection_name,
                         vector_dim=settings.embedding_dim,
                     )
-                    await qdrant_repo.ensure_collection()
+
+            try:
+                await qdrant_repo.ensure_collection()
+            except Exception as e:
+                log.warning("bg_task.ensure_collection_failed", error=str(e))
 
             chunker = ChunkingService(
                 chunk_size=settings.chunk_size,

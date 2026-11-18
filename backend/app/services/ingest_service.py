@@ -67,6 +67,9 @@ class IngestService:
                 chunks = self._chunker.chunk_pages(pages)
                 span.set_attribute("ingest.chunk_count", len(chunks))
 
+                # Ensure target vector collection exists before delete or upsert
+                await self._qdrant_repo.ensure_collection()
+
                 # Delete-then-rewrite makes re-ingest idempotent.
                 await self._qdrant_repo.delete_for_document(
                     user_id=user_id,
