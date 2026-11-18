@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Any
 
@@ -103,9 +104,18 @@ _firestore_client: Any = None
 _firestore_attempted: bool = False
 
 
+def _has_credentials() -> bool:
+    if _settings and _settings.using_firebase_emulators:
+        return True
+    if _settings and _settings.firebase_credentials_path and Path(_settings.firebase_credentials_path).is_file():
+        return True
+    gac = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
+    return bool(gac and Path(gac).is_file())
+
+
 def get_firestore() -> FirestoreClient | None:
     global _firestore_client, _firestore_attempted
-    if not is_initialized():
+    if not is_initialized() or not _has_credentials():
         return None
     if not _firestore_attempted:
         _firestore_attempted = True
@@ -123,7 +133,7 @@ _storage_attempted: bool = False
 
 def get_storage_bucket() -> Bucket | None:
     global _storage_bucket, _storage_attempted
-    if not is_initialized():
+    if not is_initialized() or not _has_credentials():
         return None
     if not _storage_attempted:
         _storage_attempted = True
