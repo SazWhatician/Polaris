@@ -107,7 +107,11 @@ _firestore_attempted: bool = False
 def _has_credentials() -> bool:
     if _settings and _settings.using_firebase_emulators:
         return True
-    if _settings and _settings.firebase_credentials_path and Path(_settings.firebase_credentials_path).is_file():
+    if (
+        _settings
+        and _settings.firebase_credentials_path
+        and Path(_settings.firebase_credentials_path).is_file()
+    ):
         return True
     gac = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
     return bool(gac and Path(gac).is_file())
