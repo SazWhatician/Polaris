@@ -99,13 +99,37 @@ def is_initialized() -> bool:
     return _initialized
 
 
-def get_firestore() -> FirestoreClient:
-    if not _initialized:
-        raise RuntimeError("Firebase not initialized")
-    return firestore.client()
+_firestore_client: Any = None
+_firestore_attempted: bool = False
 
 
-def get_storage_bucket() -> Bucket:
-    if not _initialized:
-        raise RuntimeError("Firebase not initialized")
-    return storage.bucket()
+def get_firestore() -> FirestoreClient | None:
+    global _firestore_client, _firestore_attempted
+    if not is_initialized():
+        return None
+    if not _firestore_attempted:
+        _firestore_attempted = True
+        try:
+            _firestore_client = firestore.client()
+        except Exception as exc:
+            log.warning("firebase.firestore_unavailable", error=str(exc))
+            _firestore_client = None
+    return _firestore_client
+
+
+_storage_bucket: Any = None
+_storage_attempted: bool = False
+
+
+def get_storage_bucket() -> Bucket | None:
+    global _storage_bucket, _storage_attempted
+    if not is_initialized():
+        return None
+    if not _storage_attempted:
+        _storage_attempted = True
+        try:
+            _storage_bucket = storage.bucket()
+        except Exception as exc:
+            log.warning("firebase.storage_unavailable", error=str(exc))
+            _storage_bucket = None
+    return _storage_bucket
