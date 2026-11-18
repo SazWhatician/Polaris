@@ -23,7 +23,7 @@ def _get_model(model_name: str) -> Any:
         from sentence_transformers import SentenceTransformer
 
         log.info("embedding.model.loading", model=model_name)
-        _model = SentenceTransformer(model_name)
+        _model = SentenceTransformer(model_name, device="cpu")
         log.info("embedding.model.ready", model=model_name)
     return _model
 
@@ -54,5 +54,6 @@ class EmbeddingService:
             show_progress_bar=False,
             normalize_embeddings=True,  # cosine over normalized = dot product
             convert_to_numpy=True,
+            device="cpu",
         )
         return [v.tolist() for v in vectors]
