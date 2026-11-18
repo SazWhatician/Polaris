@@ -70,6 +70,8 @@ class BackgroundTaskQueue:
 
     async def _process_document(self, user_id: str, doc_id: str) -> None:
         try:
+            from qdrant_client import AsyncQdrantClient
+
             from app.core.config import get_settings
             from app.main import get_rag_service_singleton
             from app.models.document import DocumentStatus
@@ -82,7 +84,6 @@ class BackgroundTaskQueue:
             from app.services.ocr_service import OcrService
             from app.services.storage_service import StorageService
             from app.workers.paddle_engine import PaddleOcrEngine
-            from qdrant_client import AsyncQdrantClient
 
             doc_repo = DocumentRepository()
             settings = get_settings()

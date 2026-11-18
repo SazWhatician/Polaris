@@ -42,11 +42,17 @@ def _init_rag_service(settings: Settings | None = None) -> RagService | None:
     s = settings or get_settings()
     try:
         try:
-            qc = AsyncQdrantClient(url=s.qdrant_url, api_key=s.qdrant_api_key, timeout=2.0, check_compatibility=False)
-            qr = QdrantRepository(qc, collection=s.qdrant_collection_name, vector_dim=s.embedding_dim)
+            qc = AsyncQdrantClient(
+                url=s.qdrant_url, api_key=s.qdrant_api_key, timeout=2.0, check_compatibility=False
+            )
+            qr = QdrantRepository(
+                qc, collection=s.qdrant_collection_name, vector_dim=s.embedding_dim
+            )
         except Exception:
             qc = AsyncQdrantClient(location=":memory:", check_compatibility=False)
-            qr = QdrantRepository(qc, collection=s.qdrant_collection_name, vector_dim=s.embedding_dim)
+            qr = QdrantRepository(
+                qc, collection=s.qdrant_collection_name, vector_dim=s.embedding_dim
+            )
         emb = EmbeddingService(model_name=s.embedding_model, batch_size=s.embedding_batch_size)
         g_keys = s.parsed_groq_api_keys
         m_keys = s.parsed_gemini_api_keys
@@ -54,10 +60,12 @@ def _init_rag_service(settings: Settings | None = None) -> RagService | None:
             llm = GroqClient(api_keys=g_keys, model=s.groq_model)
         elif m_keys:
             from app.services.gemini_client import GeminiClient
+
             llm = GeminiClient(api_keys=m_keys, model=s.gemini_model)
         else:
             llm = GroqClient(api_key="gsk_fallback_dev_mode", model=s.groq_model)
         from app.services.rerank_service import RerankService
+
         _rag_service_singleton = RagService(
             embedder=emb,
             qdrant_repo=qr,
